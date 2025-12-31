@@ -1,1 +1,1 @@
-# accelerated-raytracing-testbed
+# ART (Accelerated Raytracing Testbed)
