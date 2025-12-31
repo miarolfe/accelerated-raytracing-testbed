@@ -42,3 +42,7 @@
 
 # Compiled output folder
 bin
+
+# Ephemeral build files
+build/build_files
+build/Makefile

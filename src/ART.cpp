@@ -1,6 +1,12 @@
 #include <stdio.h>
 
+#include "../lib/AxisAlignedBoundingBox.h"
+
 int main()
 {
-    printf("Hello, World\n!");
+    bool running = true;
+    while (running)
+    {
+        printf("Hello, World!\n");
+    }
 }
