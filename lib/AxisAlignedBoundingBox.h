@@ -1,3 +1,6 @@
+// Copyright Mia Rolfe. All rights reserved.
+#pragma once
+
 namespace ART
 {
 
