@@ -7,7 +7,7 @@ end
 
 workspace(workspaceName)
 location "../"
-configurations { "Debug", "Release" }
+configurations { "Debug", "Release", "Test" }
 platforms { "x64", "ARM64" }
 
 warnings "Extra"
@@ -27,6 +27,13 @@ filter { "toolset:gcc or toolset:clang" }
         "-Wuninitialized",
         "-pedantic",
     }
+
+    filter { "configurations:Test" }
+        buildoptions {
+            "--coverage"
+        }
+
+filter {}
 
 filter "configurations:Debug"
     defines { "DEBUG" }
@@ -56,21 +63,50 @@ location "./"
 targetdir "../bin/%{cfg.buildcfg}"
 
 filter {}
+    files
+    {
+        path.getdirectory(os.getcwd()) .. "/external/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/external/**.h",
+        path.getdirectory(os.getcwd()) .. "/external/**.hpp",
+        path.getdirectory(os.getcwd()) .. "/lib/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/lib/**.h",
+        path.getdirectory(os.getcwd()) .. "/include/**.h",
+    }
 
-files
-{
-    path.getdirectory(os.getcwd()) .. "/lib/**.cpp",
-    path.getdirectory(os.getcwd()) .. "/lib/**.h",
-    path.getdirectory(os.getcwd()) .. "/include/**.h",
-    path.getdirectory(os.getcwd()) .. "/src/**.cpp",
-    path.getdirectory(os.getcwd()) .. "/src/**.h"
-}
+    includedirs
+    {
+        path.getdirectory(os.getcwd()) .. "/external",
+        path.getdirectory(os.getcwd()) .. "/lib",
+        path.getdirectory(os.getcwd()) .. "/include",
+    }
+
+filter {"configurations:Debug or Release"}
+    files
+    {
+        path.getdirectory(os.getcwd()) .. "/src/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/**.h"
+    }
+
+    includedirs
+    {
+        path.getdirectory(os.getcwd()) .. "/src"
+    }
 
 filter {}
 
-includedirs { path.getdirectory(os.getcwd()) .. "/lib" }
-includedirs { path.getdirectory(os.getcwd()) .. "/include" }
-includedirs { path.getdirectory(os.getcwd()) .. "/src" }
+filter {"configurations:Test"}
+    files
+    {
+        path.getdirectory(os.getcwd()) .. "/tests/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/tests/**.h"
+    }
+
+    includedirs
+    {
+        path.getdirectory(os.getcwd()) .. "/tests"
+    }
+
+filter {}
 
 cdialect "C17"
 cppdialect "C++17"
