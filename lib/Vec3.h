@@ -40,7 +40,7 @@ public:
         m_z = z;
     }
 
-    // Return inverse of this Vec3
+    // Return Vec3 with same component magntiudes but opposite signs
     Vec3 operator-() const
     {
         return Vec3(-m_x, -m_y, -m_z);
@@ -49,7 +49,7 @@ public:
     // Get component by value
     double operator[](std::size_t index) const
     {
-        assert(index >= 0 && index <= 2);
+        assert(index <= 2);
         switch (index)
         {
         case 0:
@@ -68,7 +68,7 @@ public:
     // Get component by reference
     double& operator[](std::size_t index)
     {
-        assert(index >= 0 && index <= 2);
+        assert(index <= 2);
         switch (index)
         {
         case 0:
