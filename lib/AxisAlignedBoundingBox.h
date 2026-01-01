@@ -9,29 +9,32 @@ struct AABB
 public:
     AABB
     (
-        double _min_x,
-        double _max_x,
-        double _min_y,
-        double _max_y,
-        double _min_z,
-        double _max_z
+        double min_x,
+        double max_x,
+        double min_y,
+        double max_y,
+        double min_z,
+        double max_z
     )
     {
-        min_x = _min_x;
-        max_x = _max_x;
-        min_y = _min_y;
-        max_y = _max_y;
-        min_z = _max_z;
+        m_min_x = min_x;
+        m_max_x = max_x;
+        m_min_y = min_y;
+        m_max_y = max_y;
+        m_min_z = max_z;
     }
 
-    AABB(const AABB& other) : min_x(other.min_x), max_x(other.max_x), min_y(other.min_y), max_y(other.max_y), min_z(other.min_z), max_z(other.max_z) {}
+    AABB(const AABB& other) :
+    m_min_x(other.m_min_x), m_max_x(other.m_max_x),
+    m_min_y(other.m_min_y), m_max_y(other.m_max_y),
+    m_min_z(other.m_min_z), m_max_z(other.m_max_z) {}
 
-    double min_x = 0.0;
-    double max_x = 0.0;
-    double min_y = 0.0;
-    double max_y = 0.0;
-    double min_z = 0.0;
-    double max_z = 0.0;
+    double m_min_x = 0.0;
+    double m_max_x = 0.0;
+    double m_min_y = 0.0;
+    double m_max_y = 0.0;
+    double m_min_z = 0.0;
+    double m_max_z = 0.0;
 };
 
-};
+}

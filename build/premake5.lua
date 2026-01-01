@@ -28,10 +28,10 @@ filter { "toolset:gcc or toolset:clang" }
         "-pedantic",
     }
 
-    filter { "configurations:Test" }
-        buildoptions {
-            "--coverage"
-        }
+    -- filter { "configurations:Test" }
+    --     buildoptions {
+    --         "--coverage"
+    --     }
 
 filter {}
 
