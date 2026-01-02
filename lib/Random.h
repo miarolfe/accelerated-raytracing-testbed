@@ -6,14 +6,8 @@
 namespace ART
 {
     // Returns a random number in [0, 1)
-    inline double RandomCanonicalDouble()
-    {
-        return std::rand() / (RAND_MAX + 1.0);
-    }
+    double RandomCanonicalDouble();
 
     // Returns a random number in [min, max)
-    inline double RandomDouble(double min, double max)
-    {
-        return min + (max - min) * RandomCanonicalDouble();
-    }
-}
+    double RandomDouble(double min, double max);
+} // namespace ART
