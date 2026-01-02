@@ -133,4 +133,4 @@ const std::string Logger::GetCurrentTimestamp()
     return string_stream.str();
 }
 
-}
+} // namespace ART
