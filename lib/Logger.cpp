@@ -21,6 +21,12 @@ void Logger::Log(const std::string& log_msg, LogSeverity log_severity)
 {
     std::string err_level_str;
 
+    // Don't log messages less severe than the filter level
+    if (log_severity > m_log_severity_level_filter)
+    {
+        return;
+    }
+
     switch (log_severity)
     {
         case LogSeverity::LOG_FATAL:
