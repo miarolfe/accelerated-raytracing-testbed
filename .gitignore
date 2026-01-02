@@ -47,3 +47,5 @@ bin
 build/build_files
 build/Makefile
 build/obj
+
+log.txt

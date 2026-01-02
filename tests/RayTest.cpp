@@ -64,20 +64,25 @@ TEST_CASE("Ray At(t) returns correct point along ray", "[Ray]")
     const Vec3 direction(2.0, 0.0, -1.0);
     const Ray ray(origin, direction);
 
-    const Point3 p0 = ray.At(0.0);
-    REQUIRE(p0.m_x == Approx(1.0));
+    const Point3 p0 = ray.At(-1.0);
+    REQUIRE(p0.m_x == Approx(-1.0));
     REQUIRE(p0.m_y == Approx(2.0));
-    REQUIRE(p0.m_z == Approx(3.0));
+    REQUIRE(p0.m_z == Approx(4.0));
 
-    const Point3 p1 = ray.At(1.0);
-    REQUIRE(p1.m_x == Approx(3.0));
+    const Point3 p1 = ray.At(0.0);
+    REQUIRE(p1.m_x == Approx(1.0));
     REQUIRE(p1.m_y == Approx(2.0));
-    REQUIRE(p1.m_z == Approx(2.0));
+    REQUIRE(p1.m_z == Approx(3.0));
 
-    const Point3 p2 = ray.At(2.5);
-    REQUIRE(p2.m_x == Approx(6.0));
+    const Point3 p2 = ray.At(1.0);
+    REQUIRE(p2.m_x == Approx(3.0));
     REQUIRE(p2.m_y == Approx(2.0));
-    REQUIRE(p2.m_z == Approx(0.5));
+    REQUIRE(p2.m_z == Approx(2.0));
+
+    const Point3 p3 = ray.At(2.5);
+    REQUIRE(p3.m_x == Approx(6.0));
+    REQUIRE(p3.m_y == Approx(2.0));
+    REQUIRE(p3.m_z == Approx(0.5));
 }
 
 } // namespace ART
