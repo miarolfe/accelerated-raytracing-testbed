@@ -10,8 +10,6 @@ location "../"
 configurations { "Debug", "Release", "Test" }
 platforms { "x64", "ARM64" }
 
-warnings "Extra"
-
 defaultplatform("x64")
 
 filter { "toolset:gcc or toolset:clang" }
@@ -73,9 +71,21 @@ filter {}
         path.getdirectory(os.getcwd()) .. "/include/**.h",
     }
 
-    includedirs
+    filter { "files:**/stb_image_impl.cpp", "toolset:gcc or toolset:clang" }
+        buildoptions { "-w", "-Wno-error" }
+    filter {}
+
+    filter { "files:**/stb_image_write_impl.cpp", "toolset:gcc or toolset:clang" }
+        buildoptions { "-w", "-Wno-error" }
+    filter {}
+
+    externalincludedirs
     {
         path.getdirectory(os.getcwd()) .. "/external",
+    }
+
+    includedirs
+    {
         path.getdirectory(os.getcwd()) .. "/lib",
         path.getdirectory(os.getcwd()) .. "/include",
     }
