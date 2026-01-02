@@ -1,3 +1,4 @@
+// Copyright Mia Rolfe. All rights reserved.
 #include "Random.h"
 
 namespace ART
