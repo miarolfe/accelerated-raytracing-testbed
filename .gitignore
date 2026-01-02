@@ -46,3 +46,4 @@ bin
 # Ephemeral build files
 build/build_files
 build/Makefile
+build/obj
