@@ -1,20 +1,28 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Camera.h"
+#include "Colour.h"
+#include "Constants.h"
+#include "Material.h"
+#include "Random.h"
+#include "Ray.h"
+#include "RayHitResult.h"
 #include "Utility.h"
 #include "Vec3.h"
+#include <cassert>
 #include <cstdint>
+#include "../external/stb/stb_image_write.h"
 
 namespace ART
 {
 
 const CameraSetupParams default_camera_setup_params =
 {
-    1280,                           // image_width
-    720,                            // image_height
+    600,                            // image_width
+    600,                            // image_height
     3,                              // num_image_components
     Colour(0.529, 0.808, 0.922),    // background_colour
-    60.0,                           // vertical_fov
-    500,                            // pixel_sample_scale
+    45.0,                           // vertical_fov
+    100,                            // samples_per_pixel
     50,                             // max_ray_bounces
     Point3(0.0),                    // look_from
     Point3(0.0, 0.0, 10.0),         // look_at
@@ -32,13 +40,71 @@ Camera::Camera(const CameraSetupParams& setup_params)
     m_num_image_components = setup_params.num_image_components;
     m_background_colour = setup_params.background_colour;
     m_vertical_fov = setup_params.vertical_fov;
-    m_pixel_sample_scale = setup_params.pixel_sample_scale;
+    m_samples_per_pixel = setup_params.samples_per_pixel;
     m_max_ray_bounces = setup_params.max_ray_bounces;
     m_look_from = setup_params.look_from;
     m_look_at = setup_params.look_at;
     m_up = setup_params.up;
     m_defocus_angle = setup_params.defocus_angle;
     m_focus_distance = setup_params.focus_distance;
+
+    DeriveDependentVariables();
+    ResizeImageBuffer();
+}
+
+Camera::~Camera()
+{
+    if (m_image_data)
+    {
+        delete[] m_image_data;
+    }
+}
+
+static const Interval intensity(0.0, 0.999);
+
+void Camera::Render(const IRayHittable& scene)
+{
+    assert(m_image_width > 0);
+    assert(m_image_height > 0);
+    assert(m_num_image_components > 0);
+    assert(m_vertical_fov > 0.0);
+    assert(m_samples_per_pixel >= 1);
+    assert(m_max_ray_bounces >= 1);
+    assert(m_image_data != nullptr);
+
+    std::size_t output_buffer_index = 0;
+    for (std::size_t j = 0; j < m_image_height; j++)
+    {
+        for (std::size_t i = 0; i < m_image_width; i++)
+        {
+            Colour pixel_colour(0.0);
+            for (std::size_t sample = 0; sample < m_samples_per_pixel; sample++)
+            {
+                const Ray& ray = GetRay(i, j);
+                pixel_colour += RayColour(ray, m_max_ray_bounces, scene);
+            }
+
+            pixel_colour *= m_pixel_sample_scale;
+
+            const double r_component = LinearToGamma(pixel_colour.m_x);
+            const double g_component = LinearToGamma(pixel_colour.m_y);
+            const double b_component = LinearToGamma(pixel_colour.m_z);
+
+            m_image_data[output_buffer_index++] = static_cast<uint8_t>(256 * intensity.Clamp(r_component));
+            m_image_data[output_buffer_index++] = static_cast<uint8_t>(256 * intensity.Clamp(g_component));
+            m_image_data[output_buffer_index++] = static_cast<uint8_t>(256 * intensity.Clamp(b_component));
+        }
+    }
+
+    const int8_t err_code = stbi_write_png
+    (
+        "render.png",
+        m_image_width,
+        m_image_height,
+        m_num_image_components,
+        m_image_data,
+        m_image_width * sizeof(uint8_t) * m_num_image_components
+    );
 }
 
 void Camera::DeriveDependentVariables()
@@ -47,14 +113,11 @@ void Camera::DeriveDependentVariables()
 
     m_pixel_sample_scale = 1.0 / m_samples_per_pixel;
 
-    ResizeImageBuffer();
-
     m_centre = m_look_from;
 
     const double theta = DegreesToRadians(m_vertical_fov);
     const double h = std::tan(theta / 2.0);
     const double viewport_height = 2.0 * h * m_focus_distance;
-    // Review this line
     const double viewport_width = viewport_height * (static_cast<double>(m_image_width) / m_image_height);
 
     m_w = Normalised(m_look_from - m_look_at);
@@ -83,6 +146,56 @@ void Camera::ResizeImageBuffer()
     }
 
     m_image_data = new uint8_t[m_image_width * m_image_height * m_num_image_components];
+}
+
+Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene)
+{
+    if (depth <= 0)
+    {
+        return Colour(0.0);
+    }
+
+    RayHitResult result;
+    const double min_ray_t = 0.001;
+    if (!scene.Hit(ray, Interval(min_ray_t, infinity), result))
+    {
+        return m_background_colour;
+    }
+
+
+    Ray scattered;
+    Colour attenuation;
+    Colour colour_from_emission = result.m_material->Emitted(result.m_u, result.m_v, result.m_point);
+    if (!result.m_material->Scatter(ray, result, attenuation, scattered))
+    {
+        return colour_from_emission;
+    }
+
+    Colour colour_from_scatter = attenuation * RayColour(scattered, depth - 1, scene);
+
+    return colour_from_emission + colour_from_scatter;
+}
+
+Ray Camera::GetRay(std::size_t i, std::size_t j)
+{
+    const Vec3 offset = SampleSquare();
+    const Vec3 pixel_sample = m_pixel_0_0_location + ((i + offset.m_x) * m_pixel_delta_u) + ((j + offset.m_y) * m_pixel_delta_v);
+
+    const Point3 ray_origin = (m_defocus_angle <= 0) ? m_centre : DefocusDiskSample();
+    const Vec3 ray_direction = pixel_sample - ray_origin;
+
+    return Ray(ray_origin, ray_direction);
+}
+
+Vec3 Camera::SampleSquare() const
+{
+    return Vec3(RandomCanonicalDouble() - 0.5, RandomCanonicalDouble() - 0.5, 0.0);
+}
+
+Point3 Camera::DefocusDiskSample() const
+{
+    const Vec3 random_in_unit_disk = RandomInUnitDisk();
+    return m_centre + (random_in_unit_disk[0] * m_defocus_disk_u) + (random_in_unit_disk[1] * m_defocus_disk_v);
 }
 
 } // namespace ART

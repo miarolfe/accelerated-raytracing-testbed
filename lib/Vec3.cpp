@@ -109,6 +109,11 @@ bool Vec3::NearZero() const
     return x_near_zero && y_near_zero && z_near_zero;
 }
 
+std::string Vec3::ToString() const
+{
+    return std::string("(" + std::to_string(m_x) + ", " + std::to_string(m_y) + ", " + std::to_string(m_z) + ")");
+}
+
 Vec3 Vec3::Random()
 {
     return Vec3

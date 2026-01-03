@@ -2,6 +2,7 @@
 #pragma once
 #include <cstdint>
 #include "Colour.h"
+#include "IRayHittable.h"
 #include "Vec3.h"
 
 namespace ART
@@ -15,7 +16,7 @@ public:
     std::size_t num_image_components;
     Colour background_colour;
     double vertical_fov;
-    double pixel_sample_scale;
+    double samples_per_pixel;
     std::size_t max_ray_bounces;
     Point3 look_from;
     Point3 look_at;
@@ -31,11 +32,23 @@ public:
 
     Camera(const CameraSetupParams& setup_params);
 
+    ~Camera();
+
+    void Render(const IRayHittable& scene);
+
 
 protected:
     void DeriveDependentVariables();
 
     void ResizeImageBuffer();
+
+    Colour RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene);
+
+    Ray GetRay(std::size_t i, std::size_t j);
+
+    Vec3 SampleSquare() const;
+
+    Point3 DefocusDiskSample() const;
 
     ///
     /// Non-derived member variables

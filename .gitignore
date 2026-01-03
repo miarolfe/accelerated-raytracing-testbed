@@ -40,6 +40,9 @@
 # debug information files
 *.dwo
 
+# Zed editor config
+./zed
+
 # Compiled output folder
 bin
 
@@ -48,4 +51,6 @@ build/build_files
 build/Makefile
 build/obj
 
+# Program output
+render.png
 log.txt
