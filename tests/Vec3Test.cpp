@@ -183,4 +183,4 @@ TEST_CASE("Vec3 Random vectors are within expected bounds", "[Vec3][Random]")
     REQUIRE(vec.m_z <  1.0);
 }
 
-}
+} // namespace ART

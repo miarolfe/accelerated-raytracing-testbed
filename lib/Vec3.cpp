@@ -86,7 +86,7 @@ Vec3& Vec3::operator*=(double t)
 
 Vec3& Vec3::operator/=(double t)
 {
-    return (*this *= (1.0 / t));
+    return *this *= 1.0 / t;
 }
 
 double Vec3::Length() const
@@ -107,6 +107,11 @@ bool Vec3::NearZero() const
     const bool z_near_zero = (std::fabs(m_z) < close_to_zero_value);
 
     return x_near_zero && y_near_zero && z_near_zero;
+}
+
+std::string Vec3::ToString() const
+{
+    return std::string("(" + std::to_string(m_x) + ", " + std::to_string(m_y) + ", " + std::to_string(m_z) + ")");
 }
 
 Vec3 Vec3::Random()

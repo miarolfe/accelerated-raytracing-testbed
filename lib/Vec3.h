@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <string>
 
 #include "Random.h"
 
@@ -52,6 +53,8 @@ public:
 
     // Return if components close enough to zero to effectively be all zero (FP issue)
     bool NearZero() const;
+
+    std::string ToString() const;
 
     // Return a random Vec3 with component values in the range [0, 1)
     static Vec3 Random();

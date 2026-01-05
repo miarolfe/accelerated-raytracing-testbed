@@ -17,13 +17,17 @@ filter { "toolset:gcc or toolset:clang" }
         "-Werror",
         "-Wredundant-decls",
         "-Wcast-align",
-        "-Wconversion",
         "-Wno-sign-conversion",
         "-Wdouble-promotion",
         "-Wno-unused-parameter",
         "-Wno-unused-function",
         "-Wuninitialized",
         "-pedantic",
+        "-fopenmp"
+    }
+
+    linkoptions {
+        "-fopenmp"
     }
 
     -- filter { "configurations:Test" }
