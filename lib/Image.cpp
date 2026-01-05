@@ -1,6 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Image.h"
-#include <cstddef>
 #include "Logger.h"
 #include "../external/stb/stb_image.h"
 

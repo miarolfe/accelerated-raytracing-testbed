@@ -1,9 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
-#include <cstdint>
 #include "Colour.h"
+#include "Common.h"
 #include "IRayHittable.h"
-#include "Vec3.h"
 
 namespace ART
 {

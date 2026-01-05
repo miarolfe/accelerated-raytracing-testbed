@@ -1,6 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Colour.h"
-#include <cmath>
 
 namespace ART
 {

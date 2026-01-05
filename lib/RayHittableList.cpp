@@ -1,9 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
+
 #include "RayHittableList.h"
 #include "IRayHittable.h"
-#include "Logger.h"
 #include "RayHitResult.h"
-#include <memory>
 
 namespace ART
 {

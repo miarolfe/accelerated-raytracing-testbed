@@ -1,8 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Sphere.h"
-
-#include <cassert>
-#include <memory>
 #include "AxisAlignedBoundingBox.h"
 #include "Material.h"
 

@@ -1,7 +1,6 @@
 // Copyright Mia Rolfe. ALl rights reserved.
 #include "Texture.h"
 #include "Interval.h"
-#include <memory>
 
 namespace ART
 {
