@@ -1,11 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include <cassert>
-#include <cmath>
-#include <cstdint>
-#include <string>
-
+#include "Common.h"
 #include "Random.h"
 
 namespace ART

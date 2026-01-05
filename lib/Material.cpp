@@ -4,8 +4,6 @@
 #include "RayHitResult.h"
 #include "Texture.h"
 #include "Vec3.h"
-#include <algorithm>
-#include <memory>
 
 namespace ART
 {

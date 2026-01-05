@@ -8,10 +8,6 @@
 #include "RayHitResult.h"
 #include "Utility.h"
 #include "Vec3.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <omp.h>
 #include "../external/stb/stb_image_write.h"
 
 namespace ART
