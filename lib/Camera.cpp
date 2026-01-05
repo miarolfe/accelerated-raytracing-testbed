@@ -85,7 +85,6 @@ void Camera::Render(const IRayHittable& scene)
         {
             Colour pixel_colour(0.0);
 
-            #pragma omp simd
             for (std::size_t sample = 0; sample < m_samples_per_pixel; sample++)
             {
                 const Ray& ray = GetRay(i, j);

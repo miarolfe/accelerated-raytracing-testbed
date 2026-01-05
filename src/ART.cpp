@@ -19,7 +19,7 @@ int main()
         3,                                  // num_image_components
         ART::Colour(0.7, 0.8, 1.0),         // background_colour
         90.0,                               // vertical_fov
-        500,                                 // samples_per_pixel
+        100,                                 // samples_per_pixel
         25,                                 // max_ray_bounces
         ART::Point3(0, 0.0, 0.0),        // look_from
         ART::Point3(0.0, 0.0, 10.0),        // look_at
@@ -32,11 +32,13 @@ int main()
     ART::RayHittableList world;
 
     std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::CheckerTexture>(0.32, ART::Colour(0.2, 0.3, 0.1), ART::Colour(0.9));
-    // std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::SolidColourTexture>(ART::Colour(1.0, 0.0, 0.0));
     std::shared_ptr<ART::Material> checker_material = std::make_shared<ART::LambertianMaterial>(checker_texture);
+    std::shared_ptr<ART::Material> dielectric_material = std::make_shared<ART::MetalMaterial>(ART::Colour(0.7), 0.5);
+    std::shared_ptr<ART::Material> solid_material = std::make_shared<ART::LambertianMaterial>(std::make_shared<ART::SolidColourTexture>(ART::Colour(0.2, 0.3, 0.2)));
 
     world.Add(std::make_shared<ART::Sphere>(ART::Point3(-7.5, 0.0, 10.0), 5.0, checker_material));
-    world.Add(std::make_shared<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 5.0, checker_material));
+    world.Add(std::make_shared<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 5.0, dielectric_material));
+    // world.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -20.0, 0.0), 20.0, solid_material));
 
     camera.Render(world);
 

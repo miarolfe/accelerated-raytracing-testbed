@@ -3,6 +3,7 @@
 #include "RayHitResult.h"
 #include "Texture.h"
 #include "Vec3.h"
+#include <algorithm>
 #include <memory>
 
 namespace ART
@@ -30,13 +31,13 @@ LambertianMaterial::LambertianMaterial(std::shared_ptr<Texture> texture)
 
 bool LambertianMaterial::Scatter(const Ray& ray, const RayHitResult& result, Colour& out_attenuation, Ray& out_ray) const
 {
-    Vec3 scatter_direction = result.m_normal + RandomNormalised();
+    Vec3 scatter_direction = RandomOnHemisphere(Normalised(result.m_normal));
     if (scatter_direction.NearZero())
     {
         scatter_direction = result.m_normal;
     }
 
-    out_ray = Ray(result.m_point, scatter_direction, ray.m_time);
+    out_ray = Ray(result.m_point, Normalised(scatter_direction), ray.m_time);
     out_attenuation = m_texture->Value(result.m_u, result.m_v, result.m_point);
     return true;
 }
@@ -44,16 +45,16 @@ bool LambertianMaterial::Scatter(const Ray& ray, const RayHitResult& result, Col
 MetalMaterial::MetalMaterial(const Colour& albedo, double fuzz)
 {
     m_albedo = albedo;
-	m_fuzz = fuzz;
+	m_fuzz = std::clamp(fuzz, 0.0, 1.0);
 }
 
 bool MetalMaterial::Scatter(const Ray& ray, const RayHitResult& result, Colour& out_attenuation, Ray& out_ray) const
 {
-    Vec3 reflected_direction = Reflect(ray.m_direction, result.m_normal);
-	reflected_direction = Normalised(reflected_direction) + (m_fuzz * RandomNormalised());
-	out_ray = Ray(result.m_point, reflected_direction, ray.m_time);
+    const Vec3 reflected_direction = Normalised(Reflect(Normalised(ray.m_direction), Normalised(result.m_normal)));
+	const Vec3 fuzzed_direction = Normalised(reflected_direction + (m_fuzz * RandomNormalised()));
+	out_ray = Ray(result.m_point, fuzzed_direction, ray.m_time);
 	out_attenuation = m_albedo;
-	return (Dot(out_ray.m_direction, result.m_normal) > 0);
+	return (Dot(out_ray.m_direction, Normalised(result.m_normal)) > 0);
 }
 
 DielectricMaterial::DielectricMaterial(double refraction_index)
@@ -63,23 +64,23 @@ DielectricMaterial::DielectricMaterial(double refraction_index)
 
 bool DielectricMaterial::Scatter(const Ray& ray, const RayHitResult& result, Colour& out_attenuation, Ray& out_ray) const
 {
-    out_attenuation = Colour(1.0, 1.0, 1.0);
+    out_attenuation = Colour(1.0);
 	const double actual_refractive_index = result.m_is_front_facing ? (1.0 / m_refraction_index) : m_refraction_index;
 
 	const Vec3 normalised_direction = Normalised(ray.m_direction);
 	const double cos_theta = std::fmin(Dot(-normalised_direction, result.m_normal), 1.0);
-	const double sinTheta = std::sqrt(1.0 - (cos_theta * cos_theta));
+	const double sinTheta = std::sqrt(std::max(0.0, 1.0 - (cos_theta * cos_theta)));
 
 	const bool cannot_refract = (actual_refractive_index * sinTheta) > 1.0;
 	Vec3 direction;
 
 	if (cannot_refract || (Reflectance(cos_theta, actual_refractive_index) > RandomCanonicalDouble()))
 	{
-		direction = Reflect(normalised_direction, result.m_normal);
+		direction = Reflect(normalised_direction, Normalised(result.m_normal));
 	}
 	else
 	{
-		direction = Refract(normalised_direction, result.m_normal, actual_refractive_index);
+		direction = Refract(normalised_direction, Normalised(result.m_normal), actual_refractive_index);
 	}
 
 	out_ray = Ray(result.m_point, direction, ray.m_time);
