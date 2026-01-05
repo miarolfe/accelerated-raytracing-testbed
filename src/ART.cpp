@@ -33,11 +33,13 @@ int main()
 
     std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::CheckerTexture>(0.32, ART::Colour(0.2, 0.3, 0.1), ART::Colour(0.9));
     std::shared_ptr<ART::Material> checker_material = std::make_shared<ART::LambertianMaterial>(checker_texture);
-    std::shared_ptr<ART::Material> dielectric_material = std::make_shared<ART::MetalMaterial>(ART::Colour(0.7), 0.5);
+    std::shared_ptr<ART::Material> metal_material = std::make_shared<ART::MetalMaterial>(ART::Colour(0.7), 0.5);
+    std::shared_ptr<ART::Material> dielectric_material = std::make_shared<ART::DielectricMaterial>(0.5);
     std::shared_ptr<ART::Material> solid_material = std::make_shared<ART::LambertianMaterial>(std::make_shared<ART::SolidColourTexture>(ART::Colour(0.2, 0.3, 0.2)));
 
     world.Add(std::make_shared<ART::Sphere>(ART::Point3(-7.5, 0.0, 10.0), 5.0, checker_material));
-    world.Add(std::make_shared<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 5.0, dielectric_material));
+    world.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 0.0, 1.0), 0.5, dielectric_material));
+    world.Add(std::make_shared<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 2.5, metal_material));
     // world.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -20.0, 0.0), 20.0, solid_material));
 
     camera.Render(world);
