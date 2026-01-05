@@ -13,7 +13,6 @@ struct CameraSetupParams
 public:
     std::size_t image_width;
     std::size_t image_height;
-    std::size_t num_image_components;
     Colour background_colour;
     double vertical_fov;
     double samples_per_pixel;
@@ -59,9 +58,6 @@ protected:
 
     // Height of the output image in pixels
     std::size_t m_image_height;
-
-    // Number of channels in the output image (e.g. RGB = 3)
-    std::size_t m_num_image_components;
 
     Colour m_background_colour;
 

@@ -42,8 +42,6 @@ bool RayHittableList::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_resu
         }
     }
 
-    // Logger::Get().LogError("Hit in list");
-
     return has_ray_hit_any_object;
 }
 

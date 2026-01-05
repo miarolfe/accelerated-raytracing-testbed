@@ -9,6 +9,7 @@
 #include "Utility.h"
 #include "Vec3.h"
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <omp.h>
 #include "../external/stb/stb_image_write.h"
@@ -16,11 +17,12 @@
 namespace ART
 {
 
+static constexpr std::size_t num_image_components = 3; // RGB
+
 const CameraSetupParams default_camera_setup_params =
 {
     600,                            // image_width
     600,                            // image_height
-    3,                              // num_image_components
     Colour(0.529, 0.808, 0.922),    // background_colour
     45.0,                           // vertical_fov
     50,                             // samples_per_pixel
@@ -38,7 +40,6 @@ Camera::Camera(const CameraSetupParams& setup_params)
 {
     m_image_width = setup_params.image_width;
     m_image_height = setup_params.image_height;
-    m_num_image_components = setup_params.num_image_components;
     m_background_colour = setup_params.background_colour;
     m_vertical_fov = setup_params.vertical_fov;
     m_samples_per_pixel = setup_params.samples_per_pixel;
@@ -67,7 +68,6 @@ void Camera::Render(const IRayHittable& scene)
 {
     assert(m_image_width > 0);
     assert(m_image_height > 0);
-    assert(m_num_image_components > 0);
     assert(m_vertical_fov > 0.0);
     assert(m_samples_per_pixel >= 1);
     assert(m_max_ray_bounces >= 1);
@@ -79,7 +79,7 @@ void Camera::Render(const IRayHittable& scene)
         std::size_t output_buffer_index =
             static_cast<std::size_t>(j) *
             m_image_width *
-            m_num_image_components;
+            num_image_components;
 
         for (std::size_t i = 0; i < m_image_width; i++)
         {
@@ -111,9 +111,9 @@ void Camera::Render(const IRayHittable& scene)
         "render.png",
         m_image_width,
         m_image_height,
-        m_num_image_components,
+        num_image_components,
         m_image_data,
-        m_image_width * sizeof(uint8_t) * m_num_image_components
+        m_image_width * sizeof(uint8_t) * num_image_components
     );
 }
 
@@ -156,7 +156,7 @@ void Camera::ResizeImageBuffer()
         delete[] m_image_data;
     }
 
-    m_image_data = new uint8_t[m_image_width * m_image_height * m_num_image_components];
+    m_image_data = new uint8_t[m_image_width * m_image_height * num_image_components];
 }
 
 Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene)
@@ -175,7 +175,7 @@ Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& 
 
     Ray scattered;
     Colour attenuation;
-    Colour colour_from_emission = result.m_material->Emitted(result.m_u, result.m_v, result.m_point);
+    const Colour colour_from_emission = result.m_material->Emitted(result.m_u, result.m_v, result.m_point);
     if (!result.m_material->Scatter(ray, result, attenuation, scattered))
     {
         return colour_from_emission;

@@ -125,8 +125,8 @@ void Logger::ProcessLogs()
 
 const std::string Logger::GetCurrentTimestamp()
 {
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+    const auto now = std::chrono::system_clock::now();
+    const std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
 
     std::stringstream string_stream;
     string_stream << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d %X");

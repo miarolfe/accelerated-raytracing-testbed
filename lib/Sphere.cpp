@@ -4,7 +4,6 @@
 #include <cassert>
 #include <memory>
 #include "AxisAlignedBoundingBox.h"
-#include "Logger.h"
 #include "Material.h"
 
 namespace ART
