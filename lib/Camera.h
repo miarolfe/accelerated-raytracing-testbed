@@ -98,16 +98,12 @@ protected:
     // Inverse of m_samples_per_pixel
     double m_pixel_sample_scale;
 
-    // ?
     Point3 m_centre;
 
-    // ?
     Point3 m_pixel_0_0_location;
 
-    // ?
     Vec3 m_pixel_delta_u;
 
-    // ?
     Vec3 m_pixel_delta_v;
 
     // Camera frame basis vectors
@@ -115,7 +111,6 @@ protected:
     Vec3 m_v;
     Vec3 m_w;
 
-    // ?
     Vec3 m_defocus_disk_u;
     Vec3 m_defocus_disk_v;
 };
