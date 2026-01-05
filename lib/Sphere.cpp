@@ -86,7 +86,7 @@ AABB Sphere::BoundingBox() const
 
 void Sphere::GetUVOnUnitSphere(const Point3& point, double& out_u, double& out_v)
 {
-    const double theta = std::acos(-point.m_y);
+    const double theta = std::acos(point.m_y);
     const double phi = std::atan2(-point.m_z, point.m_x) + pi;
 
     out_u = phi / (2.0 * pi);
