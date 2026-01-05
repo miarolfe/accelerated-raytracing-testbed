@@ -10,6 +10,7 @@
 #include "Vec3.h"
 #include <cassert>
 #include <cstdint>
+#include <omp.h>
 #include "../external/stb/stb_image_write.h"
 
 namespace ART
@@ -22,8 +23,8 @@ const CameraSetupParams default_camera_setup_params =
     3,                              // num_image_components
     Colour(0.529, 0.808, 0.922),    // background_colour
     45.0,                           // vertical_fov
-    100,                            // samples_per_pixel
-    50,                             // max_ray_bounces
+    50,                             // samples_per_pixel
+    25,                             // max_ray_bounces
     Point3(0.0),                    // look_from
     Point3(0.0, 0.0, 10.0),         // look_at
     Vec3(0.0, 1.0, 0.0),            // up
@@ -72,12 +73,19 @@ void Camera::Render(const IRayHittable& scene)
     assert(m_max_ray_bounces >= 1);
     assert(m_image_data != nullptr);
 
-    std::size_t output_buffer_index = 0;
-    for (std::size_t j = 0; j < m_image_height; j++)
+    #pragma omp parallel for schedule(static)
+    for (std::int64_t j = 0; j < static_cast<std::int64_t>(m_image_height); j++)
     {
+        std::size_t output_buffer_index =
+            static_cast<std::size_t>(j) *
+            m_image_width *
+            m_num_image_components;
+
         for (std::size_t i = 0; i < m_image_width; i++)
         {
             Colour pixel_colour(0.0);
+
+            #pragma omp simd
             for (std::size_t sample = 0; sample < m_samples_per_pixel; sample++)
             {
                 const Ray& ray = GetRay(i, j);
@@ -90,9 +98,12 @@ void Camera::Render(const IRayHittable& scene)
             const double g_component = LinearToGamma(pixel_colour.m_y);
             const double b_component = LinearToGamma(pixel_colour.m_z);
 
-            m_image_data[output_buffer_index++] = static_cast<uint8_t>(256 * intensity.Clamp(r_component));
-            m_image_data[output_buffer_index++] = static_cast<uint8_t>(256 * intensity.Clamp(g_component));
-            m_image_data[output_buffer_index++] = static_cast<uint8_t>(256 * intensity.Clamp(b_component));
+            m_image_data[output_buffer_index++] =
+                static_cast<uint8_t>(256 * intensity.Clamp(r_component));
+            m_image_data[output_buffer_index++] =
+                static_cast<uint8_t>(256 * intensity.Clamp(g_component));
+            m_image_data[output_buffer_index++] =
+                static_cast<uint8_t>(256 * intensity.Clamp(b_component));
         }
     }
 
@@ -106,6 +117,7 @@ void Camera::Render(const IRayHittable& scene)
         m_image_width * sizeof(uint8_t) * m_num_image_components
     );
 }
+
 
 void Camera::DeriveDependentVariables()
 {
@@ -161,7 +173,6 @@ Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& 
     {
         return m_background_colour;
     }
-
 
     Ray scattered;
     Colour attenuation;

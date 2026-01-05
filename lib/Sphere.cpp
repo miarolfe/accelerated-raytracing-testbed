@@ -4,6 +4,7 @@
 #include <cassert>
 #include <memory>
 #include "AxisAlignedBoundingBox.h"
+#include "Logger.h"
 #include "Material.h"
 
 namespace ART
@@ -20,7 +21,7 @@ Sphere::Sphere()
 
 Sphere::Sphere(const Point3& centre, double radius, std::shared_ptr<Material> material)
 {
-    assert(m_radius >= 0.0);
+    assert(radius >= 0.0);
     m_centre = Ray(centre, Vec3(0.0));
     m_radius = radius;
     const Vec3 radius_vec = Vec3(m_radius);
@@ -30,7 +31,7 @@ Sphere::Sphere(const Point3& centre, double radius, std::shared_ptr<Material> ma
 
 Sphere::Sphere(const Point3& centre1, const Point3& centre2, double radius, std::shared_ptr<Material> material)
 {
-    assert(m_radius >= 0.0);
+    assert(radius >= 0.0);
     m_centre = Ray(centre1, centre2 - centre1);
     m_radius = std::fmax(0.0, radius);
     const Vec3 radius_vec = Vec3(radius);

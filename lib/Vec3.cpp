@@ -86,7 +86,7 @@ Vec3& Vec3::operator*=(double t)
 
 Vec3& Vec3::operator/=(double t)
 {
-    return (*this *= (1.0 / t));
+    return *this *= 1.0 / t;
 }
 
 double Vec3::Length() const

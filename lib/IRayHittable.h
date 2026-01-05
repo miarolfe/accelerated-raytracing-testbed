@@ -14,7 +14,7 @@ struct IRayHittable
 {
 public:
     virtual ~IRayHittable() = default;
-    virtual bool Hit(const Ray& ray, Interval rayT, RayHitResult& result) const = 0;
+    virtual bool Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) const = 0;
     virtual AABB BoundingBox() const = 0;
 };
 

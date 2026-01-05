@@ -23,6 +23,11 @@ filter { "toolset:gcc or toolset:clang" }
         "-Wno-unused-function",
         "-Wuninitialized",
         "-pedantic",
+        "-fopenmp"
+    }
+
+    linkoptions {
+        "-fopenmp"
     }
 
     -- filter { "configurations:Test" }
