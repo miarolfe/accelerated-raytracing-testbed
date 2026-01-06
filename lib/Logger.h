@@ -38,7 +38,7 @@ public:
     void LogWarn(const std::string& log_msg);
 
     // Convenience alias for logging info messages
-    void LogInfo(const std::string& log_imsg);
+    void LogInfo(const std::string& log_msg);
 
     // Convenience alias for logging debug messages
     void LogDebug(const std::string& log_msg);
