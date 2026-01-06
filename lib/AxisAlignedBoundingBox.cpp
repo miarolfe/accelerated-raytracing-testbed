@@ -130,7 +130,7 @@ bool AABB::Hit(const Ray& ray, Interval rayT) const
 			}
 		}
 
-		if (rayT.m_min <= rayT.m_min)
+		if (rayT.m_min > rayT.m_max)
 		{
 			return false;
 		}
