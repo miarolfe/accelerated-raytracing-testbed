@@ -70,11 +70,42 @@ void Scene2()
     camera.Render(scene);
 }
 
+void Scene3()
+{
+    ART::CameraSetupParams camera_setup_params
+    {
+        1920,                           // image_width
+        1080,                           // image_height
+        ART::Colour(0.7, 0.8, 1.0),     // background_colour
+        20.0,                           // vertical_fov
+        200,                            // samples_per_pixel
+        50,                             // max_ray_bounces
+        ART::Point3(13.0, 2.0, 3.0),    // look_from
+        ART::Point3(0.0, 0.0, 0.0),     // look_at
+        ART::Vec3(0.0, 1.0, 0.0),       // up
+        0.0,                            // defocus_angle
+        10.0                            // focus_distance
+    };
+    ART::Camera camera(camera_setup_params);
+
+    ART::RayHittableList scene;
+
+    std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::CheckerTexture>(
+        0.5, ART::Colour(0.0), ART::Colour(1.0));
+
+    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -1005.0, 0.0), 1000.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(0.0, 0.8, 0.8))));
+    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10.0, std::make_shared<ART::LambertianMaterial>(checker_texture)));
+    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, std::make_shared<ART::DielectricMaterial>(1.5)));
+    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, std::make_shared<ART::DielectricMaterial>(1.0 / 1.5)));
+
+    camera.Render(scene);
+}
+
 int main()
 {
     ART::Logger::Get().LogInfo("Booting up");
 
-    Scene2();
+    Scene3();
 
     ART::Logger::Get().Flush();
 }

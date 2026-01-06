@@ -31,8 +31,8 @@ Sphere::Sphere(const Point3& centre1, const Point3& centre2, double radius, std:
     m_centre = Ray(centre1, centre2 - centre1);
     m_radius = std::fmax(0.0, radius);
     const Vec3 radius_vec = Vec3(radius);
-    AABB start_bounding_box(m_centre.At(0.0) - radius_vec, m_centre.At(0) + radius_vec);
-    AABB end_bounding_box(m_centre.At(0.0) - radius_vec, m_centre.At(0) + radius_vec);
+    AABB start_bounding_box(m_centre.At(0.0) - radius_vec, m_centre.At(0.0) + radius_vec);
+    AABB end_bounding_box(m_centre.At(1.0) - radius_vec, m_centre.At(1.0) + radius_vec);
     m_bounding_box = AABB(start_bounding_box, end_bounding_box);
     m_material = material;
 }
