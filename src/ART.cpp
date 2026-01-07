@@ -137,11 +137,112 @@ void Scene4()
     uniform_grid.Destroy();
 }
 
+void Scene5(bool use_uniform_grid)
+{
+    ART::RayHittableList scene;
+
+    ART::Point3 average_position_cluster_1;
+    int num_spheres_cluster_1 = 0;
+
+    // Cluster 1
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            for (int k = 0; k < 10; k++)
+            {
+                const ART::Point3 sphere_position(0.0 + (i * 3.0), 0.0 + (j * 3.0), 0.0 + (k * 3.0));
+                average_position_cluster_1 += sphere_position;
+                num_spheres_cluster_1++;
+
+                scene.Add
+                (
+                    std::make_shared<ART::Sphere>
+                    (
+                        sphere_position, 1.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()))
+                    )
+                );
+            }
+        }
+    }
+
+    // Cluster 2
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            for (int k = 0; k < 10; k++)
+            {
+                const ART::Point3 sphere_position(500.0 + (i * 3.0), 500.0 + (j * 3.0), 500.0 + (k * 3.0));
+                scene.Add
+                (
+                    std::make_shared<ART::Sphere>
+                    (
+                        sphere_position, 1.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()))
+                    )
+                );
+            }
+        }
+    }
+
+    // Cluster 3
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            for (int k = 0; k < 10; k++)
+            {
+                const ART::Point3 sphere_position(1000.0 + (i * 3.0), -500.0 + (j * 3.0), 1000.0 + (k * 3.0));
+                scene.Add
+                (
+                    std::make_shared<ART::Sphere>
+                    (
+                        sphere_position, 1.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()))
+                    )
+                );
+            }
+        }
+    }
+
+    assert(num_spheres_cluster_1 > 0);
+    average_position_cluster_1 /= num_spheres_cluster_1;
+
+    ART::CameraSetupParams camera_setup_params
+    {
+        1280,
+        720,
+        ART::Colour(0.7, 0.8, 1.0),
+        18.0,
+        100,
+        25,
+        ART::Point3(-100.0, 100.0, 100.0),
+        average_position_cluster_1,
+        ART::Vec3(0.0, 1.0, 0.0),
+        0.0,
+        10.0
+    };
+    ART::Camera camera(camera_setup_params);
+
+    if (use_uniform_grid)
+    {
+        ART::UniformGrid uniform_grid(scene.GetObjects());
+        uniform_grid.Create();
+
+        camera.Render(uniform_grid);
+
+        uniform_grid.Destroy();
+    }
+    else
+    {
+        camera.Render(scene);
+    }
+}
+
 int main()
 {
     ART::Logger::Get().LogInfo("Booting up");
 
-    Scene4();
+    Scene5(true);
 
     ART::Logger::Get().Flush();
 }
