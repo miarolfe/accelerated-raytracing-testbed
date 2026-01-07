@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Vec3.h"
-#include <cassert>
+
+#include "Common.h"
 #include "Random.h"
 
 namespace ART

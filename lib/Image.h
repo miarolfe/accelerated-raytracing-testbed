@@ -1,7 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
+
 #include "Common.h"
-#include <string>
 
 namespace ART
 {

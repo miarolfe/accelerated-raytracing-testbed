@@ -1,4 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
+
 #include "Common.h"
 #include "IRayHittable.h"
 #include "RayHitResult.h"

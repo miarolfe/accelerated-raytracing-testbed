@@ -1,5 +1,6 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
+
 #include <atomic>
 #include <fstream>
 #include <thread>
