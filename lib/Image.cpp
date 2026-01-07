@@ -1,7 +1,9 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Image.h"
-#include "Logger.h"
+
 #include "../external/stb/stb_image.h"
+
+#include "Logger.h"
 
 namespace ART
 {

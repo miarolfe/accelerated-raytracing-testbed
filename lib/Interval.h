@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
-#include "Constants.h"
+
+#include "Common.h"
 
 namespace ART
 {

@@ -1,5 +1,6 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Vec3Int.h"
+
 #include "Random.h"
 
 namespace ART

@@ -1,7 +1,10 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Camera.h"
+
+#include "../external/stb/stb_image_write.h"
+
 #include "Colour.h"
-#include "Constants.h"
+#include "Common.h"
 #include "Logger.h"
 #include "Material.h"
 #include "Random.h"
@@ -9,7 +12,6 @@
 #include "RayHitResult.h"
 #include "Utility.h"
 #include "Vec3.h"
-#include "../external/stb/stb_image_write.h"
 
 namespace ART
 {

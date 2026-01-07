@@ -1,5 +1,6 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Logger.h"
+
 #include <chrono>
 #include <fstream>
 #include <iomanip>

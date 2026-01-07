@@ -1,5 +1,6 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "Utility.h"
+
 #include "Constants.h"
 
 namespace ART

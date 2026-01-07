@@ -213,7 +213,7 @@ void Scene5(bool use_uniform_grid)
         720,
         ART::Colour(0.7, 0.8, 1.0),
         18.0,
-        100,
+        10,
         25,
         ART::Point3(-100.0, 100.0, 100.0),
         average_position_cluster_1,

@@ -1,6 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "AxisAlignedBoundingBox.h"
-#include <cstddef>
 
 namespace ART
 {
