@@ -8,6 +8,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 #include <omp.h>
+
+#include "Constants.h"

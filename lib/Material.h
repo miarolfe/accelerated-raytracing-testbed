@@ -1,9 +1,10 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
+
 #include "Colour.h"
+#include "Common.h"
 #include "RayHitResult.h"
 #include "Texture.h"
-#include <memory>
 
 namespace ART
 {

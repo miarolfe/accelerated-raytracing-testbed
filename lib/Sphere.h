@@ -1,5 +1,6 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
+
 #include "AxisAlignedBoundingBox.h"
 #include "Constants.h"
 #include "IRayHittable.h"
