@@ -27,7 +27,8 @@ filter { "toolset:gcc or toolset:clang" }
     }
 
     linkoptions {
-        "-fopenmp"
+        "-fopenmp",
+        "-lSDL2"
     }
 
     -- filter { "configurations:Test" }

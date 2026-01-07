@@ -12,6 +12,7 @@
 #include "RayHitResult.h"
 #include "Utility.h"
 #include "Vec3.h"
+#include <SDL2/SDL.h>
 
 namespace ART
 {
@@ -48,6 +49,8 @@ Camera::Camera(const CameraSetupParams& setup_params)
     m_up = setup_params.up;
     m_defocus_angle = setup_params.defocus_angle;
     m_focus_distance = setup_params.focus_distance;
+    m_renderer = setup_params.renderer;
+    m_texture = setup_params.texture;
 
     DeriveDependentVariables();
     ResizeImageBuffer();
@@ -74,7 +77,7 @@ void Camera::Render(const IRayHittable& scene)
     assert(m_max_ray_bounces >= 1);
     assert(m_image_data != nullptr);
 
-    #pragma omp parallel for schedule(static)
+    // #pragma omp parallel for schedule(static)
     for (std::int64_t j = 0; j < static_cast<std::int64_t>(m_image_height); j++)
     {
         std::size_t output_buffer_index =
@@ -104,7 +107,26 @@ void Camera::Render(const IRayHittable& scene)
                 static_cast<uint8_t>(256 * intensity.Clamp(g_component));
             m_image_data[output_buffer_index++] =
                 static_cast<uint8_t>(256 * intensity.Clamp(b_component));
+
+            SDL_Event e;
+            while (SDL_PollEvent(&e))
+            {
+                if (e.type == SDL_QUIT)
+                    return;
+            }
         }
+
+        SDL_UpdateTexture
+        (
+            m_texture,
+            nullptr,
+            m_image_data,
+            m_image_width * num_image_components
+        );
+
+        SDL_RenderClear(m_renderer);
+        SDL_RenderCopy(m_renderer, m_texture, nullptr, nullptr);
+        SDL_RenderPresent(m_renderer);
     }
 
     const int8_t err_code = stbi_write_png
@@ -118,6 +140,15 @@ void Camera::Render(const IRayHittable& scene)
     );
 }
 
+CameraBufferDetails Camera::GetBufferDetails()
+{
+    return
+    {
+        m_image_data,
+        m_image_height,
+        m_image_width
+    };
+}
 
 void Camera::DeriveDependentVariables()
 {

@@ -238,11 +238,11 @@ void Scene5(bool use_uniform_grid)
     }
 }
 
-int main()
-{
-    ART::Logger::Get().LogInfo("Booting up");
+// int main()
+// {
+//     ART::Logger::Get().LogInfo("Booting up");
 
-    Scene5(true);
+//     Scene5(true);
 
-    ART::Logger::Get().Flush();
-}
+//     ART::Logger::Get().Flush();
+// }

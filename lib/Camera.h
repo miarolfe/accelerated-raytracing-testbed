@@ -4,6 +4,7 @@
 #include "Colour.h"
 #include "Common.h"
 #include "IRayHittable.h"
+#include <SDL2/SDL_render.h>
 
 namespace ART
 {
@@ -22,6 +23,16 @@ public:
     Vec3 up;
     double defocus_angle;
     double focus_distance;
+    SDL_Renderer* renderer = nullptr;
+    SDL_Texture* texture = nullptr;
+};
+
+struct CameraBufferDetails
+{
+public:
+    uint8_t* buffer;
+    std::size_t image_width;
+    std::size_t image_height;
 };
 
 class Camera
@@ -35,6 +46,7 @@ public:
 
     void Render(const IRayHittable& scene);
 
+    CameraBufferDetails GetBufferDetails();
 
 protected:
     void DeriveDependentVariables();
@@ -84,6 +96,10 @@ protected:
 
     // Distance from m_look_from to plane of perfect focus
     double m_focus_distance;
+
+    SDL_Renderer* m_renderer = nullptr;
+
+    SDL_Texture* m_texture = nullptr;
 
     ///
     /// Derived member variables
