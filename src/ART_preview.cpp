@@ -16,6 +16,7 @@
 
 using namespace ART;
 
+// SDL_VIDEODRIVER=x11 ./bin/Release/ART
 int main(int argc, char* args[])
 {
     SDL_Window* window = nullptr;
