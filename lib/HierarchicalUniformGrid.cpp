@@ -303,15 +303,6 @@ bool HierarchicalUniformGrid::CellHit(const HierarchicalUniformGridEntry& entry,
 
 Vec3 HierarchicalUniformGrid::DetermineCellSize(std::size_t num_objects) const
 {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    // For hierarchical grid, use a coarser grid than the regular UniformGrid
-    // Use 6th root of n instead of cube root for fewer coarse cells
-    // This results in approximately sqrt(cube_root(n)) coarse cells per dimension
-=======
->>>>>>> 973eab8 (Hierarchical uniform grid implementation v1)
->>>>>>> refs/remotes/origin/hierarchical-uniform-grids
     const double sixth_root_n = std::pow(static_cast<double>(num_objects), 1.0 / 6.0);
     const double cell_size = 3.0 * std::max(m_bounding_box.m_x.Size(), std::max(m_bounding_box.m_y.Size(), m_bounding_box.m_z.Size())) / std::max(1.0, sixth_root_n);
 
