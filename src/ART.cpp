@@ -1,7 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include <memory>
+
 #include "../lib/Camera.h"
 #include "../lib/Colour.h"
+#include "../lib/HierarchicalUniformGrid.h"
 #include "../lib/Logger.h"
 #include "../lib/Material.h"
 #include "../lib/RayHittableList.h"
@@ -130,11 +131,9 @@ void Scene4()
     scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, std::make_shared<ART::DielectricMaterial>(1.0 / 1.5)));
 
     ART::UniformGrid uniform_grid(scene.GetObjects());
-    uniform_grid.Create();
 
     camera.Render(uniform_grid);
 
-    uniform_grid.Destroy();
 }
 
 void Scene5(bool use_uniform_grid)
@@ -225,12 +224,8 @@ void Scene5(bool use_uniform_grid)
 
     if (use_uniform_grid)
     {
-        ART::UniformGrid uniform_grid(scene.GetObjects());
-        uniform_grid.Create();
-
-        camera.Render(uniform_grid);
-
-        uniform_grid.Destroy();
+        ART::HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
+        camera.Render(hierarchical_uniform_grid);
     }
     else
     {
