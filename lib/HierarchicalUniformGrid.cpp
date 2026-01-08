@@ -249,11 +249,9 @@ void HierarchicalUniformGrid::Create(const std::vector<std::shared_ptr<IRayHitta
     {
         if (objects_per_cell_count[i] > 0)
         {
-            // Create vector for UniformGrid constructor (required by its interface)
             std::vector<std::shared_ptr<IRayHittable>> objects_vec(objects_for_each_cell[i], objects_for_each_cell[i] + objects_per_cell_count[i]);
             m_grid[i].subgrid = new UniformGrid(objects_vec);
 
-            // Clean up temporary cell object array
             delete[] objects_for_each_cell[i];
         }
     }
@@ -306,9 +304,6 @@ bool HierarchicalUniformGrid::CellHit(const HierarchicalUniformGridEntry& entry,
 
 Vec3 HierarchicalUniformGrid::DetermineCellSize(std::size_t num_objects) const
 {
-    // For hierarchical grid, use a coarser grid than the regular UniformGrid
-    // Use 6th root of n instead of cube root for fewer coarse cells
-    // This results in approximately sqrt(cube_root(n)) coarse cells per dimension
     const double sixth_root_n = std::pow(static_cast<double>(num_objects), 1.0 / 6.0);
     const double cell_size = 3.0 * std::max(m_bounding_box.m_x.Size(), std::max(m_bounding_box.m_y.Size(), m_bounding_box.m_z.Size())) / std::max(1.0, sixth_root_n);
 
