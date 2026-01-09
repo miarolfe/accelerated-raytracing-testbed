@@ -20,16 +20,16 @@ public:
     Ray m_centre;
     double m_radius;
     AABB m_bounding_box;
-    std::shared_ptr<Material> m_material;
+    Material* m_material;
 
     // Default constructor
     Sphere();
 
     // Stationary sphere constructor
-    Sphere(const Point3& centre, double radius, std::shared_ptr<Material> material);
+    Sphere(const Point3& centre, double radius, Material* material);
 
     // Moving sphere constructor
-    Sphere(const Point3& centre1, const Point3& centre2, double radius, std::shared_ptr<Material> material);
+    Sphere(const Point3& centre1, const Point3& centre2, double radius, Material* material);
 
     // Check if a ray intersects this sphere
     // Returns the result details using out_result

@@ -7,7 +7,7 @@
 namespace ART
 {
 
-UniformGrid::UniformGrid(const std::vector<std::shared_ptr<IRayHittable>>& objects)
+UniformGrid::UniformGrid(std::vector<IRayHittable*>& objects)
     : m_is_grid_valid(false), m_grid(nullptr), m_num_x_cells(0), m_num_y_cells(0), m_num_z_cells(0)
 {
     for (std::size_t i = 0; i < objects.size(); i++)
@@ -150,7 +150,7 @@ AABB UniformGrid::BoundingBox() const
     return m_bounding_box;
 }
 
-void UniformGrid::Create(const std::vector<std::shared_ptr<IRayHittable>>& objects)
+void UniformGrid::Create(std::vector<IRayHittable*>& objects)
 {
     m_cell_size = DetermineCellSize(objects.size());
 
@@ -217,7 +217,7 @@ bool UniformGrid::CellHit(const UniformGridEntry& entry, const Ray& ray, Interva
     bool has_ray_hit_any_object = false;
     double closest_distance = ray_t.m_max;
 
-    for (const std::shared_ptr<IRayHittable>& object : entry.hittables)
+    for (IRayHittable* object : entry.hittables)
     {
         if (object->Hit(ray, Interval(ray_t.m_min, closest_distance), temp_result))
         {

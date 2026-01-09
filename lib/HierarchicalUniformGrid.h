@@ -20,7 +20,7 @@ public:
 class HierarchicalUniformGrid : public IRayHittable
 {
 public:
-    HierarchicalUniformGrid(const std::vector<std::shared_ptr<IRayHittable>>& objects);
+    HierarchicalUniformGrid(std::vector<IRayHittable*>& objects);
 
     ~HierarchicalUniformGrid();
 
@@ -29,7 +29,7 @@ public:
     AABB BoundingBox() const override;
 
 protected:
-    void Create(const std::vector<std::shared_ptr<IRayHittable>>& objects);
+    void Create(std::vector<IRayHittable*>& objects);
 
     void Destroy();
 

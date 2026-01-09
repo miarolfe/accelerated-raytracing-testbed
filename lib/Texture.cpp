@@ -21,18 +21,11 @@ Colour SolidColourTexture::Value(double u, double v, const Point3& point) const
     return m_albedo;
 }
 
-CheckerTexture::CheckerTexture(double scale, std::shared_ptr<Texture> even, std::shared_ptr<Texture> odd)
+CheckerTexture::CheckerTexture(double scale, Texture* even, Texture* odd)
 {
     m_inverse_scale = 1.0 / scale;
     m_even_texture = even;
     m_odd_texture = odd;
-}
-
-CheckerTexture::CheckerTexture(double scale, const Colour& colour1, const Colour& colour2)
-{
-    m_inverse_scale = 1.0 / scale;
-    m_even_texture = std::make_shared<SolidColourTexture>(colour1);
-    m_odd_texture = std::make_shared<SolidColourTexture>(colour2);
 }
 
 Colour CheckerTexture::Value(double u, double v, const Point3& point) const
