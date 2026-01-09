@@ -31,12 +31,12 @@ protected:
 template<typename T, typename... Args>
 T* ArenaAllocator::Create(Args&& ... args)
 {
-    void* mem = Alloc(sizeof(T), alignof(T));
-    if (!mem)
+    void* allocation = Alloc(sizeof(T), alignof(T));
+    if (!allocation)
     {
         return nullptr;
     }
-    return new (mem) T(std::forward<Args>(args)...);
+    return new (allocation) T(std::forward<Args>(args)...);
 }
 
 } // namespace ART
