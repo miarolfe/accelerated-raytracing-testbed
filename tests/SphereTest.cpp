@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "../external/Catch2/catch.hpp"
 
+#include "../lib/ArenaAllocator.h"
 #include "../lib/Material.h"
 #include "../lib/Sphere.h"
 #include "../lib/Ray.h"
@@ -11,6 +12,10 @@ namespace ART
 
 TEST_CASE("Sphere constructors initialize correctly", "[Sphere]")
 {
+    ArenaAllocator allocator(ONE_MEGABYTE);
+    Texture* texture = allocator.Create<SolidColourTexture>(Colour(0.7));
+    Material* material = allocator.Create<LambertianMaterial>(texture);
+
     SECTION("Default constructor")
     {
         Sphere sphere;
@@ -24,7 +29,7 @@ TEST_CASE("Sphere constructors initialize correctly", "[Sphere]")
     {
         Point3 centre(1.0, 2.0, 3.0);
         double radius = 2.5;
-        Sphere sphere(centre, radius, std::make_shared<LambertianMaterial>(Colour(0.7)));
+        Sphere sphere(centre, radius, material);
 
         REQUIRE(sphere.m_centre.m_origin.m_x == Approx(1.0));
         REQUIRE(sphere.m_centre.m_origin.m_y == Approx(2.0));
@@ -37,7 +42,7 @@ TEST_CASE("Sphere constructors initialize correctly", "[Sphere]")
         Point3 start(0.0, 0.0, 0.0);
         Point3 end(1.0, 1.0, 1.0);
         double radius = 1.0;
-        Sphere sphere(start, end, radius, std::make_shared<LambertianMaterial>(Colour(0.7)));
+        Sphere sphere(start, end, radius, material);
 
         REQUIRE(sphere.m_centre.m_origin.m_x == Approx(0.0));
         REQUIRE(sphere.m_centre.m_origin.m_y == Approx(0.0));
@@ -51,7 +56,11 @@ TEST_CASE("Sphere constructors initialize correctly", "[Sphere]")
 
 TEST_CASE("Sphere Hit detects intersections correctly", "[Sphere]")
 {
-    Sphere sphere(Point3(0, 0.0, -5.0), 1.0, std::make_shared<LambertianMaterial>(Colour(0.7)));
+    ArenaAllocator allocator(ONE_MEGABYTE);
+    Texture* texture = allocator.Create<SolidColourTexture>(Colour(0.7));
+    Material* material = allocator.Create<LambertianMaterial>(texture);
+
+    Sphere sphere(Point3(0, 0.0, -5.0), 1.0, material);
     Interval t_range(0.001, 1000.0);
 
     SECTION("Ray hits front of sphere")
@@ -117,7 +126,11 @@ TEST_CASE("Sphere GetUVOnUnitSphere returns valid coordinates", "[Sphere]")
 
 TEST_CASE("Sphere BoundingBox returns expected box", "[Sphere]")
 {
-    Sphere sphere(Point3(0.0, 0.0, 0.0), 1.0, std::make_shared<LambertianMaterial>(Colour(0.7)));
+    ArenaAllocator allocator(ONE_MEGABYTE);
+    Texture* texture = allocator.Create<SolidColourTexture>(Colour(0.7));
+    Material* material = allocator.Create<LambertianMaterial>(texture);
+
+    Sphere sphere(Point3(0.0, 0.0, 0.0), 1.0, material);
     AABB aabb = sphere.BoundingBox();
 
     REQUIRE(aabb.m_x.m_min == Approx(-1.0));
