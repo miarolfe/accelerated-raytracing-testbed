@@ -33,7 +33,7 @@ public:
 
     ~Camera();
 
-    void Render(const IRayHittable& scene);
+    void Render(const IRayHittable& scene, const std::string& output_image_name = "render.png");
 
 
 protected:

@@ -65,7 +65,7 @@ Camera::~Camera()
 
 static const Interval intensity(0.0, 0.999);
 
-void Camera::Render(const IRayHittable& scene)
+void Camera::Render(const IRayHittable& scene, const std::string& output_image_name)
 {
     assert(m_image_width > 0);
     assert(m_image_height > 0);
@@ -109,7 +109,7 @@ void Camera::Render(const IRayHittable& scene)
 
     const int8_t err_code = stbi_write_png
     (
-        "render.png",
+        output_image_name.c_str(),
         m_image_width,
         m_image_height,
         num_image_components,

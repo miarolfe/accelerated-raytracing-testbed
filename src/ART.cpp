@@ -10,7 +10,41 @@
 #include "../lib/UniformGrid.h"
 #include "../lib/Vec3.h"
 
-void Scene1()
+enum class AccelerationStructure
+{
+    NONE,
+    UNIFORM_GRID,
+    HIERARCHICAL_UNIFORM_GRID
+};
+
+void RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& scene, AccelerationStructure acceleration_structure)
+{
+    switch (acceleration_structure)
+    {
+        case AccelerationStructure::NONE:
+        {
+            camera.Render(scene, "render_none.png");
+            ART::Logger::Get().LogInfo("Finished render using no acceleration structure");
+            break;
+        }
+        case AccelerationStructure::UNIFORM_GRID:
+        {
+            ART::UniformGrid uniform_grid(scene.GetObjects());
+            camera.Render(uniform_grid, "render_uniform_grid.png");
+            ART::Logger::Get().LogInfo("Finished render using uniform grid acceleration structure");
+            break;
+        }
+        case AccelerationStructure::HIERARCHICAL_UNIFORM_GRID:
+        {
+            ART::HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
+            camera.Render(hierarchical_uniform_grid, "render_hierarchical_uniform_grid.png");
+            ART::Logger::Get().LogInfo("Finished render using hierarchical uniform grid acceleration structure");
+            break;
+        }
+    }
+}
+
+void Scene1(AccelerationStructure acceleration_structure)
 {
     ART::CameraSetupParams camera_setup_params
     {
@@ -40,10 +74,10 @@ void Scene1()
     scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 0.0, 1.0), 0.5, dielectric_material));
     scene.Add(std::make_shared<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 2.5, metal_material));
 
-    camera.Render(scene);
+    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene2()
+void Scene2(AccelerationStructure acceleration_structure)
 {
     ART::CameraSetupParams camera_setup_params
     {
@@ -69,10 +103,10 @@ void Scene2()
     scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10, std::make_shared<ART::LambertianMaterial>(checker_texture)));
     scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 10.0, 0.0), 10, std::make_shared<ART::LambertianMaterial>(checker_texture)));
 
-    camera.Render(scene);
+    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene3()
+void Scene3(AccelerationStructure acceleration_structure)
 {
     ART::CameraSetupParams camera_setup_params
     {
@@ -100,10 +134,10 @@ void Scene3()
     scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, std::make_shared<ART::DielectricMaterial>(1.5)));
     scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, std::make_shared<ART::DielectricMaterial>(1.0 / 1.5)));
 
-    camera.Render(scene);
+    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene4()
+void Scene4(AccelerationStructure acceleration_structure)
 {
     ART::CameraSetupParams camera_setup_params
     {
@@ -132,11 +166,10 @@ void Scene4()
 
     ART::UniformGrid uniform_grid(scene.GetObjects());
 
-    camera.Render(uniform_grid);
-
+    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene5(bool use_uniform_grid)
+void Scene5(AccelerationStructure acceleration_structure)
 {
     ART::RayHittableList scene;
 
@@ -212,7 +245,7 @@ void Scene5(bool use_uniform_grid)
         720,
         ART::Colour(0.7, 0.8, 1.0),
         18.0,
-        10,
+        200,
         25,
         ART::Point3(-100.0, 100.0, 100.0),
         average_position_cluster_1,
@@ -222,22 +255,17 @@ void Scene5(bool use_uniform_grid)
     };
     ART::Camera camera(camera_setup_params);
 
-    if (use_uniform_grid)
-    {
-        ART::HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
-        camera.Render(hierarchical_uniform_grid);
-    }
-    else
-    {
-        camera.Render(scene);
-    }
+    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
 int main()
 {
     ART::Logger::Get().LogInfo("Booting up");
 
-    Scene5(true);
+    Scene5(AccelerationStructure::NONE);
+    Scene5(AccelerationStructure::UNIFORM_GRID);
+    Scene5(AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
 
+    ART::Logger::Get().LogInfo("Shutting down");
     ART::Logger::Get().Flush();
 }
