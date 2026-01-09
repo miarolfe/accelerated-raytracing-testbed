@@ -1,10 +1,10 @@
 // Copyright Mia Rolfe. ALl rights reserved.
 #pragma once
 
-#include "Colour.h"
-#include "Common.h"
-#include "Image.h"
-#include "Vec3.h"
+#include <Colour.h>
+#include <Common.h>
+#include <Image.h>
+#include <Vec3.h>
 
 namespace ART
 {

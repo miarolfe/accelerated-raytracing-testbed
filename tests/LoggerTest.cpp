@@ -1,9 +1,10 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "../external/Catch2/catch.hpp"
+#include <Catch2/catch.hpp>
 
-#include "../lib/Logger.h"
 #include <fstream>
 #include <string>
+
+#include <Logger.h>
 
 namespace ART
 {

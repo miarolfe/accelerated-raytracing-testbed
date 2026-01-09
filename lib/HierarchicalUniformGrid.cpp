@@ -1,9 +1,9 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "HierarchicalUniformGrid.h"
+#include <HierarchicalUniformGrid.h>
 
-#include "IRayHittable.h"
-#include "RayHitResult.h"
-#include "UniformGrid.h"
+#include <IRayHittable.h>
+#include <RayHitResult.h>
+#include <UniformGrid.h>
 
 namespace ART
 {

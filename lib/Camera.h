@@ -1,9 +1,9 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include "Colour.h"
-#include "Common.h"
-#include "IRayHittable.h"
+#include <Colour.h>
+#include <Common.h>
+#include <IRayHittable.h>
 
 namespace ART
 {

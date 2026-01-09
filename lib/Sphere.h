@@ -1,12 +1,12 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include "AxisAlignedBoundingBox.h"
-#include "Constants.h"
-#include "IRayHittable.h"
-#include "RayHitResult.h"
-#include "Ray.h"
-#include "Vec3.h"
+#include <AxisAlignedBoundingBox.h>
+#include <Constants.h>
+#include <IRayHittable.h>
+#include <RayHitResult.h>
+#include <Ray.h>
+#include <Vec3.h>
 
 namespace ART
 {

@@ -1,5 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "Ray.h"
+#include <Ray.h>
 
 namespace ART
 {

@@ -1,5 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "RayHitResult.h"
+#include <RayHitResult.h>
 
 namespace ART
 {

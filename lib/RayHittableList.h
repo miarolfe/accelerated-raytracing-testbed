@@ -1,8 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include "IRayHittable.h"
-#include "RayHitResult.h"
+#include <IRayHittable.h>
+#include <RayHitResult.h>
 
 #include <vector>
 

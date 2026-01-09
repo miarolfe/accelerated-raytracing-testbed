@@ -1,9 +1,9 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include "Interval.h"
-#include "Ray.h"
-#include "Vec3.h"
+#include <Interval.h>
+#include <Ray.h>
+#include <Vec3.h>
 
 namespace ART
 {

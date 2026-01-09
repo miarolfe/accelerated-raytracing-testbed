@@ -1,12 +1,12 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include "Common.h"
-#include "IRayHittable.h"
-#include "RayHitResult.h"
-#include "UniformGrid.h"
-#include "Vec3.h"
-#include "Vec3Int.h"
+#include <Common.h>
+#include <IRayHittable.h>
+#include <RayHitResult.h>
+#include <UniformGrid.h>
+#include <Vec3.h>
+#include <Vec3Int.h>
 
 namespace ART
 {

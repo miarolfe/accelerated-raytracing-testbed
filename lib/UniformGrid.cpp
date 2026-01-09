@@ -1,8 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "UniformGrid.h"
+#include <UniformGrid.h>
 
-#include "IRayHittable.h"
-#include "RayHitResult.h"
+#include <IRayHittable.h>
+#include <RayHitResult.h>
 
 namespace ART
 {

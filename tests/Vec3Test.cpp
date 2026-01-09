@@ -1,7 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "../external/Catch2/catch.hpp"
+#include <Catch2/catch.hpp>
 
-#include "../lib/Vec3.h"
+#include <Vec3.h>
 
 namespace ART
 {

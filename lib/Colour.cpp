@@ -1,5 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "Colour.h"
+#include <Colour.h>
 
 namespace ART
 {

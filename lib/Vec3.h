@@ -1,8 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include "Common.h"
-#include "Random.h"
+#include <Common.h>
+#include <Random.h>
 
 namespace ART
 {

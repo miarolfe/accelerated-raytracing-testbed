@@ -1,8 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "Sphere.h"
+#include <Sphere.h>
 
-#include "AxisAlignedBoundingBox.h"
-#include "Material.h"
+#include <AxisAlignedBoundingBox.h>
+#include <Material.h>
 
 namespace ART
 {

@@ -1,9 +1,9 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "../external/Catch2/catch.hpp"
+#include <Catch2/catch.hpp>
 
-#include "../lib/RayHitResult.h"
-#include "../lib/Ray.h"
-#include "../lib/Vec3.h"
+#include <RayHitResult.h>
+#include <Ray.h>
+#include <Vec3.h>
 
 namespace ART
 {
