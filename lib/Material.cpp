@@ -19,12 +19,7 @@ bool Material::Scatter(const Ray& ray, const RayHitResult& result, Colour& out_a
     return false;
 }
 
-LambertianMaterial::LambertianMaterial(const Colour& albedo)
-{
-    m_texture = std::make_shared<SolidColourTexture>(albedo);
-}
-
-LambertianMaterial::LambertianMaterial(std::shared_ptr<Texture> texture)
+LambertianMaterial::LambertianMaterial(Texture* texture)
 {
     m_texture = texture;
 }
@@ -92,14 +87,9 @@ double DielectricMaterial::Reflectance(double cosine, double refraction_index)
 	return r0 + (1.0 - r0) * std::pow((1.0 - cosine), 5);
 }
 
-DiffuseLightMaterial::DiffuseLightMaterial(std::shared_ptr<Texture> texture)
+DiffuseLightMaterial::DiffuseLightMaterial(Texture* texture)
 {
     m_texture = texture;
-}
-
-DiffuseLightMaterial::DiffuseLightMaterial(const Colour& emit_colour)
-{
-    m_texture = std::make_shared<SolidColourTexture>(emit_colour);
 }
 
 Colour DiffuseLightMaterial::Emitted(double u, double v, const Point3& point) const

@@ -1,5 +1,6 @@
 // Copyright Mia Rolfe. All rights reserved.
 
+#include "../lib/ArenaAllocator.h"
 #include "../lib/Camera.h"
 #include "../lib/Colour.h"
 #include "../lib/HierarchicalUniformGrid.h"
@@ -7,6 +8,7 @@
 #include "../lib/Material.h"
 #include "../lib/RayHittableList.h"
 #include "../lib/Sphere.h"
+#include "../lib/Texture.h"
 #include "../lib/UniformGrid.h"
 #include "../lib/Vec3.h"
 
@@ -46,6 +48,8 @@ void RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& 
 
 void Scene1(AccelerationStructure acceleration_structure)
 {
+    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+
     ART::CameraSetupParams camera_setup_params
     {
         600,                            // image_width
@@ -64,21 +68,24 @@ void Scene1(AccelerationStructure acceleration_structure)
 
     ART::RayHittableList scene;
 
-    std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::CheckerTexture>(0.32, ART::Colour(0.2, 0.3, 0.1), ART::Colour(0.9));
-    std::shared_ptr<ART::Material> checker_material = std::make_shared<ART::LambertianMaterial>(checker_texture);
-    std::shared_ptr<ART::Material> metal_material = std::make_shared<ART::MetalMaterial>(ART::Colour(0.7), 0.5);
-    std::shared_ptr<ART::Material> dielectric_material = std::make_shared<ART::DielectricMaterial>(0.5);
-    std::shared_ptr<ART::Material> solid_material = std::make_shared<ART::LambertianMaterial>(std::make_shared<ART::SolidColourTexture>(ART::Colour(0.2, 0.3, 0.2)));
+    ART::Texture* even_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.2, 0.3, 0.1));
+    ART::Texture* odd_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.9, 0.9, 0.9));
+    ART::Texture* checker_texture = arena.Create<ART::CheckerTexture>(0.32, even_texture, odd_texture);
+    ART::Material* checker_material = arena.Create<ART::LambertianMaterial>(checker_texture);
+    ART::Material* metal_material = arena.Create<ART::MetalMaterial>(ART::Colour(0.7), 0.5);
+    ART::Material* dielectric_material = arena.Create<ART::DielectricMaterial>(0.5);
 
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(-7.5, 0.0, 10.0), 5.0, checker_material));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 0.0, 1.0), 0.5, dielectric_material));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 2.5, metal_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(-7.5, 0.0, 10.0), 5.0, checker_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 0.0, 1.0), 0.5, dielectric_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 2.5, metal_material));
 
     RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
 void Scene2(AccelerationStructure acceleration_structure)
 {
+    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+
     ART::CameraSetupParams camera_setup_params
     {
         1280,                           // image_width
@@ -97,17 +104,21 @@ void Scene2(AccelerationStructure acceleration_structure)
 
     ART::RayHittableList scene;
 
-    std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::CheckerTexture>(
-        0.32, ART::Colour(0.2, 0.3, 0.1), ART::Colour(0.9, 0.9, 0.9));
+    ART::Texture* even_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.2, 0.3, 0.1));
+    ART::Texture* odd_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.9, 0.9, 0.9));
+    ART::Texture* checker_texture = arena.Create<ART::CheckerTexture>(0.32, even_texture, odd_texture);
+    ART::Material* checker_material = arena.Create<ART::LambertianMaterial>(checker_texture);
 
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10, std::make_shared<ART::LambertianMaterial>(checker_texture)));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 10.0, 0.0), 10, std::make_shared<ART::LambertianMaterial>(checker_texture)));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10.0, checker_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 10.0, 0.0), 10.0, checker_material));
 
     RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
 void Scene3(AccelerationStructure acceleration_structure)
 {
+    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+
     ART::CameraSetupParams camera_setup_params
     {
         1920,                           // image_width
@@ -126,19 +137,28 @@ void Scene3(AccelerationStructure acceleration_structure)
 
     ART::RayHittableList scene;
 
-    std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::CheckerTexture>(
-        0.5, ART::Colour(0.0), ART::Colour(1.0));
+    ART::Texture* even_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.0, 0.0, 0.0));
+    ART::Texture* odd_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(1.0, 1.0, 1.0));
+    ART::Texture* checker_texture = arena.Create<ART::CheckerTexture>(0.5, even_texture, odd_texture);
 
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -1005.0, 0.0), 1000.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(0.0, 0.8, 0.8))));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10.0, std::make_shared<ART::LambertianMaterial>(checker_texture)));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, std::make_shared<ART::DielectricMaterial>(1.5)));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, std::make_shared<ART::DielectricMaterial>(1.0 / 1.5)));
+    ART::Texture* cyan_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.0, 0.8, 0.8));
+    ART::Material* cyan_material = arena.Create<ART::LambertianMaterial>(cyan_texture);
+    ART::Material* checker_material = arena.Create<ART::LambertianMaterial>(checker_texture);
+    ART::Material* glass_material = arena.Create<ART::DielectricMaterial>(1.5);
+    ART::Material* glass_inner_material = arena.Create<ART::DielectricMaterial>(1.0 / 1.5);
+
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, -1005.0, 0.0), 1000.0, cyan_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10.0, checker_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, glass_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, glass_inner_material));
 
     RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
 void Scene4(AccelerationStructure acceleration_structure)
 {
+    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+
     ART::CameraSetupParams camera_setup_params
     {
         600,                            // image_width
@@ -157,12 +177,16 @@ void Scene4(AccelerationStructure acceleration_structure)
 
     ART::RayHittableList scene;
 
-    std::shared_ptr<ART::Texture> checker_texture = std::make_shared<ART::CheckerTexture>(
-        0.5, ART::Colour(0.0), ART::Colour(1.0));
+    ART::Texture* even_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.0, 0.0, 0.0));
+    ART::Texture* odd_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(1.0, 1.0, 1.0));
+    ART::Texture* checker_texture = arena.Create<ART::CheckerTexture>(0.5, even_texture, odd_texture);
+    ART::Material* checker_material = arena.Create<ART::LambertianMaterial>(checker_texture);
+    ART::Material* glass_material = arena.Create<ART::DielectricMaterial>(1.5);
+    ART::Material* glass_inner_material = arena.Create<ART::DielectricMaterial>(1.0 / 1.5);
 
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10.0, std::make_shared<ART::LambertianMaterial>(checker_texture)));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, std::make_shared<ART::DielectricMaterial>(1.5)));
-    scene.Add(std::make_shared<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, std::make_shared<ART::DielectricMaterial>(1.0 / 1.5)));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10.0, checker_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, glass_material));
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, glass_inner_material));
 
     ART::UniformGrid uniform_grid(scene.GetObjects());
 
@@ -171,6 +195,8 @@ void Scene4(AccelerationStructure acceleration_structure)
 
 void Scene5(AccelerationStructure acceleration_structure)
 {
+    ART::ArenaAllocator arena(16 * 1024 * 1024); // 16 MB for 3000 spheres
+
     ART::RayHittableList scene;
 
     ART::Point3 average_position_cluster_1;
@@ -187,13 +213,9 @@ void Scene5(AccelerationStructure acceleration_structure)
                 average_position_cluster_1 += sphere_position;
                 num_spheres_cluster_1++;
 
-                scene.Add
-                (
-                    std::make_shared<ART::Sphere>
-                    (
-                        sphere_position, 1.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()))
-                    )
-                );
+                ART::Texture* texture = arena.Create<ART::SolidColourTexture>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()));
+                ART::Material* material = arena.Create<ART::LambertianMaterial>(texture);
+                scene.Add(arena.Create<ART::Sphere>(sphere_position, 1.0, material));
             }
         }
     }
@@ -206,13 +228,9 @@ void Scene5(AccelerationStructure acceleration_structure)
             for (int k = 0; k < 10; k++)
             {
                 const ART::Point3 sphere_position(500.0 + (i * 3.0), 500.0 + (j * 3.0), 500.0 + (k * 3.0));
-                scene.Add
-                (
-                    std::make_shared<ART::Sphere>
-                    (
-                        sphere_position, 1.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()))
-                    )
-                );
+                ART::Texture* texture = arena.Create<ART::SolidColourTexture>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()));
+                ART::Material* material = arena.Create<ART::LambertianMaterial>(texture);
+                scene.Add(arena.Create<ART::Sphere>(sphere_position, 1.0, material));
             }
         }
     }
@@ -225,13 +243,9 @@ void Scene5(AccelerationStructure acceleration_structure)
             for (int k = 0; k < 10; k++)
             {
                 const ART::Point3 sphere_position(1000.0 + (i * 3.0), -500.0 + (j * 3.0), 1000.0 + (k * 3.0));
-                scene.Add
-                (
-                    std::make_shared<ART::Sphere>
-                    (
-                        sphere_position, 1.0, std::make_shared<ART::LambertianMaterial>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()))
-                    )
-                );
+                ART::Texture* texture = arena.Create<ART::SolidColourTexture>(ART::Colour(ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble(), ART::RandomCanonicalDouble()));
+                ART::Material* material = arena.Create<ART::LambertianMaterial>(texture);
+                scene.Add(arena.Create<ART::Sphere>(sphere_position, 1.0, material));
             }
         }
     }
@@ -245,7 +259,7 @@ void Scene5(AccelerationStructure acceleration_structure)
         720,
         ART::Colour(0.7, 0.8, 1.0),
         18.0,
-        200,
+        10,
         25,
         ART::Point3(-100.0, 100.0, 100.0),
         average_position_cluster_1,

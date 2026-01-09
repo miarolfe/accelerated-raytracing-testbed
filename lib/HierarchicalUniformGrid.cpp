@@ -8,7 +8,7 @@
 namespace ART
 {
 
-HierarchicalUniformGrid::HierarchicalUniformGrid(const std::vector<std::shared_ptr<IRayHittable>>& objects)
+HierarchicalUniformGrid::HierarchicalUniformGrid(std::vector<IRayHittable*>& objects)
     : m_is_grid_valid(false), m_grid(nullptr), m_num_x_cells(0), m_num_y_cells(0), m_num_z_cells(0)
 {
     for (std::size_t object_index = 0; object_index < objects.size(); object_index++)
@@ -151,7 +151,7 @@ AABB HierarchicalUniformGrid::BoundingBox() const
     return m_bounding_box;
 }
 
-void HierarchicalUniformGrid::Create(const std::vector<std::shared_ptr<IRayHittable>>& objects)
+void HierarchicalUniformGrid::Create(std::vector<IRayHittable*>& objects)
 {
     m_cell_size = DetermineCellSize(objects.size());
 
@@ -197,14 +197,14 @@ void HierarchicalUniformGrid::Create(const std::vector<std::shared_ptr<IRayHitta
     }
 
     // Allocate arrays for each cell
-    std::shared_ptr<IRayHittable>** objects_for_each_cell = new std::shared_ptr<IRayHittable>*[num_cells];
+    IRayHittable*** objects_for_each_cell = new IRayHittable**[num_cells];
     std::size_t* cell_fill_indices = new std::size_t[num_cells]();
 
     for (std::size_t i = 0; i < num_cells; i++)
     {
         if (objects_per_cell_count[i] > 0)
         {
-            objects_for_each_cell[i] = new std::shared_ptr<IRayHittable>[objects_per_cell_count[i]];
+            objects_for_each_cell[i] = new IRayHittable*[objects_per_cell_count[i]];
         }
         else
         {
@@ -249,7 +249,7 @@ void HierarchicalUniformGrid::Create(const std::vector<std::shared_ptr<IRayHitta
     {
         if (objects_per_cell_count[i] > 0)
         {
-            std::vector<std::shared_ptr<IRayHittable>> objects_vec(objects_for_each_cell[i], objects_for_each_cell[i] + objects_per_cell_count[i]);
+            std::vector<IRayHittable*> objects_vec(objects_for_each_cell[i], objects_for_each_cell[i] + objects_per_cell_count[i]);
             m_grid[i].subgrid = new UniformGrid(objects_vec);
             delete[] objects_for_each_cell[i];
         }

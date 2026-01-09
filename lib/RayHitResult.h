@@ -20,7 +20,7 @@ public:
     double m_t;
     double m_u;
     double m_v;
-    std::shared_ptr<Material> m_material;
+    Material* m_material;
     bool m_is_front_facing;
 
     // Determine the correct face normal

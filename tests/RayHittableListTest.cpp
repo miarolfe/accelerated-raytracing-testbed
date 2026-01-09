@@ -1,6 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include "../external/Catch2/catch.hpp"
 
+#include "../lib/ArenaAllocator.h"
+#include "../lib/Constants.h"
 #include "../lib/Material.h"
 #include "../lib/RayHittableList.h"
 #include "../lib/Sphere.h"
@@ -10,6 +12,10 @@ namespace ART
 
 TEST_CASE("RayHittableList basic behaviour (spheres only)", "[RayHittableList]")
 {
+    ArenaAllocator allocator(ONE_MEGABYTE);
+    Texture* texture = allocator.Create<SolidColourTexture>(Colour(0.7));
+    Material* material = allocator.Create<LambertianMaterial>(texture);
+
     SECTION("Default constructor creates empty list")
     {
         RayHittableList list;
@@ -19,11 +25,12 @@ TEST_CASE("RayHittableList basic behaviour (spheres only)", "[RayHittableList]")
     SECTION("Add actually adds IRayHittables to the list")
     {
         RayHittableList list;
-        std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>
+
+        Sphere* sphere = allocator.Create<Sphere>
         (
             Point3(0.0, 0.0, -1.0),
             0.5,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         );
 
         list.Add(sphere);
@@ -35,11 +42,12 @@ TEST_CASE("RayHittableList basic behaviour (spheres only)", "[RayHittableList]")
     SECTION("Clear removes all IRayHittables")
     {
         RayHittableList list;
-        list.Add(std::make_shared<Sphere>
+
+        list.Add(allocator.Create<Sphere>
         (
             Point3(0.0, 0.0, -1.0),
             0.5,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         ));
 
         list.Clear();
@@ -50,16 +58,20 @@ TEST_CASE("RayHittableList basic behaviour (spheres only)", "[RayHittableList]")
 
 TEST_CASE("RayHittableList Hit behaviour", "[RayHittableList]")
 {
+    ArenaAllocator allocator(ONE_MEGABYTE);
+    Texture* texture = allocator.Create<SolidColourTexture>(Colour(0.7));
+    Material* material = allocator.Create<LambertianMaterial>(texture);
+
     Ray ray(Point3(0.0, 0.0, 0.0), Vec3(0.0, 0.0, -1.0));
 
     SECTION("Ray misses all IRayHittables")
     {
         RayHittableList list;
-        list.Add(std::make_shared<Sphere>
+        list.Add(allocator.Create<Sphere>
         (
             Point3(0.0, 0.0, 5.0),
             0.5,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         ));
 
         RayHitResult result;
@@ -71,11 +83,11 @@ TEST_CASE("RayHittableList Hit behaviour", "[RayHittableList]")
     SECTION("Single IRayHittable hit")
     {
         RayHittableList list;
-        list.Add(std::make_shared<Sphere>
+        list.Add(allocator.Create<Sphere>
         (
             Point3(0.0, 0.0, -1.0),
             0.5,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         ));
 
         RayHitResult result;
@@ -89,17 +101,17 @@ TEST_CASE("RayHittableList Hit behaviour", "[RayHittableList]")
     {
         RayHittableList list;
 
-        list.Add(std::make_shared<Sphere>
+        list.Add(allocator.Create<Sphere>
         (
             Point3(0.0, 0.0, -5.0),
             1.0,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         ));
-        list.Add(std::make_shared<Sphere>
+        list.Add(allocator.Create<Sphere>
         (
             Point3(0.0, 0.0, -2.0),
             0.5,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         ));
 
         RayHitResult result;
@@ -112,6 +124,10 @@ TEST_CASE("RayHittableList Hit behaviour", "[RayHittableList]")
 
 TEST_CASE("RayHittableList BoundingBox (spheres)", "[RayHittableList]")
 {
+    ArenaAllocator allocator(ONE_MEGABYTE);
+    Texture* texture = allocator.Create<SolidColourTexture>(Colour(0.7));
+    Material* material = allocator.Create<LambertianMaterial>(texture);
+
     SECTION("Empty list has default bounding box")
     {
         RayHittableList list;
@@ -125,17 +141,17 @@ TEST_CASE("RayHittableList BoundingBox (spheres)", "[RayHittableList]")
     {
         RayHittableList list;
 
-        list.Add(std::make_shared<Sphere>
+        list.Add(allocator.Create<Sphere>
         (
             Point3(0.0, 0.0, 0.0),
             1.0,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         ));
-        list.Add(std::make_shared<Sphere>
+        list.Add(allocator.Create<Sphere>
         (
             Point3(3.0, 0.0, 0.0),
             2.0,
-            std::make_shared<LambertianMaterial>(Colour(0.7))
+            material
         ));
 
         const AABB box = list.BoundingBox();

@@ -1,8 +1,10 @@
 // Copyright Mia Rolfe. All rights reserved.
+#pragma once
 
-#include "Common.h"
 #include "IRayHittable.h"
 #include "RayHitResult.h"
+
+#include <vector>
 
 namespace ART
 {
@@ -12,20 +14,20 @@ class RayHittableList : public IRayHittable
 public:
     RayHittableList();
 
-    RayHittableList(std::shared_ptr<IRayHittable> hittable);
+    RayHittableList(IRayHittable* hittable);
 
     void Clear();
 
-    void Add(std::shared_ptr<IRayHittable> hittable);
+    void Add(IRayHittable* hittable);
 
     bool Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) const override;
 
-    std::vector<std::shared_ptr<IRayHittable>>& GetObjects();
+    std::vector<IRayHittable*>& GetObjects();
 
     AABB BoundingBox() const override;
 
 protected:
-    std::vector<std::shared_ptr<IRayHittable>> m_objects;
+    std::vector<IRayHittable*> m_objects;
     AABB m_bounding_box;
 };
 

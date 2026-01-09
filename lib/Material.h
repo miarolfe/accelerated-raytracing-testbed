@@ -22,14 +22,12 @@ public:
 struct LambertianMaterial : public Material
 {
 public:
-    LambertianMaterial(const Colour& albedo);
-
-    LambertianMaterial(std::shared_ptr<Texture> texture);
+    LambertianMaterial(Texture* texture);
 
     bool Scatter(const Ray& ray, const RayHitResult& result, Colour& out_attenuation, Ray& out_ray) const override;
 
 protected:
-    std::shared_ptr<Texture> m_texture;
+    Texture* m_texture;
 };
 
 struct MetalMaterial : public Material
@@ -63,14 +61,12 @@ protected:
 struct DiffuseLightMaterial : public Material
 {
 public:
-    DiffuseLightMaterial(std::shared_ptr<Texture> texture);
-
-    DiffuseLightMaterial(const Colour& emit_colour);
+    DiffuseLightMaterial(Texture* texture);
 
     Colour Emitted(double u, double v, const Point3& point) const override;
 
 protected:
-    std::shared_ptr<Texture> m_texture;
+    Texture* m_texture;
 };
 
 } // namespace ART

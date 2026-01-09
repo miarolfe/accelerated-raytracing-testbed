@@ -13,13 +13,13 @@ namespace ART
 struct UniformGridEntry
 {
 public:
-    std::set<std::shared_ptr<IRayHittable>> hittables;
+    std::set<IRayHittable*> hittables;
 };
 
 class UniformGrid : public IRayHittable
 {
 public:
-    UniformGrid(const std::vector<std::shared_ptr<IRayHittable>>& objects);
+    UniformGrid(std::vector<IRayHittable*>& objects);
 
     ~UniformGrid();
 
@@ -28,7 +28,7 @@ public:
     AABB BoundingBox() const override;
 
 protected:
-    void Create(const std::vector<std::shared_ptr<IRayHittable>>& objects);
+    void Create(std::vector<IRayHittable*>& objects);
 
     void Destroy();
 

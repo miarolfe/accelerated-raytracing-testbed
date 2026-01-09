@@ -12,21 +12,21 @@ Sphere::Sphere()
     m_centre = Ray(Point3(0.0), Vec3(0.0));
     m_radius = 1.0;
     const Vec3 radius_vec = Vec3(m_radius);
-	m_bounding_box = AABB(m_centre.m_origin - radius_vec, m_centre.m_origin + radius_vec);
-	m_material = std::make_shared<LambertianMaterial>(Colour(0.7));
+    m_bounding_box = AABB(m_centre.m_origin - radius_vec, m_centre.m_origin + radius_vec);
+    m_material = nullptr;
 }
 
-Sphere::Sphere(const Point3& centre, double radius, std::shared_ptr<Material> material)
+Sphere::Sphere(const Point3& centre, double radius, Material* material)
 {
     assert(radius >= 0.0);
     m_centre = Ray(centre, Vec3(0.0));
     m_radius = radius;
     const Vec3 radius_vec = Vec3(m_radius);
-   	m_bounding_box = AABB(m_centre.m_origin - radius_vec, m_centre.m_origin + radius_vec);
+    m_bounding_box = AABB(m_centre.m_origin - radius_vec, m_centre.m_origin + radius_vec);
     m_material = material;
 }
 
-Sphere::Sphere(const Point3& centre1, const Point3& centre2, double radius, std::shared_ptr<Material> material)
+Sphere::Sphere(const Point3& centre1, const Point3& centre2, double radius, Material* material)
 {
     assert(radius >= 0.0);
     m_centre = Ray(centre1, centre2 - centre1);
