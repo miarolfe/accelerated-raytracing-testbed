@@ -48,7 +48,7 @@ void RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& 
 
 void Scene1(AccelerationStructure acceleration_structure)
 {
-    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+    ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
     ART::CameraSetupParams camera_setup_params
     {
@@ -84,7 +84,7 @@ void Scene1(AccelerationStructure acceleration_structure)
 
 void Scene2(AccelerationStructure acceleration_structure)
 {
-    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+    ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
     ART::CameraSetupParams camera_setup_params
     {
@@ -117,7 +117,7 @@ void Scene2(AccelerationStructure acceleration_structure)
 
 void Scene3(AccelerationStructure acceleration_structure)
 {
-    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+    ART::ArenaAllocator arena(ART::ONE_MEGABYTE); // 1 MB
 
     ART::CameraSetupParams camera_setup_params
     {
@@ -157,7 +157,7 @@ void Scene3(AccelerationStructure acceleration_structure)
 
 void Scene4(AccelerationStructure acceleration_structure)
 {
-    ART::ArenaAllocator arena(1024 * 1024); // 1 MB
+    ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
     ART::CameraSetupParams camera_setup_params
     {
@@ -195,7 +195,7 @@ void Scene4(AccelerationStructure acceleration_structure)
 
 void Scene5(AccelerationStructure acceleration_structure)
 {
-    ART::ArenaAllocator arena(16 * 1024 * 1024); // 16 MB for 3000 spheres
+    ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
     ART::RayHittableList scene;
 
