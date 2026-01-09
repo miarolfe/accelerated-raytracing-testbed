@@ -1,8 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "../external/Catch2/catch.hpp"
+#include <Catch2/catch.hpp>
 
-#include "../lib/AxisAlignedBoundingBox.h"
-#include "../lib/Constants.h"
+#include <AxisAlignedBoundingBox.h>
+#include <Constants.h>
 
 namespace ART
 {

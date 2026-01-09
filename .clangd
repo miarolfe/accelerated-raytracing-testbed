@@ -1,0 +1,15 @@
+CompileFlags:
+  CompilationDatabase: .
+  Add:
+    - -std=c++17
+    - -fopenmp
+    - -isystem../external
+    - -isystem../lib
+    - -isystem../include
+    - -isystem../src
+    - -isystem../tests
+    - -isystemexternal
+    - -isystemlib
+    - -isysteminclude
+    - -isystemsrc
+    - -isystemtests

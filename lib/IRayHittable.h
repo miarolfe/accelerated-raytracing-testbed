@@ -1,10 +1,10 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
-#include "AxisAlignedBoundingBox.h"
-#include "Interval.h"
-#include "Ray.h"
-#include "RayHitResult.h"
+#include <AxisAlignedBoundingBox.h>
+#include <Interval.h>
+#include <Ray.h>
+#include <RayHitResult.h>
 
 namespace ART
 {

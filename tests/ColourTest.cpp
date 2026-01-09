@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "../external/Catch2/catch.hpp"
-#include "../lib/Colour.h"
+#include <Catch2/catch.hpp>
+
+#include <Colour.h>
 
 namespace ART
 {

@@ -1,10 +1,10 @@
 // Copyright Mia Rolfe. All rights reserved
-#include "Material.h"
+#include <Material.h>
 
-#include "Random.h"
-#include "RayHitResult.h"
-#include "Texture.h"
-#include "Vec3.h"
+#include <Random.h>
+#include <RayHitResult.h>
+#include <Texture.h>
+#include <Vec3.h>
 
 namespace ART
 {

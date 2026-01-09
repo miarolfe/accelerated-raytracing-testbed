@@ -1,16 +1,16 @@
 // Copyright Mia Rolfe. All rights reserved.
 
-#include "../lib/ArenaAllocator.h"
-#include "../lib/Camera.h"
-#include "../lib/Colour.h"
-#include "../lib/HierarchicalUniformGrid.h"
-#include "../lib/Logger.h"
-#include "../lib/Material.h"
-#include "../lib/RayHittableList.h"
-#include "../lib/Sphere.h"
-#include "../lib/Texture.h"
-#include "../lib/UniformGrid.h"
-#include "../lib/Vec3.h"
+#include <ArenaAllocator.h>
+#include <Camera.h>
+#include <Colour.h>
+#include <HierarchicalUniformGrid.h>
+#include <Logger.h>
+#include <Material.h>
+#include <RayHittableList.h>
+#include <Sphere.h>
+#include <Texture.h>
+#include <UniformGrid.h>
+#include <Vec3.h>
 
 enum class AccelerationStructure
 {

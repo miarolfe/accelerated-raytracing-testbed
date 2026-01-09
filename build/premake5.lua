@@ -86,10 +86,6 @@ filter {}
     externalincludedirs
     {
         path.getdirectory(os.getcwd()) .. "/external",
-    }
-
-    includedirs
-    {
         path.getdirectory(os.getcwd()) .. "/lib",
         path.getdirectory(os.getcwd()) .. "/include",
     }
@@ -101,7 +97,7 @@ filter {"configurations:Debug or Release"}
         path.getdirectory(os.getcwd()) .. "/src/**.h"
     }
 
-    includedirs
+    externalincludedirs
     {
         path.getdirectory(os.getcwd()) .. "/src"
     }
@@ -115,7 +111,7 @@ filter {"configurations:Test"}
         path.getdirectory(os.getcwd()) .. "/tests/**.h"
     }
 
-    includedirs
+    externalincludedirs
     {
         path.getdirectory(os.getcwd()) .. "/tests"
     }

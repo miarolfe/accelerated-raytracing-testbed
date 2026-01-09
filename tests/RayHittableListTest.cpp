@@ -1,11 +1,11 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "../external/Catch2/catch.hpp"
+#include <Catch2/catch.hpp>
 
-#include "../lib/ArenaAllocator.h"
-#include "../lib/Constants.h"
-#include "../lib/Material.h"
-#include "../lib/RayHittableList.h"
-#include "../lib/Sphere.h"
+#include <ArenaAllocator.h>
+#include <Constants.h>
+#include <Material.h>
+#include <RayHittableList.h>
+#include <Sphere.h>
 
 namespace ART
 {

@@ -1,5 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "Interval.h"
+#include <Interval.h>
 
 namespace ART
 {

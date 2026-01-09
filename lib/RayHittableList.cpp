@@ -1,5 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
-#include "RayHittableList.h"
+#include <RayHittableList.h>
 
 namespace ART
 {
