@@ -15,6 +15,7 @@ public:
     ArenaAllocator(std::size_t capacity_in_bytes);
     ~ArenaAllocator();
 
+    // Alignment must be a power of 2
     void* Alloc(std::size_t size_in_bytes, std::size_t alignment_in_bytes = 16);
     void Clear();
 
