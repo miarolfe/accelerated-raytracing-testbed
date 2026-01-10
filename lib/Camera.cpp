@@ -51,8 +51,6 @@ Camera::Camera(const CameraSetupParams& setup_params)
 
     DeriveDependentVariables();
     ResizeImageBuffer();
-
-    Logger::Get().LogInfo("Camera initialised at " + std::to_string(m_image_width) + "x" + std::to_string(m_image_height));
 }
 
 Camera::~Camera()
