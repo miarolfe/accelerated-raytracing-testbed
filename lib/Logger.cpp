@@ -52,6 +52,9 @@ void Logger::Log(const std::string& log_msg, LogSeverity log_severity)
     {
         std::scoped_lock lock(m_log_queue_mutex);
         m_log_queue.push(timestamped_log_msg);
+#ifdef DEBUG
+        std::cerr << timestamped_log_msg << std::endl;
+#endif
     }
 }
 

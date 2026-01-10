@@ -1,5 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 
+#include <iomanip>
+
 #include <ArenaAllocator.h>
 #include <BoundingVolumeHierarchy.h>
 #include <Camera.h>
@@ -10,52 +12,87 @@
 #include <RayHittableList.h>
 #include <Sphere.h>
 #include <Texture.h>
+#include <Timer.h>
 #include <UniformGrid.h>
+#include <Utility.h>
 #include <Vec3.h>
 
-enum class AccelerationStructure
+void LogRenderStats(const ART::RenderStats& stats)
 {
-    NONE,
-    UNIFORM_GRID,
-    HIERARCHICAL_UNIFORM_GRID,
-    BOUNDING_VOLUME_HIERARCHY
-};
+    std::ostringstream output_string_stream;
+    // Use fixed-point (no scientific notation)
+    output_string_stream << std::fixed << std::setprecision(2);
+    output_string_stream << "[Acceleration structure: " << ART::AccelerationStructureToString(stats.m_acceleration_structure) << "] "
+        << "Construction time: " << stats.m_construction_time_ms << " ms, "
+        << "Render time: " << stats.m_render_time_ms << " ms, "
+        << "Total time: " << stats.TotalTimeMilliseconds() << " ms";
+    ART::Logger::Get().LogInfo(output_string_stream.str());
+}
 
-void RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& scene, AccelerationStructure acceleration_structure)
+ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& scene, ART::AccelerationStructure acceleration_structure)
 {
+    ART::Timer timer;
+    ART::RenderStats stats;
+    stats.m_acceleration_structure = acceleration_structure;
+
     switch (acceleration_structure)
     {
-        case AccelerationStructure::NONE:
+        case ART::AccelerationStructure::NONE:
         {
+            stats.m_construction_time_ms = 0.0;
+
+            timer.Start();
             camera.Render(scene, "render_none.png");
-            ART::Logger::Get().LogInfo("Finished render using no acceleration structure");
+            timer.Stop();
+            stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
         }
-        case AccelerationStructure::UNIFORM_GRID:
+        case ART::AccelerationStructure::UNIFORM_GRID:
         {
+            timer.Start();
             ART::UniformGrid uniform_grid(scene.GetObjects());
+            timer.Stop();
+            stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+
+            timer.Start();
             camera.Render(uniform_grid, "render_uniform_grid.png");
-            ART::Logger::Get().LogInfo("Finished render using uniform grid acceleration structure");
+            timer.Stop();
+            stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
         }
-        case AccelerationStructure::HIERARCHICAL_UNIFORM_GRID:
+        case ART::AccelerationStructure::HIERARCHICAL_UNIFORM_GRID:
         {
+            timer.Start();
             ART::HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
+            timer.Stop();
+            stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+
+            timer.Start();
             camera.Render(hierarchical_uniform_grid, "render_hierarchical_uniform_grid.png");
-            ART::Logger::Get().LogInfo("Finished render using hierarchical uniform grid acceleration structure");
+            timer.Stop();
+            stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
         }
-        case AccelerationStructure::BOUNDING_VOLUME_HIERARCHY:
+        case ART::AccelerationStructure::BOUNDING_VOLUME_HIERARCHY:
         {
+            timer.Start();
             ART::BVHNode bounding_volume_hierarchy(scene.GetObjects());
+            timer.Stop();
+            stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+
+            timer.Start();
             camera.Render(bounding_volume_hierarchy, "render_bounding_volume_hierarchy.png");
-            ART::Logger::Get().LogInfo("Finished render using bounding volume hierarchy acceleration structure");
+            timer.Stop();
+            stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
         }
     }
+
+    LogRenderStats(stats);
+    return stats;
 }
 
-void Scene1(AccelerationStructure acceleration_structure)
+void Scene1(ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
@@ -91,7 +128,7 @@ void Scene1(AccelerationStructure acceleration_structure)
     RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene2(AccelerationStructure acceleration_structure)
+void Scene2(ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
@@ -124,7 +161,7 @@ void Scene2(AccelerationStructure acceleration_structure)
     RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene3(AccelerationStructure acceleration_structure)
+void Scene3(ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE); // 1 MB
 
@@ -164,7 +201,7 @@ void Scene3(AccelerationStructure acceleration_structure)
     RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene4(AccelerationStructure acceleration_structure)
+void Scene4(ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
@@ -202,7 +239,7 @@ void Scene4(AccelerationStructure acceleration_structure)
     RenderWithAccelerationStructure(camera, scene, acceleration_structure);
 }
 
-void Scene5(AccelerationStructure acceleration_structure)
+void Scene5(ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
@@ -268,7 +305,7 @@ void Scene5(AccelerationStructure acceleration_structure)
         720,
         ART::Colour(0.7, 0.8, 1.0),
         18.0,
-        10,
+        1,
         25,
         ART::Point3(-100.0, 100.0, 100.0),
         average_position_cluster_1,
@@ -285,10 +322,10 @@ int main()
 {
     ART::Logger::Get().LogInfo("Booting up");
 
-    Scene5(AccelerationStructure::NONE);
-    Scene5(AccelerationStructure::UNIFORM_GRID);
-    Scene5(AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
-    Scene5(AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
+    Scene5(ART::AccelerationStructure::NONE);
+    Scene5(ART::AccelerationStructure::UNIFORM_GRID);
+    Scene5(ART::AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    Scene5(ART::AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
 
     ART::Logger::Get().LogInfo("Shutting down");
     ART::Logger::Get().Flush();

@@ -78,11 +78,11 @@ private:
     std::mutex m_log_filestream_mutex;
     std::mutex m_log_queue_mutex;
     std::atomic_bool m_exit_flag = false;
-    #ifdef NDEBUG
-        LogSeverity m_log_severity_level_filter = LogSeverity::LOG_WARN;
-    #else
-        LogSeverity m_log_severity_level_filter = LogSeverity::LOG_DEBUG;
-    #endif
+#ifdef NDEBUG
+    LogSeverity m_log_severity_level_filter = LogSeverity::LOG_INFO;
+#else
+    LogSeverity m_log_severity_level_filter = LogSeverity::LOG_DEBUG;
+#endif
 };
 
 } // namespace ART
