@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 
 #include <ArenaAllocator.h>
+#include <BoundingVolumeHierarchy.h>
 #include <Camera.h>
 #include <Colour.h>
 #include <HierarchicalUniformGrid.h>
@@ -46,8 +47,8 @@ void RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& 
         }
         case AccelerationStructure::BOUNDING_VOLUME_HIERARCHY:
         {
-            ART::HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
-            camera.Render(hierarchical_uniform_grid, "render_bounding_volume_hierarchy.png");
+            ART::BVHNode bounding_volume_hierarchy(scene.GetObjects());
+            camera.Render(bounding_volume_hierarchy, "render_bounding_volume_hierarchy.png");
             ART::Logger::Get().LogInfo("Finished render using bounding volume hierarchy acceleration structure");
             break;
         }
