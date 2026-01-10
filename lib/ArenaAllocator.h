@@ -12,6 +12,7 @@ namespace ART
 class ArenaAllocator
 {
 public:
+    // Capacity rounds up to nearest multiple of 64 bytes for aligned_alloc
     ArenaAllocator(std::size_t capacity_in_bytes);
     ~ArenaAllocator();
 

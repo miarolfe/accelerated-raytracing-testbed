@@ -9,7 +9,8 @@ namespace ART
 ArenaAllocator::ArenaAllocator(std::size_t capacity_in_bytes)
     : m_buffer(nullptr), m_capacity(capacity_in_bytes), m_offset(0)
 {
-    m_buffer = static_cast<uint8_t*>(malloc(capacity_in_bytes));
+    std::size_t aligned_capacity = (capacity_in_bytes + 63) & ~std::size_t(63);
+    m_buffer = static_cast<uint8_t*>(aligned_alloc(64, aligned_capacity));
 }
 
 ArenaAllocator::~ArenaAllocator()
