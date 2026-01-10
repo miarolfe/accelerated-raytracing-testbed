@@ -16,7 +16,8 @@ enum class AccelerationStructure
 {
     NONE,
     UNIFORM_GRID,
-    HIERARCHICAL_UNIFORM_GRID
+    HIERARCHICAL_UNIFORM_GRID,
+    BOUNDING_VOLUME_HIERARCHY
 };
 
 void RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& scene, AccelerationStructure acceleration_structure)
@@ -41,6 +42,13 @@ void RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& 
             ART::HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
             camera.Render(hierarchical_uniform_grid, "render_hierarchical_uniform_grid.png");
             ART::Logger::Get().LogInfo("Finished render using hierarchical uniform grid acceleration structure");
+            break;
+        }
+        case AccelerationStructure::BOUNDING_VOLUME_HIERARCHY:
+        {
+            ART::HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
+            camera.Render(hierarchical_uniform_grid, "render_bounding_volume_hierarchy.png");
+            ART::Logger::Get().LogInfo("Finished render using bounding volume hierarchy acceleration structure");
             break;
         }
     }
@@ -276,9 +284,10 @@ int main()
 {
     ART::Logger::Get().LogInfo("Booting up");
 
-    // Scene5(AccelerationStructure::NONE);
+    Scene5(AccelerationStructure::NONE);
     Scene5(AccelerationStructure::UNIFORM_GRID);
-    // Scene5(AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    Scene5(AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    Scene5(AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
 
     ART::Logger::Get().LogInfo("Shutting down");
     ART::Logger::Get().Flush();

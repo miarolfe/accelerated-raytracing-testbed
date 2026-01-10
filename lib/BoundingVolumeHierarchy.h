@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
+#include <ArenaAllocator.h>
 #include <Common.h>
 #include <IRayHittable.h>
 #include <Interval.h>
@@ -10,23 +11,26 @@
 namespace ART
 {
 
-class BoundingVolumeHierarchy : public IRayHittable
+class BVHNode : public IRayHittable
 {
 public:
-    BoundingVolumeHierarchy(std::vector<IRayHittable*>& objects);
+    BVHNode(std::vector<IRayHittable*>& objects);
 
-    ~BoundingVolumeHierarchy();
+    ~BVHNode();
 
     bool Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) const override;
 
     AABB BoundingBox() const override;
 
-protected:
-    void Create(std::vector<IRayHittable*>& objects);
+    BVHNode(IRayHittable** objects, std::size_t count, ArenaAllocator& allocator);
 
-    void Destroy();
+protected:
+    void Create(IRayHittable** objects, std::size_t count, ArenaAllocator& allocator);
 
     AABB m_bounding_box;
+    ArenaAllocator* m_allocator = nullptr;  // Only root node owns allocator
+    IRayHittable* m_left = nullptr;
+    IRayHittable* m_right = nullptr;
 };
 
 } // namespace ART
