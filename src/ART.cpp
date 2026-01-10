@@ -276,9 +276,9 @@ int main()
 {
     ART::Logger::Get().LogInfo("Booting up");
 
-    Scene5(AccelerationStructure::NONE);
+    // Scene5(AccelerationStructure::NONE);
     Scene5(AccelerationStructure::UNIFORM_GRID);
-    Scene5(AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    // Scene5(AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
 
     ART::Logger::Get().LogInfo("Shutting down");
     ART::Logger::Get().Flush();

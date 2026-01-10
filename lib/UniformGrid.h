@@ -12,8 +12,8 @@ namespace ART
 
 struct UniformGridEntry
 {
-public:
-    std::set<IRayHittable*> hittables;
+    IRayHittable** hittables = nullptr;
+    std::size_t num_hittables = 0;
 };
 
 class UniformGrid : public IRayHittable
