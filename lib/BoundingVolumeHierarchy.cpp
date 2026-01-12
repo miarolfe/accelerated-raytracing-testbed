@@ -143,7 +143,10 @@ std::size_t BVHNode::SplitSAH(IRayHittable** objects, std::size_t count)
                 }
             }
 
-            if (left_num_hittables == 0 || right_num_hittables == 0) continue;
+            if (left_num_hittables == 0 || right_num_hittables == 0)
+            {
+                continue;
+            }
 
             const double cost_of_left_subtree = (left_bounding_box.SurfaceArea() / parent_node_surface_area) * left_num_hittables * HITTABLE_INTERSECT_COST;
             const double cost_of_right_subtree = (right_bounding_box.SurfaceArea() / parent_node_surface_area) * right_num_hittables * HITTABLE_INTERSECT_COST;
