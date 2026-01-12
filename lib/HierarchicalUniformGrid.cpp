@@ -196,21 +196,17 @@ void HierarchicalUniformGrid::Create(std::vector<IRayHittable*>& objects)
         }
     }
 
-    // Allocate arrays for each cell
-    IRayHittable*** objects_for_each_cell = new IRayHittable**[num_cells];
-    std::size_t* cell_fill_indices = new std::size_t[num_cells]();
-
+    // Calculate offset for each cell in hittables buffer
+    std::size_t* cell_buffer_offsets = new std::size_t[num_cells];
+    std::size_t num_object_references = 0;
     for (std::size_t i = 0; i < num_cells; i++)
     {
-        if (objects_per_cell_count[i] > 0)
-        {
-            objects_for_each_cell[i] = new IRayHittable*[objects_per_cell_count[i]];
-        }
-        else
-        {
-            objects_for_each_cell[i] = nullptr;
-        }
+        cell_buffer_offsets[i] = num_object_references;
+        num_object_references += objects_per_cell_count[i];
     }
+
+    IRayHittable** objects_buffer = new IRayHittable*[num_object_references];
+    std::size_t* objects_count_per_cell = new std::size_t[num_cells]();
 
     // Distribute objects to cells
     for (std::size_t object_index = 0; object_index < objects.size(); object_index++)
@@ -238,7 +234,9 @@ void HierarchicalUniformGrid::Create(std::vector<IRayHittable*>& objects)
                 for (int k = min_bound_grid_index.m_z; k <= max_bound_grid_index.m_z; k++)
                 {
                     const std::size_t one_dimensional_index = Calculate1DIndex(Vec3Int(i, j, k));
-                    objects_for_each_cell[one_dimensional_index][cell_fill_indices[one_dimensional_index]++] = objects[object_index];
+                    const std::size_t buffer_index = cell_buffer_offsets[one_dimensional_index] + objects_count_per_cell[one_dimensional_index];
+                    objects_count_per_cell[one_dimensional_index] += 1;
+                    objects_buffer[buffer_index] = objects[object_index];
                 }
             }
         }
@@ -249,16 +247,16 @@ void HierarchicalUniformGrid::Create(std::vector<IRayHittable*>& objects)
     {
         if (objects_per_cell_count[i] > 0)
         {
-            std::vector<IRayHittable*> objects_vec(objects_for_each_cell[i], objects_for_each_cell[i] + objects_per_cell_count[i]);
+            std::vector<IRayHittable*> objects_vec(objects_buffer + cell_buffer_offsets[i], objects_buffer + cell_buffer_offsets[i] + objects_per_cell_count[i]);
             m_grid[i].subgrid = new UniformGrid(objects_vec);
-            delete[] objects_for_each_cell[i];
         }
     }
 
     // Clean up temporary arrays
-    delete[] objects_for_each_cell;
+    delete[] objects_buffer;
+    delete[] cell_buffer_offsets;
     delete[] objects_per_cell_count;
-    delete[] cell_fill_indices;
+    delete[] objects_count_per_cell;
 
     m_is_grid_valid = true;
 }
@@ -303,8 +301,8 @@ bool HierarchicalUniformGrid::CellHit(const HierarchicalUniformGridEntry& entry,
 
 Vec3 HierarchicalUniformGrid::DetermineCellSize(std::size_t num_objects) const
 {
-    const double sixth_root_n = std::pow(static_cast<double>(num_objects), 1.0 / 6.0);
-    const double cell_size = 3.0 * std::max(m_bounding_box.m_x.Size(), std::max(m_bounding_box.m_y.Size(), m_bounding_box.m_z.Size())) / std::max(1.0, sixth_root_n);
+    const double cube_root_n = std::cbrt(static_cast<double>(num_objects));
+    const double cell_size = 3.0 * std::max(m_bounding_box.m_x.Size(), std::max(m_bounding_box.m_y.Size(), m_bounding_box.m_z.Size())) / std::max(1.0, cube_root_n);
 
     return Vec3(cell_size);
 }

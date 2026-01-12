@@ -12,7 +12,8 @@ namespace ART
 
 struct UniformGridEntry
 {
-    IRayHittable** hittables = nullptr;
+public:
+    std::size_t hittables_buffer_offset = 0;
     std::size_t num_hittables = 0;
 };
 
@@ -46,6 +47,7 @@ protected:
 
     AABB m_bounding_box;
     UniformGridEntry* m_grid = nullptr;
+    IRayHittable** m_hittables_buffer = nullptr;
     Vec3 m_cell_size;
     std::size_t m_num_x_cells = 0;
     std::size_t m_num_y_cells = 0;
