@@ -63,6 +63,9 @@ public:
     // x = 0, y = 1, z = 2
     std::size_t LongestAxis();
 
+    // Calculate surface area of the AABB
+    double SurfaceArea() const;
+
     void PadToMinimums();
 };
 

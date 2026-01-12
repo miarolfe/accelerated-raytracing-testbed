@@ -150,6 +150,14 @@ std::size_t AABB::LongestAxis()
     }
 }
 
+double AABB::SurfaceArea() const
+{
+    const double dx = m_x.Size();
+    const double dy = m_y.Size();
+    const double dz = m_z.Size();
+    return 2.0 * (dx * dy + dy * dz + dz * dx);
+}
+
 void AABB::PadToMinimums()
 {
     static constexpr double delta = 0.0001;
