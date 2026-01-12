@@ -1,5 +1,7 @@
 # ART (Accelerated Raytracing Testbed)
 
+<img width="1920" height="1080" alt="A 10x10x10 3D grid of spheres spaced out" src="https://github.com/user-attachments/assets/ebd9bc40-8a74-40fc-85b7-01dea756f84c" />
+
 ART is a ray tracing testbed designed to benchmark and compare different spatial acceleration structures used in ray tracing.
 
 ## Key features
