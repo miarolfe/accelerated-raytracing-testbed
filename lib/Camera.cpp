@@ -18,36 +18,39 @@ namespace ART
 
 static constexpr std::size_t num_image_components = 3; // RGB
 
-const CameraSetupParams default_camera_setup_params =
+const CameraViewConfig default_view_config =
 {
-    600,                            // image_width
-    600,                            // image_height
-    Colour(0.529, 0.808, 0.922),    // background_colour
-    45.0,                           // vertical_fov
-    50,                             // samples_per_pixel
-    25,                             // max_ray_bounces
-    Point3(0.0),                    // look_from
-    Point3(0.0, 0.0, 10.0),         // look_at
-    Vec3(0.0, 1.0, 0.0),            // up
-    0.0,                            // defocus_angle
-    10.0                            // focus_distance
+    Point3(0.0),
+    Point3(0.0, 0.0, 10.0),
+    Vec3(0.0, 1.0, 0.0),
+    45.0,
+    0.0,
+    10.0
 };
 
-Camera::Camera() : Camera(default_camera_setup_params) {}
-
-Camera::Camera(const CameraSetupParams& setup_params)
+const CameraRenderConfig default_render_config =
 {
-    m_image_width = setup_params.image_width;
-    m_image_height = setup_params.image_height;
-    m_background_colour = setup_params.background_colour;
-    m_vertical_fov = setup_params.vertical_fov;
-    m_samples_per_pixel = setup_params.samples_per_pixel;
-    m_max_ray_bounces = setup_params.max_ray_bounces;
-    m_look_from = setup_params.look_from;
-    m_look_at = setup_params.look_at;
-    m_up = setup_params.up;
-    m_defocus_angle = setup_params.defocus_angle;
-    m_focus_distance = setup_params.focus_distance;
+    600,
+    600,
+    50,
+    25
+};
+
+Camera::Camera() : Camera(default_view_config, default_render_config) {}
+
+Camera::Camera(const CameraViewConfig& view_config, const CameraRenderConfig& render_config)
+{
+    m_look_from = view_config.look_from;
+    m_look_at = view_config.look_at;
+    m_up = view_config.up;
+    m_vertical_fov = view_config.vertical_fov;
+    m_defocus_angle = view_config.defocus_angle;
+    m_focus_distance = view_config.focus_distance;
+
+    m_image_width = render_config.image_width;
+    m_image_height = render_config.image_height;
+    m_samples_per_pixel = render_config.samples_per_pixel;
+    m_max_ray_bounces = render_config.max_ray_bounces;
 
     DeriveDependentVariables();
     ResizeImageBuffer();
@@ -63,7 +66,7 @@ Camera::~Camera()
 
 static const Interval intensity(0.0, 0.999);
 
-void Camera::Render(const IRayHittable& scene, const std::string& output_image_name)
+void Camera::Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name)
 {
     assert(m_image_width > 0);
     assert(m_image_height > 0);
@@ -71,6 +74,8 @@ void Camera::Render(const IRayHittable& scene, const std::string& output_image_n
     assert(m_samples_per_pixel >= 1);
     assert(m_max_ray_bounces >= 1);
     assert(m_image_data != nullptr);
+
+    const Colour& background_colour = scene_config.background_colour;
 
     #pragma omp parallel for schedule(static)
     for (std::int64_t j = 0; j < static_cast<std::int64_t>(m_image_height); j++)
@@ -87,7 +92,7 @@ void Camera::Render(const IRayHittable& scene, const std::string& output_image_n
             for (std::size_t sample = 0; sample < m_samples_per_pixel; sample++)
             {
                 const Ray& ray = GetRay(i, j);
-                pixel_colour += RayColour(ray, m_max_ray_bounces, scene);
+                pixel_colour += RayColour(ray, m_max_ray_bounces, scene, background_colour);
             }
 
             pixel_colour *= m_pixel_sample_scale;
@@ -158,7 +163,7 @@ void Camera::ResizeImageBuffer()
     m_image_data = new uint8_t[m_image_width * m_image_height * num_image_components];
 }
 
-Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene)
+Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene, const Colour& background_colour)
 {
     if (depth <= 0)
     {
@@ -169,7 +174,7 @@ Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& 
     const double min_ray_t = 0.001;
     if (!scene.Hit(ray, Interval(min_ray_t, infinity), result))
     {
-        return m_background_colour;
+        return background_colour;
     }
 
     Ray scattered;
@@ -180,7 +185,7 @@ Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& 
         return colour_from_emission;
     }
 
-    Colour colour_from_scatter = attenuation * RayColour(scattered, depth - 1, scene);
+    Colour colour_from_scatter = attenuation * RayColour(scattered, depth - 1, scene, background_colour);
 
     return colour_from_emission + colour_from_scatter;
 }

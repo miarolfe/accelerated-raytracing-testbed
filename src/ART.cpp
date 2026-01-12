@@ -1,6 +1,9 @@
 // Copyright Mia Rolfe. All rights reserved.
 
+#include <cstdlib>
+#include <cstring>
 #include <iomanip>
+#include <iostream>
 
 #include <ArenaAllocator.h>
 #include <BoundingVolumeHierarchy.h>
@@ -17,6 +20,105 @@
 #include <Utility.h>
 #include <Vec3.h>
 
+struct CLIParams
+{
+public:
+    std::size_t screen_width = 1280;
+    std::size_t screen_height = 720;
+    std::size_t samples_per_pixel = 100;
+    int scene = 5;
+};
+
+void PrintHelpMsg(const char* program_name)
+{
+    std::cerr << "Usage: " << program_name << " [options]\n"
+              << "Options:\n"
+              << "  --width <pixels>       Screen width (default: 1280)\n"
+              << "  --height <pixels>      Screen height (default: 720)\n"
+              << "  --samples <count>      Samples per pixel (default: 100)\n"
+              << "  --scene <scene_number> Scene to render (default: 5)\n"
+              << "  --help                 Show this help message\n";
+}
+
+bool ParseCLIArgs(int argc, char* argv[], CLIParams& out_params)
+{
+    for (int i = 1; i < argc; i++)
+    {
+        if (std::strcmp(argv[i], "--help") == 0)
+        {
+            PrintHelpMsg(argv[0]);
+            return false;
+        }
+        else if (std::strcmp(argv[i], "--width") == 0)
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Error: --width requires a value\n";
+                return false;
+            }
+            out_params.screen_width = static_cast<std::size_t>(std::atoi(argv[++i]));
+        }
+        else if (std::strcmp(argv[i], "--height") == 0)
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Error: --height requires a value\n";
+                return false;
+            }
+            out_params.screen_height = static_cast<std::size_t>(std::atoi(argv[++i]));
+        }
+        else if (std::strcmp(argv[i], "--samples") == 0)
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Error: --samples requires a value\n";
+                return false;
+            }
+            out_params.samples_per_pixel = static_cast<std::size_t>(std::atoi(argv[++i]));
+        }
+        else if (std::strcmp(argv[i], "--scene") == 0)
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Error: --scene requires a value\n";
+                return false;
+            }
+            out_params.scene = std::atoi(argv[++i]);
+            if (out_params.scene < 1 || out_params.scene > 5)
+            {
+                std::cerr << "Error: --scene must be between 1 and 5\n";
+                return false;
+            }
+        }
+        else
+        {
+            std::cerr << "Error: Unknown option '" << argv[i] << "'\n";
+            PrintHelpMsg(argv[0]);
+            return false;
+        }
+    }
+    return true;
+}
+
+ART::CameraRenderConfig MakeCameraRenderConfig(const CLIParams& cli_params)
+{
+    return ART::CameraRenderConfig
+    {
+        cli_params.screen_width,
+        cli_params.screen_height,
+        cli_params.samples_per_pixel,
+        25
+    };
+}
+
+void LogRenderConfig(const ART::CameraRenderConfig& render_config, int scene_number)
+{
+    std::ostringstream output_string_stream;
+    output_string_stream << "Configuration: " << render_config.image_width << "x" << render_config.image_height
+                         << ", " << render_config.samples_per_pixel << " samples per pixel";
+    ART::Logger::Get().LogInfo(output_string_stream.str());
+}
+
 void LogRenderStats(const ART::RenderStats& stats)
 {
     std::ostringstream output_string_stream;
@@ -29,7 +131,7 @@ void LogRenderStats(const ART::RenderStats& stats)
     ART::Logger::Get().LogInfo(output_string_stream.str());
 }
 
-ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& scene, ART::AccelerationStructure acceleration_structure)
+ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHittableList& scene, const ART::SceneConfig& scene_config, ART::AccelerationStructure acceleration_structure)
 {
     ART::Timer timer;
     ART::RenderStats stats;
@@ -42,7 +144,7 @@ ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHi
             stats.m_construction_time_ms = 0.0;
 
             timer.Start();
-            camera.Render(scene, "render_none.png");
+            camera.Render(scene, scene_config, "render_none.png");
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -55,7 +157,7 @@ ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHi
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
 
             timer.Start();
-            camera.Render(uniform_grid, "render_uniform_grid.png");
+            camera.Render(uniform_grid, scene_config, "render_uniform_grid.png");
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -68,7 +170,7 @@ ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHi
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
 
             timer.Start();
-            camera.Render(hierarchical_uniform_grid, "render_hierarchical_uniform_grid.png");
+            camera.Render(hierarchical_uniform_grid, scene_config, "render_hierarchical_uniform_grid.png");
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -81,7 +183,7 @@ ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHi
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
 
             timer.Start();
-            camera.Render(bounding_volume_hierarchy, "render_bounding_volume_hierarchy.png");
+            camera.Render(bounding_volume_hierarchy, scene_config, "render_bounding_volume_hierarchy.png");
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -92,25 +194,25 @@ ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHi
     return stats;
 }
 
-void Scene1(ART::AccelerationStructure acceleration_structure)
+void Scene1(const ART::CameraRenderConfig& render_config, ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
-    ART::CameraSetupParams camera_setup_params
+    ART::CameraViewConfig view_config
     {
-        600,                            // image_width
-        400,                            // image_height
-        ART::Colour(0.7, 0.8, 1.0),     // background_colour
-        90.0,                           // vertical_fov
-        100,                            // samples_per_pixel
-        25,                             // max_ray_bounces
         ART::Point3(0, 0.0, 0.0),       // look_from
         ART::Point3(0.0, 0.0, 10.0),    // look_at
         ART::Vec3(0.0, 1.0, 0.0),       // up
+        90.0,                           // vertical_fov
         0.0,                            // defocus_angle
         10.0                            // focus_distance
     };
-    ART::Camera camera(camera_setup_params);
+    ART::Camera camera(view_config, render_config);
+
+    ART::SceneConfig scene_config
+    {
+        ART::Colour(0.7, 0.8, 1.0)      // background_colour
+    };
 
     ART::RayHittableList scene;
 
@@ -125,28 +227,28 @@ void Scene1(ART::AccelerationStructure acceleration_structure)
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 0.0, 1.0), 0.5, dielectric_material));
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(7.5, 0.0, 10.0), 2.5, metal_material));
 
-    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
+    RenderWithAccelerationStructure(camera, scene, scene_config, acceleration_structure);
 }
 
-void Scene2(ART::AccelerationStructure acceleration_structure)
+void Scene2(const ART::CameraRenderConfig& render_config, ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
-    ART::CameraSetupParams camera_setup_params
+    ART::CameraViewConfig view_config
     {
-        1280,                           // image_width
-        720,                            // image_height
-        ART::Colour(0.7, 0.8, 1.0),     // background_colour
-        20.0,                           // vertical_fov
-        100,                            // samples_per_pixel
-        25,                             // max_ray_bounces
         ART::Point3(13.0, 2.0, 3.0),    // look_from
         ART::Point3(0.0, 0.0, 0.0),     // look_at
         ART::Vec3(0.0, 1.0, 0.0),       // up
+        20.0,                           // vertical_fov
         0.0,                            // defocus_angle
         10.0                            // focus_distance
     };
-    ART::Camera camera(camera_setup_params);
+    ART::Camera camera(view_config, render_config);
+
+    ART::SceneConfig scene_config
+    {
+        ART::Colour(0.7, 0.8, 1.0)      // background_colour
+    };
 
     ART::RayHittableList scene;
 
@@ -158,28 +260,32 @@ void Scene2(ART::AccelerationStructure acceleration_structure)
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, -10.0, 0.0), 10.0, checker_material));
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 10.0, 0.0), 10.0, checker_material));
 
-    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
+    RenderWithAccelerationStructure(camera, scene, scene_config, acceleration_structure);
 }
 
-void Scene3(ART::AccelerationStructure acceleration_structure)
+void Scene3(const ART::CameraRenderConfig& render_config, ART::AccelerationStructure acceleration_structure)
 {
-    ART::ArenaAllocator arena(ART::ONE_MEGABYTE); // 1 MB
+    ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
-    ART::CameraSetupParams camera_setup_params
+    // Scene 3 uses more ray bounces for glass materials
+    ART::CameraRenderConfig scene3_render_config = render_config;
+    scene3_render_config.max_ray_bounces = 50;
+
+    ART::CameraViewConfig view_config
     {
-        1920,                           // image_width
-        1080,                           // image_height
-        ART::Colour(0.7, 0.8, 1.0),     // background_colour
-        20.0,                           // vertical_fov
-        200,                            // samples_per_pixel
-        50,                             // max_ray_bounces
         ART::Point3(13.0, 2.0, 3.0),    // look_from
         ART::Point3(0.0, 0.0, 0.0),     // look_at
         ART::Vec3(0.0, 1.0, 0.0),       // up
+        20.0,                           // vertical_fov
         0.0,                            // defocus_angle
         10.0                            // focus_distance
     };
-    ART::Camera camera(camera_setup_params);
+    ART::Camera camera(view_config, scene3_render_config);
+
+    ART::SceneConfig scene_config
+    {
+        ART::Colour(0.7, 0.8, 1.0)      // background_colour
+    };
 
     ART::RayHittableList scene;
 
@@ -198,28 +304,28 @@ void Scene3(ART::AccelerationStructure acceleration_structure)
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, glass_material));
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, glass_inner_material));
 
-    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
+    RenderWithAccelerationStructure(camera, scene, scene_config, acceleration_structure);
 }
 
-void Scene4(ART::AccelerationStructure acceleration_structure)
+void Scene4(const ART::CameraRenderConfig& render_config, ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
-    ART::CameraSetupParams camera_setup_params
+    ART::CameraViewConfig view_config
     {
-        600,                            // image_width
-        400,                            // image_height
-        ART::Colour(0.7, 0.8, 1.0),     // background_colour
-        20.0,                           // vertical_fov
-        100,                            // samples_per_pixel
-        25,                             // max_ray_bounces
         ART::Point3(13.0, 2.0, 3.0),    // look_from
         ART::Point3(0.0, 0.0, 0.0),     // look_at
         ART::Vec3(0.0, 1.0, 0.0),       // up
+        20.0,                           // vertical_fov
         0.0,                            // defocus_angle
         10.0                            // focus_distance
     };
-    ART::Camera camera(camera_setup_params);
+    ART::Camera camera(view_config, render_config);
+
+    ART::SceneConfig scene_config
+    {
+        ART::Colour(0.7, 0.8, 1.0)      // background_colour
+    };
 
     ART::RayHittableList scene;
 
@@ -234,12 +340,10 @@ void Scene4(ART::AccelerationStructure acceleration_structure)
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 1.0, glass_material));
     scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 1.0, 0.0), 0.8, glass_inner_material));
 
-    ART::UniformGrid uniform_grid(scene.GetObjects());
-
-    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
+    RenderWithAccelerationStructure(camera, scene, scene_config, acceleration_structure);
 }
 
-void Scene5(ART::AccelerationStructure acceleration_structure)
+void Scene5(const ART::CameraRenderConfig& render_config, ART::AccelerationStructure acceleration_structure)
 {
     ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
 
@@ -299,34 +403,57 @@ void Scene5(ART::AccelerationStructure acceleration_structure)
     assert(num_spheres_cluster_1 > 0);
     average_position_cluster_1 /= num_spheres_cluster_1;
 
-    ART::CameraSetupParams camera_setup_params
+    ART::CameraViewConfig view_config
     {
-        1280,
-        720,
-        ART::Colour(0.7, 0.8, 1.0),
-        18.0,
-        1,
-        25,
-        ART::Point3(-100.0, 100.0, 100.0),
-        average_position_cluster_1,
-        ART::Vec3(0.0, 1.0, 0.0),
-        0.0,
-        10.0
+        ART::Point3(-100.0, 100.0, 100.0),  // look_from
+        average_position_cluster_1,          // look_at
+        ART::Vec3(0.0, 1.0, 0.0),            // up
+        18.0,                                // vertical_fov
+        0.0,                                 // defocus_angle
+        10.0                                 // focus_distance
     };
-    ART::Camera camera(camera_setup_params);
+    ART::Camera camera(view_config, render_config);
 
-    RenderWithAccelerationStructure(camera, scene, acceleration_structure);
+    ART::SceneConfig scene_config
+    {
+        ART::Colour(0.7, 0.8, 1.0)      // background_colour
+    };
+
+    RenderWithAccelerationStructure(camera, scene, scene_config, acceleration_structure);
 }
 
-int main()
+void RenderScene(const ART::CameraRenderConfig& render_config, int scene_number, ART::AccelerationStructure acceleration_structure)
 {
+    switch (scene_number)
+    {
+        case 1: Scene1(render_config, acceleration_structure); break;
+        case 2: Scene2(render_config, acceleration_structure); break;
+        case 3: Scene3(render_config, acceleration_structure); break;
+        case 4: Scene4(render_config, acceleration_structure); break;
+        case 5: Scene5(render_config, acceleration_structure); break;
+    }
+}
+
+int main(int argc, char* argv[])
+{
+    CLIParams cli_params;
+    if (!ParseCLIArgs(argc, argv, cli_params))
+    {
+        return 1;
+    }
+
     ART::Logger::Get().LogInfo("Booting up");
 
-    Scene5(ART::AccelerationStructure::NONE);
-    Scene5(ART::AccelerationStructure::UNIFORM_GRID);
-    Scene5(ART::AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
-    Scene5(ART::AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
+    ART::CameraRenderConfig render_config = MakeCameraRenderConfig(cli_params);
+    LogRenderConfig(render_config, cli_params.scene);
+
+    RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::NONE);
+    RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::UNIFORM_GRID);
+    RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
 
     ART::Logger::Get().LogInfo("Shutting down");
     ART::Logger::Get().Flush();
+
+    return 0;
 }
