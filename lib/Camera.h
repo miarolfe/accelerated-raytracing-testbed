@@ -8,20 +8,30 @@
 namespace ART
 {
 
-struct CameraSetupParams
+struct CameraViewConfig
+{
+public:
+    Point3 look_from;
+    Point3 look_at;
+    Vec3 up;
+    double vertical_fov;
+    double defocus_angle;
+    double focus_distance;
+};
+
+struct CameraRenderConfig
 {
 public:
     std::size_t image_width;
     std::size_t image_height;
-    Colour background_colour;
-    double vertical_fov;
-    double samples_per_pixel;
+    std::size_t samples_per_pixel;
     std::size_t max_ray_bounces;
-    Point3 look_from;
-    Point3 look_at;
-    Vec3 up;
-    double defocus_angle;
-    double focus_distance;
+};
+
+struct SceneConfig
+{
+public:
+    Colour background_colour;
 };
 
 class Camera
@@ -29,11 +39,11 @@ class Camera
 public:
     Camera();
 
-    Camera(const CameraSetupParams& setup_params);
+    Camera(const CameraViewConfig& view_config, const CameraRenderConfig& render_config);
 
     ~Camera();
 
-    void Render(const IRayHittable& scene, const std::string& output_image_name = "render.png");
+    void Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name = "render.png");
 
 
 protected:
@@ -41,7 +51,7 @@ protected:
 
     void ResizeImageBuffer();
 
-    Colour RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene);
+    Colour RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene, const Colour& background_colour);
 
     Ray GetRay(std::size_t i, std::size_t j);
 
@@ -59,13 +69,11 @@ protected:
     // Height of the output image in pixels
     std::size_t m_image_height;
 
-    Colour m_background_colour;
-
     // In degrees
     double m_vertical_fov;
 
     // Number of rays per pixel; reduces noise
-    double m_samples_per_pixel;
+    std::size_t m_samples_per_pixel;
 
     // Max number of recursions for each ray bouncing
     std::size_t m_max_ray_bounces;
