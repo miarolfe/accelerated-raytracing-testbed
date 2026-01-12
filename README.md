@@ -71,8 +71,6 @@ GitHub Actions automatically runs tests on every push and pull request to the `m
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Copyright © 2026 Mia Rolfe. All rights reserved.
-
 ### Third-party licenses
 
 - **Catch2** - Boost Software License 1.0 (see `external/Catch2/`)
