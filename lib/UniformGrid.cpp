@@ -193,19 +193,16 @@ void UniformGrid::Create(std::vector<IRayHittable*>& objects)
         }
     }
 
-    // Allocate arrays for each cell
-    std::size_t* cell_fill_indices = new std::size_t[num_cells]();
-    for (std::size_t i = 0; i < num_cells; i++)
+    std::size_t num_object_references = 0;
+    for (std::size_t cell_index = 0; cell_index < num_cells; cell_index++)
     {
-        if (m_grid[i].num_hittables > 0)
-        {
-            m_grid[i].hittables = new IRayHittable*[m_grid[i].num_hittables];
-        }
-        else
-        {
-            m_grid[i].hittables = nullptr;
-        }
+        m_grid[cell_index].hittables_buffer_offset = num_object_references;
+        num_object_references += m_grid[cell_index].num_hittables;
     }
+
+    m_hittables_buffer = new IRayHittable*[num_object_references];
+
+    std::size_t* objects_count_per_cell = new std::size_t[num_cells]();
 
     // Distribute objects to cells
     for (std::size_t object_index = 0; object_index < objects.size(); object_index++)
@@ -233,31 +230,28 @@ void UniformGrid::Create(std::vector<IRayHittable*>& objects)
                 for (int k = min_bound_grid_index.m_z; k <= max_bound_grid_index.m_z; k++)
                 {
                     const std::size_t one_dimensional_index = Calculate1DIndex(Vec3Int(i, j, k));
-                    m_grid[one_dimensional_index].hittables[cell_fill_indices[one_dimensional_index]++] = objects[object_index];
+                    const std::size_t hittables_buffer_index = m_grid[one_dimensional_index].hittables_buffer_offset + objects_count_per_cell[one_dimensional_index];
+                    objects_count_per_cell[one_dimensional_index] += 1;
+                    m_hittables_buffer[hittables_buffer_index] = objects[object_index];
                 }
             }
         }
     }
 
-    delete[] cell_fill_indices;
+    delete[] objects_count_per_cell;
 
     m_is_grid_valid = true;
 }
 
 void UniformGrid::Destroy()
 {
-    if (m_grid && m_is_grid_valid)
+    if (m_is_grid_valid)
     {
-        const std::size_t num_cells = m_num_x_cells * m_num_y_cells * m_num_z_cells;
-
-        for (std::size_t i = 0; i < num_cells; i++)
-        {
-            delete[] m_grid[i].hittables;
-            m_grid[i].hittables = nullptr;
-        }
-
         delete[] m_grid;
         m_grid = nullptr;
+
+        delete[] m_hittables_buffer;
+        m_hittables_buffer = nullptr;
     }
 
     m_bounding_box = AABB();
@@ -274,9 +268,9 @@ bool UniformGrid::CellHit(const UniformGridEntry& entry, const Ray& ray, Interva
     bool has_ray_hit_any_object = false;
     double closest_distance = ray_t.m_max;
 
-    for (std::size_t i = 0; i < entry.num_hittables; i++)
+    for (std::size_t object_offset = 0; object_offset < entry.num_hittables; object_offset++)
     {
-        if (entry.hittables[i]->Hit(ray, Interval(ray_t.m_min, closest_distance), temp_result))
+        if (m_hittables_buffer[entry.hittables_buffer_offset + object_offset]->Hit(ray, Interval(ray_t.m_min, closest_distance), temp_result))
         {
             has_ray_hit_any_object = true;
             closest_distance = temp_result.m_t;
