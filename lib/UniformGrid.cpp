@@ -54,29 +54,29 @@ bool UniformGrid::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) 
 
     if (step_x > 0)
     {
-        t_max.m_x = m_bounding_box.m_x.m_min + (current_cell.m_x + 1) * m_cell_size.m_x - ray.m_origin.m_x;
+        t_max.m_x = (m_bounding_box.m_x.m_min + (current_cell.m_x + 1) * m_cell_size.m_x - ray.m_origin.m_x) / ray.m_direction.m_x;
     }
     else
     {
-        t_max.m_x = ray.m_origin.m_x - (m_bounding_box.m_x.m_min + current_cell.m_x * m_cell_size.m_x) / ray.m_direction.m_x;
+        t_max.m_x = (m_bounding_box.m_x.m_min + current_cell.m_x * m_cell_size.m_x - ray.m_origin.m_x) / ray.m_direction.m_x;
     }
 
     if (step_y > 0)
     {
-        t_max.m_y = m_bounding_box.m_y.m_min + (current_cell.m_y + 1) * m_cell_size.m_y - ray.m_origin.m_y;
+        t_max.m_y = (m_bounding_box.m_y.m_min + (current_cell.m_y + 1) * m_cell_size.m_y - ray.m_origin.m_y) / ray.m_direction.m_y;
     }
     else
     {
-        t_max.m_y = ray.m_origin.m_y - (m_bounding_box.m_y.m_min + current_cell.m_y * m_cell_size.m_y) / ray.m_direction.m_y;
+        t_max.m_y = (m_bounding_box.m_y.m_min + current_cell.m_y * m_cell_size.m_y - ray.m_origin.m_y) / ray.m_direction.m_y;
     }
 
     if (step_z > 0)
     {
-        t_max.m_z = m_bounding_box.m_z.m_min + (current_cell.m_z + 1) * m_cell_size.m_z - ray.m_origin.m_z;
+        t_max.m_z = (m_bounding_box.m_z.m_min + (current_cell.m_z + 1) * m_cell_size.m_z - ray.m_origin.m_z) / ray.m_direction.m_z;
     }
     else
     {
-        t_max.m_z  = ray.m_origin.m_z - (m_bounding_box.m_z.m_min + current_cell.m_z * m_cell_size.m_z) / ray.m_direction.m_z;
+        t_max.m_z = (m_bounding_box.m_z.m_min + current_cell.m_z * m_cell_size.m_z - ray.m_origin.m_z) / ray.m_direction.m_z;
     }
 
     // Distance along ray to cross one full cell
