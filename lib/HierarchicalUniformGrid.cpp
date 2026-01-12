@@ -303,8 +303,8 @@ bool HierarchicalUniformGrid::CellHit(const HierarchicalUniformGridEntry& entry,
 
 Vec3 HierarchicalUniformGrid::DetermineCellSize(std::size_t num_objects) const
 {
-    const double sixth_root_n = std::pow(static_cast<double>(num_objects), 1.0 / 6.0);
-    const double cell_size = 3.0 * std::max(m_bounding_box.m_x.Size(), std::max(m_bounding_box.m_y.Size(), m_bounding_box.m_z.Size())) / std::max(1.0, sixth_root_n);
+    const double cube_root_n = std::cbrt(static_cast<double>(num_objects));
+    const double cell_size = 3.0 * std::max(m_bounding_box.m_x.Size(), std::max(m_bounding_box.m_y.Size(), m_bounding_box.m_z.Size())) / std::max(1.0, cube_root_n);
 
     return Vec3(cell_size);
 }
