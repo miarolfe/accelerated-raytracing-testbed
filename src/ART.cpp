@@ -1,6 +1,5 @@
 // Copyright Mia Rolfe. All rights reserved.
 
-#include <KDTree.h>
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
@@ -11,6 +10,7 @@
 #include <Camera.h>
 #include <Colour.h>
 #include <HierarchicalUniformGrid.h>
+#include <KDTree.h>
 #include <Logger.h>
 #include <Material.h>
 #include <RayHittableList.h>
