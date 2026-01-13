@@ -13,6 +13,7 @@ enum class AccelerationStructure
     NONE,
     UNIFORM_GRID,
     HIERARCHICAL_UNIFORM_GRID,
+    K_D_TREE,
     BOUNDING_VOLUME_HIERARCHY
 };
 

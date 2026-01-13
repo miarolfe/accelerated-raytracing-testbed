@@ -206,7 +206,7 @@ bool BVHNode::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) cons
         return false;
     }
 
-    // Leaf nodes only have one child (left)
+    // Leaf nodes with only child
     if (m_right == nullptr)
     {
         return m_left->Hit(ray, ray_t, out_result);

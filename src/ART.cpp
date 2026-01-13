@@ -10,6 +10,7 @@
 #include <Camera.h>
 #include <Colour.h>
 #include <HierarchicalUniformGrid.h>
+#include <KDTree.h>
 #include <Logger.h>
 #include <Material.h>
 #include <RayHittableList.h>
@@ -171,6 +172,19 @@ ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHi
 
             timer.Start();
             camera.Render(hierarchical_uniform_grid, scene_config, "render_hierarchical_uniform_grid.png");
+            timer.Stop();
+            stats.m_render_time_ms = timer.ElapsedMilliseconds();
+            break;
+        }
+        case ART::AccelerationStructure::K_D_TREE:
+        {
+            timer.Start();
+            ART::KDTreeNode hierarchical_uniform_grid(scene.GetObjects());
+            timer.Stop();
+            stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+
+            timer.Start();
+            camera.Render(hierarchical_uniform_grid, scene_config, "render_k_d_tree.png");
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -450,6 +464,7 @@ int main(int argc, char* argv[])
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::NONE);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::UNIFORM_GRID);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::K_D_TREE);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
 
     ART::Logger::Get().LogInfo("Shutting down");
