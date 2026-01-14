@@ -95,47 +95,44 @@ Interval& AABB::operator[](std::size_t index)
 
 bool AABB::Hit(const Ray& ray, Interval rayT) const
 {
-    const Point3& rayOrigin = ray.m_origin;
-	const Vec3& rayDirection = ray.m_direction;
+    // Unrolled branchless loop :)
 
-	for (std::size_t axis = 0; axis < 3; axis++)
-	{
-		const Interval& axisInterval = (*this)[axis];
-		const double rayDirectionAxisInverse = 1.0 / rayDirection[axis];
+    // For each axis, compute t values where ray crosses the min/max planes
+    const double inverse_direction_x = 1.0 / ray.m_direction.m_x;
+    const double inverse_direction_y = 1.0 / ray.m_direction.m_y;
+    const double inverse_direction_z = 1.0 / ray.m_direction.m_z;
 
-		const double t0 = (axisInterval.m_min - rayOrigin[axis]) * rayDirectionAxisInverse;
-		const double t1 = (axisInterval.m_max - rayOrigin[axis]) * rayDirectionAxisInverse;
+    const double t0_x = (m_x.m_min - ray.m_origin.m_x) * inverse_direction_x;
+    const double t1_x = (m_x.m_max - ray.m_origin.m_x) * inverse_direction_x;
+    const double t0_y = (m_y.m_min - ray.m_origin.m_y) * inverse_direction_y;
+    const double t1_y = (m_y.m_max - ray.m_origin.m_y) * inverse_direction_y;
+    const double t0_z = (m_z.m_min - ray.m_origin.m_z) * inverse_direction_z;
+    const double t1_z = (m_z.m_max - ray.m_origin.m_z) * inverse_direction_z;
 
-		if (t0 < t1)
-		{
-			if (t0 > rayT.m_min)
-			{
-				rayT.m_min = t0;
-			}
-			if (t1 < rayT.m_max)
-			{
-				rayT.m_max = t1;
-			}
-		}
-		else
-		{
-			if (t1 > rayT.m_min)
-			{
-				rayT.m_min = t1;
-			}
-			if (t0 < rayT.m_max)
-			{
-				rayT.m_max = t0;
-			}
-		}
+    // Find entry and exit per-axis
+    const double t_near_x = t0_x < t1_x ? t0_x : t1_x;
+    const double t_far_x  = t0_x > t1_x ? t0_x : t1_x;
+    const double t_near_y = t0_y < t1_y ? t0_y : t1_y;
+    const double t_far_y  = t0_y > t1_y ? t0_y : t1_y;
+    const double t_near_z = t0_z < t1_z ? t0_z : t1_z;
+    const double t_far_z  = t0_z > t1_z ? t0_z : t1_z;
 
-		if (rayT.m_min > rayT.m_max)
-		{
-			return false;
-		}
-	}
+    // t_min = max of all near values (latest entry)
+    double t_min = rayT.m_min;
 
-	return true;
+    // t_max = min of all far values (earliest exit)
+    double t_max = rayT.m_max;
+
+    t_min = t_near_x > t_min ? t_near_x : t_min;
+    t_min = t_near_y > t_min ? t_near_y : t_min;
+    t_min = t_near_z > t_min ? t_near_z : t_min;
+
+    t_max = t_far_x < t_max ? t_far_x : t_max;
+    t_max = t_far_y < t_max ? t_far_y : t_max;
+    t_max = t_far_z < t_max ? t_far_z : t_max;
+
+    // If ray enters before it exits, have intersected
+    return t_min <= t_max;
 }
 
 std::size_t AABB::LongestAxis()
