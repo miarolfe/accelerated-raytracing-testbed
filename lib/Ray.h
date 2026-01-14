@@ -11,6 +11,7 @@ class Ray
 public:
     Point3 m_origin;
     Vec3 m_direction;
+    Vec3 m_inverse_direction;
 
     Ray();
 
