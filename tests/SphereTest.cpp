@@ -10,48 +10,20 @@
 namespace ART
 {
 
-TEST_CASE("Sphere constructors initialize correctly", "[Sphere]")
+TEST_CASE("Sphere constructor initializes correctly", "[Sphere]")
 {
     ArenaAllocator allocator(ONE_MEGABYTE);
     Texture* texture = allocator.Create<SolidColourTexture>(Colour(0.7));
     Material* material = allocator.Create<LambertianMaterial>(texture);
 
-    SECTION("Default constructor")
-    {
-        Sphere sphere;
-        REQUIRE(sphere.m_centre.m_origin.m_x == Approx(0.0));
-        REQUIRE(sphere.m_centre.m_origin.m_y == Approx(0.0));
-        REQUIRE(sphere.m_centre.m_origin.m_z == Approx(0.0));
-        REQUIRE(sphere.m_radius == Approx(1.0));
-    }
+    Point3 centre(1.0, 2.0, 3.0);
+    double radius = 2.5;
+    Sphere sphere(centre, radius, material);
 
-    SECTION("Stationary sphere constructor")
-    {
-        Point3 centre(1.0, 2.0, 3.0);
-        double radius = 2.5;
-        Sphere sphere(centre, radius, material);
-
-        REQUIRE(sphere.m_centre.m_origin.m_x == Approx(1.0));
-        REQUIRE(sphere.m_centre.m_origin.m_y == Approx(2.0));
-        REQUIRE(sphere.m_centre.m_origin.m_z == Approx(3.0));
-        REQUIRE(sphere.m_radius == Approx(2.5));
-    }
-
-    SECTION("Moving sphere constructor")
-    {
-        Point3 start(0.0, 0.0, 0.0);
-        Point3 end(1.0, 1.0, 1.0);
-        double radius = 1.0;
-        Sphere sphere(start, end, radius, material);
-
-        REQUIRE(sphere.m_centre.m_origin.m_x == Approx(0.0));
-        REQUIRE(sphere.m_centre.m_origin.m_y == Approx(0.0));
-        REQUIRE(sphere.m_centre.m_origin.m_z == Approx(0.0));
-        REQUIRE(sphere.m_centre.m_direction.m_x == Approx(1.0));
-        REQUIRE(sphere.m_centre.m_direction.m_y == Approx(1.0));
-        REQUIRE(sphere.m_centre.m_direction.m_z == Approx(1.0));
-        REQUIRE(sphere.m_radius == Approx(1.0));
-    }
+    REQUIRE(sphere.m_centre.m_x == Approx(1.0));
+    REQUIRE(sphere.m_centre.m_y == Approx(2.0));
+    REQUIRE(sphere.m_centre.m_z == Approx(3.0));
+    REQUIRE(sphere.m_radius == Approx(2.5));
 }
 
 TEST_CASE("Sphere Hit detects intersections correctly", "[Sphere]")

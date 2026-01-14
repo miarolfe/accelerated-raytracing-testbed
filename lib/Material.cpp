@@ -32,7 +32,7 @@ bool LambertianMaterial::Scatter(const Ray& ray, const RayHitResult& result, Col
         scatter_direction = result.m_normal;
     }
 
-    out_ray = Ray(result.m_point, Normalised(scatter_direction), ray.m_time);
+    out_ray = Ray(result.m_point, Normalised(scatter_direction));
     out_attenuation = m_texture->Value(result.m_u, result.m_v, result.m_point);
     return true;
 }
@@ -47,7 +47,7 @@ bool MetalMaterial::Scatter(const Ray& ray, const RayHitResult& result, Colour& 
 {
     const Vec3 reflected_direction = Normalised(Reflect(Normalised(ray.m_direction), Normalised(result.m_normal)));
 	const Vec3 fuzzed_direction = Normalised(reflected_direction + (m_fuzz * RandomNormalised()));
-	out_ray = Ray(result.m_point, fuzzed_direction, ray.m_time);
+	out_ray = Ray(result.m_point, fuzzed_direction);
 	out_attenuation = m_albedo;
 	return (Dot(out_ray.m_direction, Normalised(result.m_normal)) > 0);
 }
@@ -75,7 +75,7 @@ bool DielectricMaterial::Scatter(const Ray& ray, const RayHitResult& result, Col
         Reflect(normalised_direction, normalised_normal) :
         Refract(normalised_direction, normalised_normal, refraction_ratio);
 
-    out_ray = Ray(result.m_point, scatter_direction, ray.m_time);
+    out_ray = Ray(result.m_point, scatter_direction);
 
     return true;
 }

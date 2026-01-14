@@ -2,10 +2,7 @@
 #pragma once
 
 #include <AxisAlignedBoundingBox.h>
-#include <Constants.h>
 #include <IRayHittable.h>
-#include <RayHitResult.h>
-#include <Ray.h>
 #include <Vec3.h>
 
 namespace ART
@@ -14,22 +11,12 @@ namespace ART
 struct Sphere : IRayHittable
 {
 public:
-    // Using a ray to represent the centre of the sphere because
-    // it can move over time. A static sphere is represented by a ray
-    // of length 0.
-    Ray m_centre;
+    Point3 m_centre;
     double m_radius;
     AABB m_bounding_box;
     Material* m_material;
 
-    // Default constructor
-    Sphere();
-
-    // Stationary sphere constructor
     Sphere(const Point3& centre, double radius, Material* material);
-
-    // Moving sphere constructor
-    Sphere(const Point3& centre1, const Point3& centre2, double radius, Material* material);
 
     // Check if a ray intersects this sphere
     // Returns the result details using out_result

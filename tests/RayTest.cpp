@@ -17,11 +17,9 @@ TEST_CASE("Ray default constructor", "[Ray]")
     REQUIRE(ray.m_direction.m_x == Approx(0.0));
     REQUIRE(ray.m_direction.m_y == Approx(0.0));
     REQUIRE(ray.m_direction.m_z == Approx(0.0));
-
-    REQUIRE(ray.m_time == Approx(0.0));
 }
 
-TEST_CASE("Ray constructor without time", "[Ray]")
+TEST_CASE("Ray constructor", "[Ray]")
 {
     const Point3 origin(1.0, 2.0, 3.0);
     const Vec3 direction(4.0, 5.0, 6.0);
@@ -35,27 +33,6 @@ TEST_CASE("Ray constructor without time", "[Ray]")
     REQUIRE(ray.m_direction.m_x == Approx(4.0));
     REQUIRE(ray.m_direction.m_y == Approx(5.0));
     REQUIRE(ray.m_direction.m_z == Approx(6.0));
-
-    REQUIRE(ray.m_time == Approx(0.0));
-}
-
-TEST_CASE("Ray constructor with time", "[Ray]")
-{
-    const Point3 origin(-1.0, -2.0, -3.0);
-    const Vec3 direction(1.0, 0.0, 0.0);
-    const double time = 2.5;
-
-    const Ray ray(origin, direction, time);
-
-    REQUIRE(ray.m_origin.m_x == Approx(-1.0));
-    REQUIRE(ray.m_origin.m_y == Approx(-2.0));
-    REQUIRE(ray.m_origin.m_z == Approx(-3.0));
-
-    REQUIRE(ray.m_direction.m_x == Approx(1.0));
-    REQUIRE(ray.m_direction.m_y == Approx(0.0));
-    REQUIRE(ray.m_direction.m_z == Approx(0.0));
-
-    REQUIRE(ray.m_time == Approx(2.5));
 }
 
 TEST_CASE("Ray At(t) returns correct point along ray", "[Ray]")
