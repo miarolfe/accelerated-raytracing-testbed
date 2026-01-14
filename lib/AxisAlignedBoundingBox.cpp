@@ -98,16 +98,12 @@ bool AABB::Hit(const Ray& ray, Interval rayT) const
     // Unrolled branchless loop :)
 
     // For each axis, compute t values where ray crosses the min/max planes
-    const double inverse_direction_x = 1.0 / ray.m_direction.m_x;
-    const double inverse_direction_y = 1.0 / ray.m_direction.m_y;
-    const double inverse_direction_z = 1.0 / ray.m_direction.m_z;
-
-    const double t0_x = (m_x.m_min - ray.m_origin.m_x) * inverse_direction_x;
-    const double t1_x = (m_x.m_max - ray.m_origin.m_x) * inverse_direction_x;
-    const double t0_y = (m_y.m_min - ray.m_origin.m_y) * inverse_direction_y;
-    const double t1_y = (m_y.m_max - ray.m_origin.m_y) * inverse_direction_y;
-    const double t0_z = (m_z.m_min - ray.m_origin.m_z) * inverse_direction_z;
-    const double t1_z = (m_z.m_max - ray.m_origin.m_z) * inverse_direction_z;
+    const double t0_x = (m_x.m_min - ray.m_origin.m_x) * ray.m_inverse_direction.m_x;
+    const double t1_x = (m_x.m_max - ray.m_origin.m_x) * ray.m_inverse_direction.m_x;
+    const double t0_y = (m_y.m_min - ray.m_origin.m_y) * ray.m_inverse_direction.m_y;
+    const double t1_y = (m_y.m_max - ray.m_origin.m_y) * ray.m_inverse_direction.m_y;
+    const double t0_z = (m_z.m_min - ray.m_origin.m_z) * ray.m_inverse_direction.m_z;
+    const double t1_z = (m_z.m_max - ray.m_origin.m_z) * ray.m_inverse_direction.m_z;
 
     // Find entry and exit per-axis
     const double t_near_x = t0_x < t1_x ? t0_x : t1_x;
