@@ -8,6 +8,7 @@
 namespace ART
 {
 
+// Collision struct
 struct AABB
 {
 public:

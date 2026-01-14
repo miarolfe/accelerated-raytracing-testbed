@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <ArenaAllocator.h>
+#include <AxisAlignedBox.h>
 #include <BoundingVolumeHierarchy.h>
 #include <Camera.h>
 #include <Colour.h>
@@ -85,9 +86,9 @@ bool ParseCLIArgs(int argc, char* argv[], CLIParams& out_params)
                 return false;
             }
             out_params.scene = std::atoi(argv[++i]);
-            if (out_params.scene < 1 || out_params.scene > 5)
+            if (out_params.scene < 1 || out_params.scene > 6)
             {
-                std::cerr << "Error: --scene must be between 1 and 5\n";
+                std::cerr << "Error: --scene must be between 1 and 6\n";
                 return false;
             }
         }
@@ -436,6 +437,63 @@ void Scene5(const ART::CameraRenderConfig& render_config, ART::AccelerationStruc
     RenderWithAccelerationStructure(camera, scene, scene_config, acceleration_structure);
 }
 
+// Simple test scenario with low number of objects
+void Scene6(const ART::CameraRenderConfig& render_config, ART::AccelerationStructure acceleration_structure)
+{
+    ART::ArenaAllocator arena(ART::ONE_MEGABYTE);
+
+    ART::CameraViewConfig view_config
+    {
+        ART::Point3(5.0, 4.0, 8.0),
+        ART::Point3(0.0, 0.5, 0.0),
+        ART::Vec3(0.0, 1.0, 0.0),
+        40.0,
+        0.0,
+        10.0
+    };
+    ART::Camera camera(view_config, render_config);
+
+    ART::SceneConfig scene_config
+    {
+        ART::Colour(0.7, 0.8, 1.0)
+    };
+
+    ART::RayHittableList scene;
+
+    // Ground
+    ART::Texture* ground_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.4, 0.4, 0.4));
+    ART::Material* ground_material = arena.Create<ART::LambertianMaterial>(ground_texture);
+    scene.Add(arena.Create<ART::AxisAlignedBox>(ART::Point3(-5.0, -0.5, -5.0), ART::Point3(5.0, 0.0, 5.0), ground_material));
+
+    // Red box
+    ART::Texture* red_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.8, 0.2, 0.2));
+    ART::Material* red_material = arena.Create<ART::LambertianMaterial>(red_texture);
+    scene.Add(arena.Create<ART::AxisAlignedBox>(ART::Point3(-1.5, 0.0, -0.5), ART::Point3(-0.5, 1.0, 0.5), red_material));
+
+    // Green metallic box
+    ART::Material* green_metal = arena.Create<ART::MetalMaterial>(ART::Colour(0.3, 0.8, 0.3), 0.1);
+    scene.Add(arena.Create<ART::AxisAlignedBox>(ART::Point3(0.5, 0.0, -0.5), ART::Point3(1.5, 1.5, 0.5), green_metal));
+
+    // Glass sphere
+    ART::Material* glass_material = arena.Create<ART::DielectricMaterial>(1.5);
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(-1.0, 1.35, 0.0), 0.35, glass_material));
+
+    // Silver metallic sphere
+    ART::Material* silver_metal = arena.Create<ART::MetalMaterial>(ART::Colour(0.9, 0.9, 0.9), 0.0);
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(0.0, 0.4, 1.5), 0.4, silver_metal));
+
+    // Blue sphere
+    ART::Texture* blue_texture = arena.Create<ART::SolidColourTexture>(ART::Colour(0.2, 0.2, 0.8));
+    ART::Material* blue_material = arena.Create<ART::LambertianMaterial>(blue_texture);
+    scene.Add(arena.Create<ART::Sphere>(ART::Point3(-2.0, 0.3, 1.0), 0.3, blue_material));
+
+    // Small gold metallic box
+    ART::Material* gold_metal = arena.Create<ART::MetalMaterial>(ART::Colour(0.8, 0.6, 0.2), 0.3);
+    scene.Add(arena.Create<ART::AxisAlignedBox>(ART::Point3(1.8, 0.0, 1.0), ART::Point3(2.3, 0.5, 1.5), gold_metal));
+
+    RenderWithAccelerationStructure(camera, scene, scene_config, acceleration_structure);
+}
+
 void RenderScene(const ART::CameraRenderConfig& render_config, int scene_number, ART::AccelerationStructure acceleration_structure)
 {
     switch (scene_number)
@@ -445,6 +503,7 @@ void RenderScene(const ART::CameraRenderConfig& render_config, int scene_number,
         case 3: Scene3(render_config, acceleration_structure); break;
         case 4: Scene4(render_config, acceleration_structure); break;
         case 5: Scene5(render_config, acceleration_structure); break;
+        case 6: Scene6(render_config, acceleration_structure); break;
     }
 }
 
