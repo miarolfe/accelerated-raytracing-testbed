@@ -120,18 +120,13 @@ bool KDTreeNode::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) c
     const double ray_origin_along_axis = ray.m_origin[m_split_axis];
     const double ray_direction_along_axis = ray.m_direction[m_split_axis];
 
-    IRayHittable* first_child = m_left;
-    IRayHittable* second_child = m_right;
-
     // If ray is going in negative direction along split axis, or
     // if ray origin is past split position, swap order
     const bool should_swap_child_order = (ray_direction_along_axis < 0.0) ||
         (ray_direction_along_axis == 0.0 && ray_origin_along_axis > m_split_position_along_split_axis);
 
-    if (should_swap_child_order)
-    {
-        std::swap(first_child, second_child);
-    }
+    IRayHittable* first_child = should_swap_child_order ? m_right : m_left;
+    IRayHittable* second_child = should_swap_child_order ? m_left : m_right;
 
     // Find closest hit of child nodes
     const bool hit_left = first_child->Hit(ray, ray_t, out_result);
