@@ -30,4 +30,6 @@ public:
     double TotalTimeMilliseconds() const;
 };
 
+void Init();
+
 } // namespace ART

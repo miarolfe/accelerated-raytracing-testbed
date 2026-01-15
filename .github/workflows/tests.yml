@@ -2,22 +2,44 @@ name: Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
+
+env:
+  SOLUTION_FILE_PATH: .
 
 permissions:
   contents: read
 
 jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Visual Studio solution
+        run: ./generate_vs2022_solution.bat
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Build
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: msbuild /m /p:Configuration=Test ${{env.SOLUTION_FILE_PATH}}
+
+      - name: Run tests
+        run: ./bin/Test/ART.exe
+
   build-ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build
-      run: ./build.sh test
+      - uses: actions/checkout@v4
 
-    - name: Run tests
-      run: ./bin/Test/ART
+      - name: Build
+        run: ./build.sh test
+
+      - name: Run tests
+        run: ./bin/Test/ART

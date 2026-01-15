@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Camera.h>
 
+#include <omp.h>
 #include <stb/stb_image_write.h>
 
 #include <Colour.h>
