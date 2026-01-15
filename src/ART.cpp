@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <SDL3/SDL.h>
 
 #include <ArenaAllocator.h>
 #include <AxisAlignedBox.h>

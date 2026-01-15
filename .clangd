@@ -4,6 +4,7 @@ CompileFlags:
     - -std=c++17
     - -fopenmp
     - -isystem../external
+    - -isystem../external/SDL3/include
     - -isystem../lib
     - -isystem../include
     - -isystem../src

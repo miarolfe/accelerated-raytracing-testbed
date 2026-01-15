@@ -7,7 +7,22 @@ end
 
 workspace(workspaceName)
 location "../"
-configurations { "Debug", "Release", "Test" }
+configurations {
+    "Debug_Headless",
+    "Debug_GUI",
+    "Release_Headless",
+    "Release_GUI",
+    "Test"
+}
+
+filter "configurations:*_GUI"
+    defines { "ART_GUI" }
+
+filter "configurations:*_Headless"
+    defines { "ART_HEADLESS" }
+
+filter {}
+
 platforms { "x64", "ARM64" }
 
 defaultplatform "x64"
@@ -48,13 +63,13 @@ filter { "toolset:msc" }
 
 filter {}
 
-filter "configurations:Debug"
+filter "configurations:Debug_*"
     defines { "DEBUG" }
     symbols "On"
     optimize "Off"
     runtime "Debug"
 
-filter "configurations:Release"
+filter "configurations:Release_*"
     defines { "NDEBUG" }
     symbols "Off"
     optimize "On"
@@ -105,11 +120,31 @@ filter {}
 
 externalincludedirs {
     path.getdirectory(os.getcwd()) .. "/external",
+    path.getdirectory(os.getcwd()) .. "/external/SDL3/include",
     path.getdirectory(os.getcwd()) .. "/lib",
     path.getdirectory(os.getcwd()) .. "/include",
 }
 
-filter { "configurations:Debug or Release" }
+filter { "system:windows", "platforms:x64", "configurations:*_GUI" }
+    libdirs { path.getdirectory(os.getcwd()) .. "/external/SDL3/lib/windows/x64" }
+    links { "SDL3" }
+    postbuildcommands {
+        '{COPYFILE} "%{wks.location}/external/SDL3/lib/windows/x64/SDL3.dll" "%{cfg.targetdir}"'
+    }
+
+filter { "system:windows", "platforms:ARM64", "configurations:*_GUI" }
+    libdirs { path.getdirectory(os.getcwd()) .. "/external/SDL3/lib/windows/arm64" }
+    links { "SDL3" }
+    postbuildcommands {
+        '{COPYFILE} "%{wks.location}/external/SDL3/lib/windows/arm64/SDL3.dll" "%{cfg.targetdir}"'
+    }
+
+filter { "system:linux", "configurations:*_GUI" }
+    links { "SDL3" }
+
+filter {}
+
+filter { "configurations:Debug_* or Release_*" }
     files {
         path.getdirectory(os.getcwd()) .. "/src/**.cpp",
         path.getdirectory(os.getcwd()) .. "/src/**.h",
