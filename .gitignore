@@ -33,7 +33,7 @@
 *.lib
 
 # Executables
-*.exe
+*/bin/*.exe
 *.out
 *.app
 
@@ -487,6 +487,6 @@ FodyWeavers.xsd
 *.msp
 
 # VS solution - this should be generated locally using premake
-*.sln 
+*.sln
 *.vcxproj
 *.vcxproj.filters
