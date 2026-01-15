@@ -22,6 +22,8 @@ const std::string AccelerationStructureToString(AccelerationStructure accelerati
         return "Uniform grid";
     case AccelerationStructure::HIERARCHICAL_UNIFORM_GRID:
         return "Hierarchical uniform grid";
+    case AccelerationStructure::OCTREE:
+        return "Octree";
     case AccelerationStructure::K_D_TREE:
         return "k-d tree";
     case AccelerationStructure::BOUNDING_VOLUME_HIERARCHY:
