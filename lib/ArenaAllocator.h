@@ -5,6 +5,8 @@
 #include <new>
 #include <utility>
 
+#include <Logger.h>
+
 namespace ART
 {
 
@@ -36,6 +38,7 @@ T* ArenaAllocator::Create(Args&& ... args)
     void* allocation = Alloc(sizeof(T), alignof(T));
     if (!allocation)
     {
+        Logger::Get().LogFatal("Failed to allocate " + std::to_string(sizeof(T)) + " bytes");
         return nullptr;
     }
     return new (allocation) T(std::forward<Args>(args)...);
