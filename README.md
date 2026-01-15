@@ -22,7 +22,7 @@ ART is a ray tracing testbed designed to benchmark and compare different spatial
 
 ## System requirements
 
-Linux is the only actively supported platform at present. This is a C++17 project; it is untested with older C++ standards and may not compile.
+Linux and Windows are actively supported. This is a C++17 project; it is untested with older C++ standards and may not compile.
 
 ### Dependencies
 
@@ -41,6 +41,11 @@ All dependencies are bundled in the `external/` directory:
 ./build.sh test         # Build and run test suite
 ```
 
+### Windows
+```
+./generate_vs2022_solution.bat
+```
+
 ### Output locations
 
 - `bin/Debug/ART` - Debug executable with symbols
@@ -52,7 +57,7 @@ All dependencies are bundled in the `external/` directory:
 ```bash
 git clone https://github.com/miarolfe/accelerated-raytracing-testbed
 cd accelerated-raytracing-testbed
-./build.sh release
+./build.sh release      # Linux - use "generate_vs2022_solution.bat" on Windows
 ./bin/Release/ART
 ```
 
@@ -67,7 +72,7 @@ cd accelerated-raytracing-testbed
 
 ### Continuous integration
 
-GitHub Actions automatically runs tests on every push and pull request to the `main` branch. Tests execute on `ubuntu-latest` (Linux environment). Check the Actions tab for build logs and test results.
+GitHub Actions automatically runs tests on every push and pull request to the `main` branch. Tests execute on `ubuntu-latest` and `windows-latest`. Check the Actions tab for build logs and test results.
 
 ## License
 
