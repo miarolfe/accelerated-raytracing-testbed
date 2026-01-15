@@ -9,13 +9,13 @@ ART is a ray tracing testbed designed to benchmark and compare different spatial
 - [x] Path tracing renderer
 - [x] Uniform grid acceleration structure
 - [x] Hierarchical uniform grid acceleration structure
+- [X] Octree acceleration structure
 - [X] k-d tree acceleration structure
 - [x] Bounding volume hierarchy (BVH) acceleration structure
 - [x] Basic time-based performance benchmarking
 
 ## Future work
 
-- [ ] Octree acceleration structure
 - [ ] BSP tree acceleration structure
 - [ ] Comprehensive performance benchmarking
 - [ ] Wide range of varied test scenarios
