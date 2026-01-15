@@ -1,8 +1,8 @@
 workspaceName = "ART"
-baseName = path.getbasename(path.getdirectory(os.getcwd()));
+baseName = path.getbasename(path.getdirectory(os.getcwd()))
 
-if (os.isdir('build_files') == false) then
-    os.mkdir('build_files')
+if not os.isdir("build_files") then
+    os.mkdir("build_files")
 end
 
 workspace(workspaceName)
@@ -10,7 +10,7 @@ location "../"
 configurations { "Debug", "Release", "Test" }
 platforms { "x64", "ARM64" }
 
-defaultplatform("x64")
+defaultplatform "x64"
 
 filter { "toolset:gcc or toolset:clang" }
     buildoptions {
@@ -30,10 +30,21 @@ filter { "toolset:gcc or toolset:clang" }
         "-fopenmp"
     }
 
-    -- filter { "configurations:Test" }
-    --     buildoptions {
-    --         "--coverage"
-    --     }
+filter {}
+
+filter { "toolset:msc" }
+    buildoptions {
+        "/W4",
+        "/WX",
+        "/permissive-",
+        "/openmp",
+        "/MP",
+    }
+
+    linkoptions {
+        "/openmp",
+        "/MP",
+    }
 
 filter {}
 
@@ -41,32 +52,35 @@ filter "configurations:Debug"
     defines { "DEBUG" }
     symbols "On"
     optimize "Off"
+    runtime "Debug"
 
 filter "configurations:Release"
     defines { "NDEBUG" }
     symbols "Off"
     optimize "On"
+    runtime "Release"
 
-filter { "platforms:x64" }
-architecture "x86_64"
-
-filter { "platforms:Arm64" }
-architecture "ARM64"
+filter "configurations:Test"
+    runtime "Debug"
 
 filter {}
 
-targetdir "bin/%{cfg.buildcfg}/"
+filter "platforms:x64"
+    architecture "x86_64"
+
+filter "platforms:ARM64"
+    architecture "ARM64"
+
+filter {}
 
 startproject(workspaceName)
 
 project(workspaceName)
-kind "ConsoleApp"
-location "./"
-targetdir "../bin/%{cfg.buildcfg}"
+    kind "ConsoleApp"
+    location "./"
+    targetdir "../bin/%{cfg.buildcfg}"
 
-filter {}
-    files
-    {
+    files {
         path.getdirectory(os.getcwd()) .. "/external/**.cpp",
         path.getdirectory(os.getcwd()) .. "/external/**.h",
         path.getdirectory(os.getcwd()) .. "/external/**.hpp",
@@ -75,44 +89,45 @@ filter {}
         path.getdirectory(os.getcwd()) .. "/include/**.h",
     }
 
-    filter { "files:**/stb_image_impl.cpp", "toolset:gcc or toolset:clang" }
-        buildoptions { "-w", "-Wno-error" }
-    filter {}
+filter { "files:**/stb_image_impl.cpp", "toolset:msc" }
+    disablewarnings { "4100", "4244", "4267", "4389", "4505" }
 
-    filter { "files:**/stb_image_write_impl.cpp", "toolset:gcc or toolset:clang" }
-        buildoptions { "-w", "-Wno-error" }
-    filter {}
+filter { "files:**/stb_image_write_impl.cpp", "toolset:msc" }
+    disablewarnings { "4100", "4244", "4267", "4389", "4505" }
 
-    externalincludedirs
-    {
-        path.getdirectory(os.getcwd()) .. "/external",
-        path.getdirectory(os.getcwd()) .. "/lib",
-        path.getdirectory(os.getcwd()) .. "/include",
-    }
+filter { "files:**/stb_image_impl.cpp", "toolset:gcc or toolset:clang" }
+    buildoptions { "-w", "-Wno-error" }
 
-filter {"configurations:Debug or Release"}
-    files
-    {
+filter { "files:**/stb_image_write_impl.cpp", "toolset:gcc or toolset:clang" }
+    buildoptions { "-w", "-Wno-error" }
+
+filter {}
+
+externalincludedirs {
+    path.getdirectory(os.getcwd()) .. "/external",
+    path.getdirectory(os.getcwd()) .. "/lib",
+    path.getdirectory(os.getcwd()) .. "/include",
+}
+
+filter { "configurations:Debug or Release" }
+    files {
         path.getdirectory(os.getcwd()) .. "/src/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/**.h"
+        path.getdirectory(os.getcwd()) .. "/src/**.h",
     }
 
-    externalincludedirs
-    {
+    externalincludedirs {
         path.getdirectory(os.getcwd()) .. "/src"
     }
 
 filter {}
 
-filter {"configurations:Test"}
-    files
-    {
+filter { "configurations:Test" }
+    files {
         path.getdirectory(os.getcwd()) .. "/tests/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/tests/**.h"
+        path.getdirectory(os.getcwd()) .. "/tests/**.h",
     }
 
-    externalincludedirs
-    {
+    externalincludedirs {
         path.getdirectory(os.getcwd()) .. "/tests"
     }
 
@@ -120,10 +135,3 @@ filter {}
 
 cdialect "C17"
 cppdialect "C++17"
-
-filter {}
-
--- postbuildcommands
--- {
---     "{COPYDIR} %[../assets] %[../bin/%{cfg.buildcfg}/assets]"
--- }

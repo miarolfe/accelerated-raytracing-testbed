@@ -1,8 +1,12 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Utility.h>
 
+#include <omp.h>
+#include <thread>
+
 #include <Common.h>
 #include <Constants.h>
+#include <Logger.h>
 
 namespace ART
 {
@@ -37,6 +41,20 @@ const std::string AccelerationStructureToString(AccelerationStructure accelerati
 double RenderStats::TotalTimeMilliseconds() const
 {
     return m_construction_time_ms + m_render_time_ms;
+}
+
+void Init()
+{
+#ifdef _MSC_VER
+    std::size_t num_openmp_threads = std::thread::hardware_concurrency();
+    if (num_openmp_threads <= 0)
+    {
+        num_openmp_threads = 1;
+    }
+    omp_set_num_threads(num_openmp_threads);
+
+    Logger::Get().LogInfo("Using " + std::to_string(num_openmp_threads) + " threads for render");
+#endif
 }
 
 } // namespace ART

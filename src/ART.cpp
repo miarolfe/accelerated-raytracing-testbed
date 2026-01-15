@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 #include <ArenaAllocator.h>
 #include <AxisAlignedBox.h>
@@ -523,6 +524,8 @@ void RenderScene(const ART::CameraRenderConfig& render_config, int scene_number,
 
 int main(int argc, char* argv[])
 {
+    ART::Init();
+
     CLIParams cli_params;
     if (!ParseCLIArgs(argc, argv, cli_params))
     {
