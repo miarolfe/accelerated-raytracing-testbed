@@ -539,6 +539,9 @@ void RenderScene(const ART::CameraRenderConfig& render_config, int scene_number,
 
 int main(int argc, char* argv[])
 {
+#ifdef ART_GUI
+    ART::Logger::Get().LogInfo("Test");
+#endif // ART_GUI
     ART::Init();
 
     CLIParams cli_params;

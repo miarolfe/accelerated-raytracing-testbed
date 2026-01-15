@@ -82,7 +82,7 @@ private:
     LogSeverity m_log_severity_level_filter = LogSeverity::LOG_INFO;
 #else
     LogSeverity m_log_severity_level_filter = LogSeverity::LOG_DEBUG;
-#endif
+#endif // NDEBUG
 };
 
 } // namespace ART
