@@ -2,7 +2,9 @@
 #include <Utility.h>
 
 #include <omp.h>
+#ifdef _MSC_VER
 #include <thread>
+#endif
 
 #include <Common.h>
 #include <Constants.h>
