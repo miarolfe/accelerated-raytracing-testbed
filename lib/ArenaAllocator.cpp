@@ -1,7 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <ArenaAllocator.h>
 
-#include <cstdlib>
+#include <Common.h>
 
 namespace ART
 {
@@ -34,6 +34,7 @@ void* ArenaAllocator::Alloc(std::size_t size_in_bytes, std::size_t alignment_in_
     // Can't allocate if the allocation would use more than remaining capacity
     if (aligned_offset + size_in_bytes > m_capacity)
     {
+        Logger::Get().LogFatal("Failed to allocate " + std::to_string(size_in_bytes) + " bytes");
         return nullptr;
     }
 

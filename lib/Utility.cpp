@@ -30,6 +30,8 @@ const std::string AccelerationStructureToString(AccelerationStructure accelerati
         return "Hierarchical uniform grid";
     case AccelerationStructure::OCTREE:
         return "Octree";
+    case AccelerationStructure::BSP_TREE:
+        return "BSP tree";
     case AccelerationStructure::K_D_TREE:
         return "k-d tree";
     case AccelerationStructure::BOUNDING_VOLUME_HIERARCHY:

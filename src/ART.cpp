@@ -9,6 +9,7 @@
 #include <ArenaAllocator.h>
 #include <AxisAlignedBox.h>
 #include <BoundingVolumeHierarchy.h>
+#include <BSPTree.h>
 #include <Camera.h>
 #include <Colour.h>
 #include <HierarchicalUniformGrid.h>
@@ -188,6 +189,19 @@ ART::RenderStats RenderWithAccelerationStructure(ART::Camera& camera, ART::RayHi
 
             timer.Start();
             camera.Render(octree, scene_config, "render_octree.png");
+            timer.Stop();
+            stats.m_render_time_ms = timer.ElapsedMilliseconds();
+            break;
+        }
+        case ART::AccelerationStructure::BSP_TREE:
+        {
+            timer.Start();
+            ART::BSPTreeNode bsp_tree(scene.GetObjects());
+            timer.Stop();
+            stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+
+            timer.Start();
+            camera.Render(bsp_tree, scene_config, "render_bsp_tree.png");
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -540,6 +554,7 @@ int main(int argc, char* argv[])
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::NONE);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::UNIFORM_GRID);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::BSP_TREE);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::OCTREE);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::K_D_TREE);
     RenderScene(render_config, cli_params.scene, ART::AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);

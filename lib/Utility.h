@@ -14,6 +14,7 @@ enum class AccelerationStructure
     UNIFORM_GRID,
     HIERARCHICAL_UNIFORM_GRID,
     OCTREE,
+    BSP_TREE,
     K_D_TREE,
     BOUNDING_VOLUME_HIERARCHY
 };
