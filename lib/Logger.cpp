@@ -55,7 +55,7 @@ void Logger::Log(const std::string& log_msg, LogSeverity log_severity)
         m_log_queue.push(timestamped_log_msg);
 #ifdef DEBUG
         std::cerr << timestamped_log_msg << std::endl;
-#endif
+#endif // DEBUG
     }
 }
 

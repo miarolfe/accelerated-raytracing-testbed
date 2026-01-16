@@ -58,7 +58,7 @@ void Init()
     omp_set_num_threads(num_openmp_threads);
 
     Logger::Get().LogInfo("Using " + std::to_string(num_openmp_threads) + " threads for render");
-#endif
+#endif // _MSC_VER
 }
 
 } // namespace ART
