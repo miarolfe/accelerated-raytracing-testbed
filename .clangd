@@ -3,14 +3,21 @@ CompileFlags:
   Add:
     - -std=c++17
     - -fopenmp
+    - -isystem..
     - -isystem../external
     - -isystem../external/SDL3/include
     - -isystem../lib
     - -isystem../include
     - -isystem../src
+    - -isystem../src/common
+    - -isystem../src/gui
+    - -isystem../src/headless
     - -isystem../tests
-    - -isystemexternal
-    - -isystemlib
-    - -isysteminclude
-    - -isystemsrc
-    - -isystemtests
+    - -isystem../../external
+    - -isystem../../external/SDL3/include
+    - -isystem../../lib
+    - -isystem../../include
+    - -isystem../../src
+    - -isystem../../src/common
+    - -isystem../../src/gui
+    - -isystem../../src/headless

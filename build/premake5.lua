@@ -151,7 +151,10 @@ filter { "configurations:Debug_* or Release_*" }
     }
 
     externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/src"
+        path.getdirectory(os.getcwd()) .. "/src",
+        path.getdirectory(os.getcwd()) .. "/src/common",
+        path.getdirectory(os.getcwd()) .. "/src/gui",
+        path.getdirectory(os.getcwd()) .. "/src/headless",
     }
 
 filter {}
