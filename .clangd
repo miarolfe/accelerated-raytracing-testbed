@@ -14,6 +14,7 @@ CompileFlags:
     - -isystem../src/headless
     - -isystem../tests
     - -isystem../../external
+    - -isystem../../external/imgui
     - -isystem../../external/SDL3/include
     - -isystem../../lib
     - -isystem../../include

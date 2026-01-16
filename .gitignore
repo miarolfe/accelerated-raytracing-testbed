@@ -490,3 +490,6 @@ FodyWeavers.xsd
 *.sln
 *.vcxproj
 *.vcxproj.filters
+
+# imgui state
+imgui.ini

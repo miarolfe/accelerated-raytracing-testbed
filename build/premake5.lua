@@ -96,34 +96,42 @@ project(workspaceName)
     targetdir "../bin/%{cfg.buildcfg}"
 
     files {
-        path.getdirectory(os.getcwd()) .. "/external/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/external/**.h",
-        path.getdirectory(os.getcwd()) .. "/external/**.hpp",
+        path.getdirectory(os.getcwd()) .. "/external/stb/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/external/stb/**.h",
         path.getdirectory(os.getcwd()) .. "/lib/**.cpp",
         path.getdirectory(os.getcwd()) .. "/lib/**.h",
         path.getdirectory(os.getcwd()) .. "/include/**.h",
     }
 
-filter { "files:**/stb_image_impl.cpp", "toolset:msc" }
+filter { "configurations:*_GUI" }
+    files {
+        path.getdirectory(os.getcwd()) .. "/external/imgui/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/external/imgui/**.h",
+    }
+
+filter {}
+
+filter { "files:**/external/**", "toolset:msc" }
     disablewarnings { "4100", "4244", "4267", "4389", "4505" }
 
-filter { "files:**/stb_image_write_impl.cpp", "toolset:msc" }
-    disablewarnings { "4100", "4244", "4267", "4389", "4505" }
-
-filter { "files:**/stb_image_impl.cpp", "toolset:gcc or toolset:clang" }
-    buildoptions { "-w", "-Wno-error" }
-
-filter { "files:**/stb_image_write_impl.cpp", "toolset:gcc or toolset:clang" }
+filter { "files:**/external/**", "toolset:gcc or toolset:clang" }
     buildoptions { "-w", "-Wno-error" }
 
 filter {}
 
 externalincludedirs {
     path.getdirectory(os.getcwd()) .. "/external",
-    path.getdirectory(os.getcwd()) .. "/external/SDL3/include",
     path.getdirectory(os.getcwd()) .. "/lib",
     path.getdirectory(os.getcwd()) .. "/include",
 }
+
+filter { "configurations:*_GUI" }
+    externalincludedirs {
+        path.getdirectory(os.getcwd()) .. "/external/imgui/",
+        path.getdirectory(os.getcwd()) .. "/external/SDL3/include",
+    }
+
+filter {}
 
 filter { "system:windows", "platforms:x64", "configurations:*_GUI" }
     libdirs { path.getdirectory(os.getcwd()) .. "/external/SDL3/lib/windows/x64" }
@@ -146,14 +154,37 @@ filter {}
 
 filter { "configurations:Debug_* or Release_*" }
     files {
-        path.getdirectory(os.getcwd()) .. "/src/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/**.h",
+        path.getdirectory(os.getcwd()) .. "/src/ART.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/common/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/common/**.h",
     }
 
     externalincludedirs {
         path.getdirectory(os.getcwd()) .. "/src",
         path.getdirectory(os.getcwd()) .. "/src/common",
+    }
+
+filter {}
+
+filter { "configurations:*_GUI" }
+    files {
+        path.getdirectory(os.getcwd()) .. "/src/gui/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/gui/**.h",
+    }
+
+    externalincludedirs {
         path.getdirectory(os.getcwd()) .. "/src/gui",
+    }
+
+filter {}
+
+filter { "configurations:*_Headless" }
+    files {
+        path.getdirectory(os.getcwd()) .. "/src/headless/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/headless/**.h",
+    }
+
+    externalincludedirs {
         path.getdirectory(os.getcwd()) .. "/src/headless",
     }
 

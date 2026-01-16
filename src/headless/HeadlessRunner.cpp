@@ -109,7 +109,7 @@ HeadlessRunner::~HeadlessRunner()
 
 void HeadlessRunner::Init()
 {
-    ART::Logger::Get().LogInfo("Booting up");
+    ART::Logger::Get().LogInfo("Initialising ART [Headless]");
 
     LogRenderConfig(m_camera_render_config, m_scene_number);
 
@@ -124,7 +124,7 @@ void HeadlessRunner::Init()
 
 void HeadlessRunner::Shutdown()
 {
-    ART::Logger::Get().LogInfo("Shutting down");
+    ART::Logger::Get().LogInfo("Shutting down ART [Headless]");
 
     ART::Logger::Get().Flush();
 }
