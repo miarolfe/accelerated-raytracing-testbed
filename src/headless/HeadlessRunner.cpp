@@ -125,6 +125,7 @@ void HeadlessRunner::Init()
 void HeadlessRunner::Shutdown()
 {
     ART::Logger::Get().LogInfo("Shutting down");
+
     ART::Logger::Get().Flush();
 }
 
