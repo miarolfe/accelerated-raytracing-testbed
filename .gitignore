@@ -20,7 +20,7 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
+#*.dll
 
 # Fortran module files
 *.mod
@@ -98,9 +98,9 @@ obj/x86/
 
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-[Aa][Rr][Mm]64[Ee][Cc]/
-bld/
+#[Aa][Rr][Mm]64/
+#[Aa][Rr][Mm]64[Ee][Cc]/
+#bld/
 [Oo]bj/
 [Oo]ut/
 [Ll]og/
