@@ -2,9 +2,9 @@
 #include <Utility.h>
 
 #include <omp.h>
-#ifdef _MSC_VER
-#include <thread>
-#endif
+#if defined(_MSC_VER)
+    #include <thread>
+#endif // defined(_MSC_VER)
 
 #include <Common.h>
 #include <Constants.h>
@@ -49,7 +49,7 @@ double RenderStats::TotalTimeMilliseconds() const
 
 void Init()
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
     std::size_t num_openmp_threads = std::thread::hardware_concurrency();
     if (num_openmp_threads <= 0)
     {
@@ -58,7 +58,7 @@ void Init()
     omp_set_num_threads(num_openmp_threads);
 
     Logger::Get().LogInfo("Using " + std::to_string(num_openmp_threads) + " threads for render");
-#endif // _MSC_VER
+#endif // defined(_MSC_VER)
 }
 
 } // namespace ART

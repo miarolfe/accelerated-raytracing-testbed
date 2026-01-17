@@ -10,20 +10,20 @@ ArenaAllocator::ArenaAllocator(std::size_t capacity_in_bytes)
     : m_buffer(nullptr), m_capacity(capacity_in_bytes), m_offset(0)
 {
     std::size_t aligned_capacity = (capacity_in_bytes + 63) & ~std::size_t(63);
-#ifdef _MSC_VER
+#if defined (_MSC_VER)
     m_buffer = static_cast<uint8_t*>(_aligned_malloc(aligned_capacity, 64));
 #else
     m_buffer = static_cast<uint8_t*>(aligned_alloc(64, aligned_capacity));
-#endif // _MSC_VER
+#endif // defined (_MSC_VER)
 }
 
 ArenaAllocator::~ArenaAllocator()
 {
-#ifdef _MSC_VER
+#if defined (_MSC_VER)
     _aligned_free(m_buffer);
 #else
     free(m_buffer);
-#endif // _MSC_VER
+#endif // defined (_MSC_VER)
 }
 
 void* ArenaAllocator::Alloc(std::size_t size_in_bytes, std::size_t alignment_in_bytes)
