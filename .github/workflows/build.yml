@@ -1,0 +1,79 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  SOLUTION_FILE_PATH: .
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Visual Studio solution
+        run: ./generate_vs2022_solution.bat
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Build Release (Headless)
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: msbuild /m /p:Configuration=Release_Headless ${{env.SOLUTION_FILE_PATH}}
+
+      - name: Build Release (GUI)
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: msbuild /m /p:Configuration=Release_GUI ${{env.SOLUTION_FILE_PATH}}
+
+      - name: Upload Release (Headless)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ART-Windows-Headless
+          path: bin/Release_Headless/ART.exe
+
+      - name: Upload Release (GUI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ART-Windows-GUI
+          path: |
+            bin/Release_GUI/ART.exe
+            bin/Release_GUI/SDL3.dll
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SDL3
+        run: |
+          sudo add-apt-repository -y ppa:bleedingedge/noble-bleed
+          sudo apt-get update
+          sudo apt-get install -y libsdl3-dev
+
+      - name: Build Release (Headless)
+        run: ./build.sh release headless
+
+      - name: Build Release (GUI)
+        run: ./build.sh release gui
+
+      - name: Upload Release (Headless)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ART-Linux-Headless
+          path: bin/Release_Headless/ART
+
+      - name: Upload Release (GUI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ART-Linux-GUI
+          path: bin/Release_GUI/ART
