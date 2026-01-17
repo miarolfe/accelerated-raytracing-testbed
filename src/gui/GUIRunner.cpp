@@ -173,6 +173,7 @@ void GUIRunner::RunRender()
     if (m_use_acceleration_structure_hierarchical_uniform_grid)
     {
         RenderScene(config, scene_number_one_indexed, AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+    }
     if (m_use_acceleration_structure_octree)
     {
         RenderScene(config, scene_number_one_indexed, AccelerationStructure::OCTREE);
@@ -180,7 +181,6 @@ void GUIRunner::RunRender()
     if (m_use_acceleration_structure_bsp_tree)
     {
         RenderScene(config, scene_number_one_indexed, AccelerationStructure::BSP_TREE);
-    }
     }
     if (m_use_acceleration_structure_k_d_tree)
     {
