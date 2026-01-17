@@ -26,30 +26,51 @@ Linux and Windows are actively supported. This is a C++17 project; it is unteste
 
 ### Dependencies
 
-All dependencies are bundled in the `external/` directory:
+Most dependencies are bundled in the `external/` directory:
 - **Catch2** - Header-only C++ testing framework
-- **stb_image / stb_image_write** - Single-header image I/O libraries
+- **imgui** - Immediate mode GUI library (GUI builds only)
+- **SDL3** - Cross-platform multimedia library (GUI builds only)
+  - Windows: Bundled in `external/SDL3/`
+  - Linux: Install via package manager (e.g., `sudo apt install libsdl3-dev` or equivalent)
+- **stb_image, stb_image_write** - Single-header image I/O libraries
 
 ## Building
+
+### Build configurations
+
+The project supports three build modes:
+- **GUI** - Interactive graphical interface using SDL3 and imgui
+- **Headless** - Command-line only, no GUI dependencies required
+- **Test** - Command-line only, unit test suite
 
 ### Linux
 
 ```bash
-./build.sh              # Debug build (default)
-./build.sh debug        # Debug build (explicit)
-./build.sh release      # Optimized release build
-./build.sh test         # Build and run test suite
+./build.sh                      # Debug Headless build (default)
+./build.sh debug                # Debug Headless build
+./build.sh debug_gui            # Debug GUI build
+./build.sh release              # Release Headless build
+./build.sh release_gui          # Release GUI build
+./build.sh test                 # Build test suite
 ```
 
 ### Windows
 ```
 ./generate_vs2022_solution.bat
 ```
+Then open the generated solution and select the desired configuration:
+- `Debug_GUI`
+- `Debug_Headless`
+- `Release_GUI`
+- `Release_Headless`
+- `Test`
 
 ### Output locations
 
-- `bin/Debug/ART` - Debug executable with symbols
-- `bin/Release/ART` - Optimized release executable
+- `bin/Debug_Headless/ART` - Debug headless executable
+- `bin/Debug_GUI/ART` - Debug GUI executable
+- `bin/Release_Headless/ART` - Optimized headless executable
+- `bin/Release_GUI/ART` - Optimized GUI executable
 - `bin/Test/ART` - Test suite executable
 
 ## Quick start
@@ -58,7 +79,7 @@ All dependencies are bundled in the `external/` directory:
 git clone https://github.com/miarolfe/accelerated-raytracing-testbed
 cd accelerated-raytracing-testbed
 ./build.sh release      # Linux - use "generate_vs2022_solution.bat" on Windows
-./bin/Release/ART
+./bin/Release_Headless/ART
 ```
 
 ## Testing
@@ -81,12 +102,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### Third-party licenses
 
 - **Catch2** - Boost Software License 1.0 (see `external/Catch2/`)
-- **stb libraries** - Public domain / MIT (see headers in `external/stb/`)
+- **imgui** - MIT License (see `external/imgui/`)
+- **SDL3** - zlib License (see `external/SDL3/`)
+- **stb_image, stb_image_write** - Public domain / MIT (see headers in `external/stb/`)
 
 ## Acknowledgments
 
 - **Catch2** - [C++ testing framework](https://github.com/catchorg/Catch2)
-- **stb libraries** - [Public domain image single-header libraries (stb_image, stb_image_write)](https://github.com/nothings/stb)
+- **imgui** - [Immediate mode graphical user interface](https://github.com/ocornut/imgui)
+- **SDL3** - [Platform abstraction layer](https://github.com/libsdl-org/SDL)
+- **stb_image, stb_image_write** - [Public domain image single-header libraries (stb_image, stb_image_write)](https://github.com/nothings/stb)
 - This project, and my interest in ray tracing, were heavily inspired by the ["Ray Tracing in One Weekend" series](https://raytracing.github.io/). Check them out!
 
 ---
