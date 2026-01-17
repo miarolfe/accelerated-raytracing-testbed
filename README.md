@@ -73,6 +73,13 @@ Then open the generated solution and select the desired configuration:
 - `bin/Release_GUI/ART` - Optimized GUI executable
 - `bin/Test/ART` - Test suite executable
 
+### Runtime dependencies (Linux)
+
+On Linux, GUI executables require the SDL3 shared library to be installed. Install it via your package manager before running GUI builds:
+
+- **Ubuntu/Debian**: `sudo apt install libsdl3`
+- **Fedora**: `sudo dnf install SDL3`
+
 ## Quick start
 
 ```bash
