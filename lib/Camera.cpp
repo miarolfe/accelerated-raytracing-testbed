@@ -65,9 +65,88 @@ Camera::~Camera()
     }
 }
 
+Camera::Camera(Camera&& other) noexcept
+    : m_image_width(other.m_image_width)
+    , m_image_height(other.m_image_height)
+    , m_vertical_fov(other.m_vertical_fov)
+    , m_samples_per_pixel(other.m_samples_per_pixel)
+    , m_max_ray_bounces(other.m_max_ray_bounces)
+    , m_look_from(other.m_look_from)
+    , m_look_at(other.m_look_at)
+    , m_up(other.m_up)
+    , m_defocus_angle(other.m_defocus_angle)
+    , m_focus_distance(other.m_focus_distance)
+    , m_image_data(other.m_image_data)
+    , m_aspect_ratio(other.m_aspect_ratio)
+    , m_pixel_sample_scale(other.m_pixel_sample_scale)
+    , m_centre(other.m_centre)
+    , m_pixel_0_0_location(other.m_pixel_0_0_location)
+    , m_pixel_delta_u(other.m_pixel_delta_u)
+    , m_pixel_delta_v(other.m_pixel_delta_v)
+    , m_u(other.m_u)
+    , m_v(other.m_v)
+    , m_w(other.m_w)
+    , m_defocus_disk_u(other.m_defocus_disk_u)
+    , m_defocus_disk_v(other.m_defocus_disk_v)
+{
+    other.m_image_data = nullptr;
+}
+
+Camera& Camera::operator=(Camera&& other) noexcept
+{
+    if (this != &other)
+    {
+        if (m_image_data)
+        {
+            delete[] m_image_data;
+        }
+
+        m_image_width = other.m_image_width;
+        m_image_height = other.m_image_height;
+        m_vertical_fov = other.m_vertical_fov;
+        m_samples_per_pixel = other.m_samples_per_pixel;
+        m_max_ray_bounces = other.m_max_ray_bounces;
+        m_look_from = other.m_look_from;
+        m_look_at = other.m_look_at;
+        m_up = other.m_up;
+        m_defocus_angle = other.m_defocus_angle;
+        m_focus_distance = other.m_focus_distance;
+        m_image_data = other.m_image_data;
+        m_aspect_ratio = other.m_aspect_ratio;
+        m_pixel_sample_scale = other.m_pixel_sample_scale;
+        m_centre = other.m_centre;
+        m_pixel_0_0_location = other.m_pixel_0_0_location;
+        m_pixel_delta_u = other.m_pixel_delta_u;
+        m_pixel_delta_v = other.m_pixel_delta_v;
+        m_u = other.m_u;
+        m_v = other.m_v;
+        m_w = other.m_w;
+        m_defocus_disk_u = other.m_defocus_disk_u;
+        m_defocus_disk_v = other.m_defocus_disk_v;
+
+        other.m_image_data = nullptr;
+    }
+    return *this;
+}
+
 static const Interval intensity(0.0, 0.999);
 
 void Camera::Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name)
+{
+    std::atomic<bool> no_cancel{false};
+
+    // Uses same render process with no cancel option or progress indicators
+    RenderAsync(scene, scene_config, no_cancel, nullptr, output_image_name);
+}
+
+bool Camera::RenderAsync
+(
+    const IRayHittable& scene,
+    const SceneConfig& scene_config,
+    const std::atomic<bool>& should_cancel,
+    std::atomic<std::size_t>* num_completed_rows,
+    const std::string& output_image_name
+)
 {
     assert(m_image_width > 0);
     assert(m_image_height > 0);
@@ -78,9 +157,18 @@ void Camera::Render(const IRayHittable& scene, const SceneConfig& scene_config, 
 
     const Colour& background_colour = scene_config.background_colour;
 
-    #pragma omp parallel for schedule(static)
+    // Update progress every 16 rows
+    constexpr std::size_t progress_update_interval = 16;
+
+    #pragma omp parallel for schedule(dynamic)
     for (std::int64_t j = 0; j < static_cast<std::int64_t>(m_image_height); j++)
     {
+        // Skip work in loop until return possible
+        if (should_cancel.load(std::memory_order_relaxed))
+        {
+            continue;
+        }
+
         std::size_t output_buffer_index =
             static_cast<std::size_t>(j) *
             m_image_width *
@@ -109,9 +197,27 @@ void Camera::Render(const IRayHittable& scene, const SceneConfig& scene_config, 
             m_image_data[output_buffer_index++] =
                 static_cast<uint8_t>(256 * intensity.Clamp(b_component));
         }
+
+        // Update rows completed every (progress_update_interval) rows
+        if (num_completed_rows && (static_cast<std::size_t>(j) % progress_update_interval == 0))
+        {
+            num_completed_rows->fetch_add(progress_update_interval, std::memory_order_relaxed);
+        }
     }
 
-    const int8_t err_code = stbi_write_png
+    // Exit if render cancel has been requested
+    if (should_cancel.load(std::memory_order_relaxed))
+    {
+        return false;
+    }
+
+    // Show 100% when complete
+    if (num_completed_rows)
+    {
+        num_completed_rows->store(m_image_height, std::memory_order_relaxed);
+    }
+
+    stbi_write_png
     (
         output_image_name.c_str(),
         m_image_width,
@@ -120,8 +226,9 @@ void Camera::Render(const IRayHittable& scene, const SceneConfig& scene_config, 
         m_image_data,
         m_image_width * sizeof(uint8_t) * num_image_components
     );
-}
 
+    return true;
+}
 
 void Camera::DeriveDependentVariables()
 {

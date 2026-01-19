@@ -1,6 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
+#include <atomic>
+
 #include <Colour.h>
 #include <Common.h>
 #include <IRayHittable.h>
@@ -43,7 +45,36 @@ public:
 
     ~Camera();
 
+    // Non-copyable
+    Camera(const Camera&) = delete;
+
+    Camera& operator=(const Camera&) = delete;
+
+    // Movable
+    Camera(Camera&& other) noexcept;
+
+    Camera& operator=(Camera&& other) noexcept;
+
     void Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name = "render.png");
+
+    // Render with cancellation and progress indicator support
+    // should_cancel: cancel render-in-progress
+    // num_completed_rows (optional): incremented as rows complete
+    bool RenderAsync
+    (
+        const IRayHittable& scene,
+        const SceneConfig& scene_config,
+        const std::atomic<bool>& should_cancel,
+        std::atomic<std::size_t>* num_completed_rows = nullptr,
+        const std::string& output_image_name = "render.png"
+    );
+
+    // Read-only access to image buffer for live preview
+    const uint8_t* GetImageBuffer() const { return m_image_data; }
+
+    std::size_t GetImageWidth() const { return m_image_width; }
+
+    std::size_t GetImageHeight() const { return m_image_height; }
 
 
 protected:
