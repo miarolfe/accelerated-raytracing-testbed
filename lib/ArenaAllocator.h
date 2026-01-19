@@ -18,6 +18,14 @@ public:
     ArenaAllocator(std::size_t capacity_in_bytes);
     ~ArenaAllocator();
 
+    // Can't be copied
+    ArenaAllocator(const ArenaAllocator&) = delete;
+    ArenaAllocator& operator=(const ArenaAllocator&) = delete;
+
+    // Can be moved
+    ArenaAllocator(ArenaAllocator&& other) noexcept;
+    ArenaAllocator& operator=(ArenaAllocator&& other) noexcept;
+
     // Alignment must be a power of 2
     void* Alloc(std::size_t size_in_bytes, std::size_t alignment_in_bytes = 16);
     void Clear();

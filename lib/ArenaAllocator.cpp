@@ -19,11 +19,46 @@ ArenaAllocator::ArenaAllocator(std::size_t capacity_in_bytes)
 
 ArenaAllocator::~ArenaAllocator()
 {
+    if (m_buffer)
+    {
 #if defined (_MSC_VER)
-    _aligned_free(m_buffer);
+        _aligned_free(m_buffer);
 #else
-    free(m_buffer);
+        free(m_buffer);
 #endif // defined (_MSC_VER)
+    }
+}
+
+ArenaAllocator::ArenaAllocator(ArenaAllocator&& other) noexcept
+    : m_buffer(other.m_buffer), m_capacity(other.m_capacity), m_offset(other.m_offset)
+{
+    other.m_buffer = nullptr;
+    other.m_capacity = 0;
+    other.m_offset = 0;
+}
+
+ArenaAllocator& ArenaAllocator::operator=(ArenaAllocator&& other) noexcept
+{
+    if (this != &other)
+    {
+        if (m_buffer)
+        {
+#if defined (_MSC_VER)
+            _aligned_free(m_buffer);
+#else
+            free(m_buffer);
+#endif // defined (_MSC_VER)
+        }
+
+        m_buffer = other.m_buffer;
+        m_capacity = other.m_capacity;
+        m_offset = other.m_offset;
+
+        other.m_buffer = nullptr;
+        other.m_capacity = 0;
+        other.m_offset = 0;
+    }
+    return *this;
 }
 
 void* ArenaAllocator::Alloc(std::size_t size_in_bytes, std::size_t alignment_in_bytes)
