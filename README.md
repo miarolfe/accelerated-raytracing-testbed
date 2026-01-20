@@ -4,6 +4,10 @@
 
 ART is a ray tracing testbed designed to benchmark and compare different spatial acceleration structures used in CPU ray tracing.
 
+<img src="https://github.com/user-attachments/assets/64af592d-fe99-4d9a-8c86-1aa5b140bfdb">
+
+It features a full GUI for ease of use.
+
 ## Key features
 
 - [x] Path tracing renderer
