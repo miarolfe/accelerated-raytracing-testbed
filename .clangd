@@ -7,6 +7,12 @@ CompileFlags:
     - -isystem../external
     - -isystem../external/SDL3/include
     - -isystem../lib
+    - -isystem../lib/Acceleration
+    - -isystem../lib/Core
+    - -isystem../lib/Geometry
+    - -isystem../lib/Materials
+    - -isystem../lib/Maths
+    - -isystem../lib/RayTracing
     - -isystem../include
     - -isystem../src
     - -isystem../src/common
@@ -17,6 +23,12 @@ CompileFlags:
     - -isystem../../external/imgui
     - -isystem../../external/SDL3/include
     - -isystem../../lib
+    - -isystem../../lib/Acceleration
+    - -isystem../../lib/Core
+    - -isystem../../lib/Geometry
+    - -isystem../../lib/Materials
+    - -isystem../../lib/Maths
+    - -isystem../../lib/RayTracing
     - -isystem../../include
     - -isystem../../src
     - -isystem../../src/common

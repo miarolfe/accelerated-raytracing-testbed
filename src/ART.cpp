@@ -5,30 +5,31 @@
     #define ART_HEADLESS
 #endif // !defined (ART_GUI) && !defined (ART_HEADLESS)
 
-#include <ArenaAllocator.h>
+#include <Common/RenderCommon.h>
 #if defined (ART_GUI)
-    #include <GUIRunner.h>
+    #include <GUI/GUIRunner.h>
 #elif defined (ART_HEADLESS)
-    #include <HeadlessRunner.h>
+    #include <Headless/HeadlessRunner.h>
 #endif // defined (ART_GUI)
-#include <AxisAlignedBox.h>
-#include <BoundingVolumeHierarchy.h>
-#include <BSPTree.h>
-#include <Camera.h>
-#include <Colour.h>
-#include <HierarchicalUniformGrid.h>
-#include <KDTree.h>
-#include <Logger.h>
-#include <Material.h>
-#include <Octree.h>
-#include <RayHittableList.h>
-#include <RenderCommon.h>
-#include <Sphere.h>
-#include <Texture.h>
-#include <Timer.h>
-#include <UniformGrid.h>
-#include <Utility.h>
-#include <Vec3.h>
+
+#include <Acceleration/BoundingVolumeHierarchy.h>
+#include <Acceleration/BSPTree.h>
+#include <Acceleration/HierarchicalUniformGrid.h>
+#include <Acceleration/KDTree.h>
+#include <Acceleration/Octree.h>
+#include <Acceleration/UniformGrid.h>
+#include <Core/ArenaAllocator.h>
+#include <Core/Logger.h>
+#include <Core/Timer.h>
+#include <Core/Utility.h>
+#include <Geometry/AxisAlignedBox.h>
+#include <Geometry/Sphere.h>
+#include <Materials/Material.h>
+#include <Materials/Texture.h>
+#include <Maths/Colour.h>
+#include <Maths/Vec3.h>
+#include <RayTracing/Camera.h>
+#include <RayTracing/RayHittableList.h>
 
 int main(int argc, char* argv[])
 {

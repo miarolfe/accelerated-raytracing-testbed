@@ -125,6 +125,12 @@ filter {}
 externalincludedirs {
     path.getdirectory(os.getcwd()) .. "/external",
     path.getdirectory(os.getcwd()) .. "/lib",
+    path.getdirectory(os.getcwd()) .. "/lib/foundation",
+    path.getdirectory(os.getcwd()) .. "/lib/math",
+    path.getdirectory(os.getcwd()) .. "/lib/geometry",
+    path.getdirectory(os.getcwd()) .. "/lib/materials",
+    path.getdirectory(os.getcwd()) .. "/lib/raytracing",
+    path.getdirectory(os.getcwd()) .. "/lib/acceleration",
     path.getdirectory(os.getcwd()) .. "/include",
 }
 
@@ -158,37 +164,37 @@ filter {}
 filter { "configurations:Debug_* or Release_*" }
     files {
         path.getdirectory(os.getcwd()) .. "/src/ART.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/common/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/common/**.h",
+        path.getdirectory(os.getcwd()) .. "/src/Common/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/Common/**.h",
     }
 
     externalincludedirs {
         path.getdirectory(os.getcwd()) .. "/src",
-        path.getdirectory(os.getcwd()) .. "/src/common",
+        path.getdirectory(os.getcwd()) .. "/src/Common",
     }
 
 filter {}
 
 filter { "configurations:*_GUI" }
     files {
-        path.getdirectory(os.getcwd()) .. "/src/gui/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/gui/**.h",
+        path.getdirectory(os.getcwd()) .. "/src/GUI/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/GUI/**.h",
     }
 
     externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/src/gui",
+        path.getdirectory(os.getcwd()) .. "/src/GUI",
     }
 
 filter {}
 
 filter { "configurations:*_Headless" }
     files {
-        path.getdirectory(os.getcwd()) .. "/src/headless/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/headless/**.h",
+        path.getdirectory(os.getcwd()) .. "/src/Headless/**.cpp",
+        path.getdirectory(os.getcwd()) .. "/src/Headless/**.h",
     }
 
     externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/src/headless",
+        path.getdirectory(os.getcwd()) .. "/src/Headless",
     }
 
 filter {}

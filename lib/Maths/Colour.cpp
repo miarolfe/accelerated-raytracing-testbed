@@ -1,0 +1,19 @@
+// Copyright Mia Rolfe. All rights reserved.
+#include <Maths/Colour.h>
+
+namespace ART
+{
+
+double LinearToGamma(double linear_colour)
+{
+    if (linear_colour > 0.0)
+    {
+        return std::sqrt(linear_colour);
+    }
+    else
+    {
+        return 0.0;
+    }
+}
+
+} // namespace ART
