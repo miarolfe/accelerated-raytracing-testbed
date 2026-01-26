@@ -12,24 +12,12 @@
     #include <Headless/HeadlessRunner.h>
 #endif // defined (ART_GUI)
 
-#include <Acceleration/BoundingVolumeHierarchy.h>
-#include <Acceleration/BSPTree.h>
-#include <Acceleration/HierarchicalUniformGrid.h>
-#include <Acceleration/KDTree.h>
-#include <Acceleration/Octree.h>
-#include <Acceleration/UniformGrid.h>
-#include <Core/ArenaAllocator.h>
-#include <Core/Logger.h>
-#include <Core/Timer.h>
-#include <Core/Utility.h>
-#include <Geometry/AxisAlignedBox.h>
-#include <Geometry/Sphere.h>
-#include <Materials/Material.h>
-#include <Materials/Texture.h>
-#include <Maths/Colour.h>
-#include <Maths/Vec3.h>
-#include <RayTracing/Camera.h>
-#include <RayTracing/RayHittableList.h>
+#include <Acceleration/AccelerationStructures.h>
+#include <Core/Core.h>
+#include <Geometry/Geometry.h>
+#include <Materials/Materials.h>
+#include <Maths/Maths.h>
+#include <RayTracing/RayTracing.h>
 
 int main(int argc, char* argv[])
 {
