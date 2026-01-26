@@ -220,11 +220,11 @@ bool Camera::RenderAsync
     stbi_write_png
     (
         output_image_name.c_str(),
-        m_image_width,
-        m_image_height,
-        num_image_components,
+        static_cast<int>(m_image_width),
+        static_cast<int>(m_image_height),
+        static_cast<int>(num_image_components),
         m_image_data,
-        m_image_width * sizeof(uint8_t) * num_image_components
+        static_cast<int>(m_image_width * sizeof(uint8_t) * num_image_components)
     );
 
     return true;
@@ -250,8 +250,8 @@ void Camera::DeriveDependentVariables()
     const Vec3 viewport_u = viewport_width * m_u;
     const Vec3 viewport_v = viewport_height * -m_v;
 
-    m_pixel_delta_u = viewport_u / m_image_width;
-    m_pixel_delta_v = viewport_v / m_image_height;
+    m_pixel_delta_u = viewport_u / static_cast<double>(m_image_width);
+    m_pixel_delta_v = viewport_v / static_cast<double>(m_image_height);
 
     const Point3 viewport_upper_left = m_centre - (m_focus_distance * m_w) - (viewport_u / 2.0) - (viewport_v / 2.0);
     m_pixel_0_0_location = viewport_upper_left + 0.5 * (m_pixel_delta_u + m_pixel_delta_v);

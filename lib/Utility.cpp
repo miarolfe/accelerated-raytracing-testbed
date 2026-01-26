@@ -55,7 +55,7 @@ void Init()
     {
         num_openmp_threads = 1;
     }
-    omp_set_num_threads(num_openmp_threads);
+    omp_set_num_threads(static_cast<int>(num_openmp_threads));
 
     Logger::Get().LogInfo("Using " + std::to_string(num_openmp_threads) + " threads for render");
 #endif // defined(_MSC_VER)

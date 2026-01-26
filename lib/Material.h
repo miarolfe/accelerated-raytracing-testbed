@@ -9,7 +9,7 @@
 namespace ART
 {
 
-struct Material
+class Material
 {
 public:
     virtual ~Material() = default;
@@ -19,7 +19,7 @@ public:
     virtual bool Scatter(const Ray& ray, const RayHitResult& result, Colour& out_attenuation, Ray& out_ray) const;
 };
 
-struct LambertianMaterial : public Material
+class LambertianMaterial : public Material
 {
 public:
     LambertianMaterial(Texture* texture);
@@ -30,7 +30,7 @@ protected:
     Texture* m_texture;
 };
 
-struct MetalMaterial : public Material
+class MetalMaterial : public Material
 {
 public:
     MetalMaterial(const Colour& albedo, double fuzz);
@@ -42,7 +42,7 @@ protected:
     double m_fuzz;
 };
 
-struct DielectricMaterial : public Material
+class DielectricMaterial : public Material
 {
 public:
     DielectricMaterial(double refraction_index);
@@ -58,7 +58,7 @@ protected:
     double m_refraction_index;
 };
 
-struct DiffuseLightMaterial : public Material
+class DiffuseLightMaterial : public Material
 {
 public:
     DiffuseLightMaterial(Texture* texture);

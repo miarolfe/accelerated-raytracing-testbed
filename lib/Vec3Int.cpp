@@ -81,7 +81,7 @@ Vec3Int& Vec3Int::operator*=(int t)
 
 Vec3Int& Vec3Int::operator/=(int t)
 {
-    return *this *= 1.0 / t;
+    return *this *= static_cast<int>(1.0 / t);
 }
 
 double Vec3Int::Length() const
