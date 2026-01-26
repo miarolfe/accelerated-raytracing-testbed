@@ -1,8 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Catch2/catch.hpp>
 
-#include <AxisAlignedBoundingBox.h>
-#include <Constants.h>
+#include <Core/Constants.h>
+#include <Geometry/AxisAlignedBox.h>
 
 namespace ART
 {

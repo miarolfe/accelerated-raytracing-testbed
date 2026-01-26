@@ -1,7 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Catch2/catch.hpp>
 
-#include <Vec3.h>
+#include <Maths/Vec3.h>
 
 namespace ART
 {

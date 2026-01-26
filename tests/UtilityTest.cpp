@@ -1,8 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Catch2/catch.hpp>
 
-#include <Constants.h>
-#include <Utility.h>
+#include <Core/Constants.h>
+#include <Core/Utility.h>
 
 namespace ART
 {
