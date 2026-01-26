@@ -47,9 +47,10 @@ filter { "toolset:gcc or toolset:clang" }
 
 filter {}
 
-filter { "toolset:msc" }
+filter { "system:windows" }
     defines { "_CRT_SECURE_NO_WARNINGS" }
 
+filter { "toolset:msc" }
     buildoptions {
         "/W4",
         "/WX",
