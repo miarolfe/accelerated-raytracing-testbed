@@ -1,11 +1,11 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Catch2/catch.hpp>
 
-#include <ArenaAllocator.h>
-#include <Material.h>
-#include <Sphere.h>
-#include <Ray.h>
-#include <Vec3.h>
+#include <Core/ArenaAllocator.h>
+#include <Geometry/Sphere.h>
+#include <Materials/Material.h>
+#include <Maths/Ray.h>
+#include <Maths/Vec3.h>
 
 namespace ART
 {

@@ -1,7 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Catch2/catch.hpp>
 
-#include <Interval.h>
+#include <Maths/Interval.h>
 
 namespace ART
 {

@@ -1,7 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Catch2/catch.hpp>
 
-#include <Ray.h>
+#include <Maths/Ray.h>
 
 namespace ART
 {

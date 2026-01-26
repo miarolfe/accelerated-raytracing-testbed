@@ -1,11 +1,11 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Catch2/catch.hpp>
 
-#include <ArenaAllocator.h>
-#include <BoundingVolumeHierarchy.h>
-#include <Constants.h>
-#include <Material.h>
-#include <Sphere.h>
+#include <Acceleration/BoundingVolumeHierarchy.h>
+#include <Core/ArenaAllocator.h>
+#include <Core/Constants.h>
+#include <Geometry/Sphere.h>
+#include <Materials/Material.h>
 
 namespace ART
 {
