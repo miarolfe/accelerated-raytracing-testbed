@@ -80,6 +80,14 @@ bool ParseCLIArgs(int argc, char* argv[], CLIParams& out_params)
             return false;
         }
     }
+
+    out_params.screen_width = (out_params.screen_width < MIN_RENDER_WIDTH) ? MIN_RENDER_WIDTH : out_params.screen_width;
+    out_params.screen_width = (out_params.screen_width > MAX_RENDER_WIDTH) ? MAX_RENDER_WIDTH : out_params.screen_width;
+    out_params.screen_height = (out_params.screen_height < MIN_RENDER_HEIGHT) ? MIN_RENDER_HEIGHT : out_params.screen_height;
+    out_params.screen_height = (out_params.screen_height > MAX_RENDER_HEIGHT) ? MAX_RENDER_HEIGHT : out_params.screen_height;
+    out_params.samples_per_pixel = (out_params.samples_per_pixel < MIN_SAMPLES_PER_PIXEL) ? MIN_SAMPLES_PER_PIXEL : out_params.samples_per_pixel;
+    out_params.samples_per_pixel = (out_params.samples_per_pixel > MAX_SAMPLES_PER_PIXEL) ? MAX_SAMPLES_PER_PIXEL : out_params.samples_per_pixel;
+
     return true;
 }
 

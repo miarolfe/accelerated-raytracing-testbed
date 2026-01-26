@@ -2,6 +2,7 @@
 #pragma once
 
 #include <atomic>
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -27,6 +28,13 @@
 
 namespace ART
 {
+
+constexpr std::size_t MIN_RENDER_WIDTH = 1;
+constexpr std::size_t MAX_RENDER_WIDTH = 7680;
+constexpr std::size_t MIN_RENDER_HEIGHT = 1;
+constexpr std::size_t MAX_RENDER_HEIGHT = 4320;
+constexpr std::size_t MIN_SAMPLES_PER_PIXEL = 1;
+constexpr std::size_t MAX_SAMPLES_PER_PIXEL = 10000;
 
 // Holds all scene data needed for async rendering
 struct RenderContext

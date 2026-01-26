@@ -131,9 +131,12 @@ void GUIRunner::DrawSettingsUI()
         ImGui::InputInt("Height (px)", &m_render_height);
         ImGui::InputInt("Samples per pixel", &m_samples_per_pixel);
 
-        m_render_width = (m_render_width < 1) ? 1 : m_render_width;
-        m_render_height = (m_render_height < 1) ? 1 : m_render_height;
-        m_samples_per_pixel = (m_samples_per_pixel < 1) ? 1 : m_samples_per_pixel;
+        m_render_width = (m_render_width < MIN_RENDER_WIDTH) ? MIN_RENDER_WIDTH : m_render_width;
+        m_render_width = (m_render_width > MAX_RENDER_WIDTH) ? MAX_RENDER_WIDTH : m_render_width;
+        m_render_height = (m_render_height < MIN_RENDER_HEIGHT) ? MIN_RENDER_HEIGHT : m_render_height;
+        m_render_height = (m_render_height > MAX_RENDER_HEIGHT) ? MAX_RENDER_HEIGHT : m_render_height;
+        m_samples_per_pixel = (m_samples_per_pixel < MIN_SAMPLES_PER_PIXEL) ? MIN_SAMPLES_PER_PIXEL : m_samples_per_pixel;
+        m_samples_per_pixel = (m_samples_per_pixel > MAX_SAMPLES_PER_PIXEL) ? MAX_SAMPLES_PER_PIXEL : m_samples_per_pixel;
     }
 
     if (ImGui::CollapsingHeader("Acceleration Structures", ImGuiTreeNodeFlags_DefaultOpen))
