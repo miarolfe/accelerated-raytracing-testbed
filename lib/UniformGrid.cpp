@@ -305,18 +305,18 @@ Vec3Int UniformGrid::Calculate3DIndex(Vec3 position) const
     int z = static_cast<int>((position.m_z - m_bounding_box.m_z.m_min) / cell_size_z);
 
     // Edge case where position is exactly on max boundary
-    if (x >= static_cast<int>(m_num_x_cells)) x = m_num_x_cells - 1;
-    if (y >= static_cast<int>(m_num_y_cells)) y = m_num_y_cells - 1;
-    if (z >= static_cast<int>(m_num_z_cells)) z = m_num_z_cells - 1;
+    if (x >= static_cast<int>(m_num_x_cells)) x = static_cast<int>(m_num_x_cells - 1);
+    if (y >= static_cast<int>(m_num_y_cells)) y = static_cast<int>(m_num_y_cells - 1);
+    if (z >= static_cast<int>(m_num_z_cells)) z = static_cast<int>(m_num_z_cells - 1);
 
     return Vec3Int(x, y, z);
 }
 
 Vec3Int UniformGrid::Calculate3DIndex(std::size_t one_dimensional_index) const
 {
-    const int x = one_dimensional_index / (m_num_y_cells * m_num_z_cells);
-    const int y = (one_dimensional_index % (m_num_y_cells * m_num_z_cells)) / m_num_z_cells;
-    const int z = one_dimensional_index % m_num_z_cells;
+    const int x = static_cast<int>(one_dimensional_index) / static_cast<int>(m_num_y_cells * m_num_z_cells);
+    const int y = (static_cast<int>(one_dimensional_index) % static_cast<int>(m_num_y_cells * m_num_z_cells)) / static_cast<int>(m_num_z_cells);
+    const int z = static_cast<int>(one_dimensional_index % m_num_z_cells);
 
     return Vec3Int(x, y, z);
 }

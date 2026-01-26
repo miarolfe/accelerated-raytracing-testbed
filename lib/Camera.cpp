@@ -224,7 +224,7 @@ bool Camera::RenderAsync
         m_image_height,
         num_image_components,
         m_image_data,
-        m_image_width * sizeof(uint8_t) * num_image_components
+        static_cast<int>(m_image_width * sizeof(uint8_t) * num_image_components)
     );
 
     return true;

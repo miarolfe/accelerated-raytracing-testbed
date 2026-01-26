@@ -91,15 +91,15 @@ uint32_t Image::Clamp(std::size_t val, std::size_t low, std::size_t high)
 {
     if (val < low)
     {
-        return low;
+        return static_cast<uint32_t>(low);
     }
     else if (val < high)
     {
-        return val;
+        return static_cast<uint32_t>(val);
     }
     else
     {
-        return high - 1;
+        return static_cast<uint32_t>(high - 1);
     }
 }
 
@@ -107,7 +107,7 @@ uint8_t Image::FloatToByte(double val)
 {
     if (val <= 0.0)
     {
-        return 0.0;
+        return 0;
     }
     else if (1.0 <= val)
     {
