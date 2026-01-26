@@ -72,7 +72,7 @@ void KDTreeNode::Create(IRayHittable** objects, std::size_t count, std::size_t d
     double* centroids = static_cast<double*>(allocator.Alloc(count * sizeof(double), alignof(double)));
     for (std::size_t object_index = 0; object_index < count; object_index++)
     {
-        const Interval& interval = objects[object_index]->BoundingBox()[m_split_axis];
+        const Interval interval = objects[object_index]->BoundingBox()[m_split_axis];
         centroids[object_index] = 0.5 * (interval.m_min + interval.m_max);
     }
     std::sort(centroids, centroids + count);
@@ -85,7 +85,7 @@ void KDTreeNode::Create(IRayHittable** objects, std::size_t count, std::size_t d
         objects, objects + count,
         [this](IRayHittable* obj)
         {
-            const Interval& interval = obj->BoundingBox()[m_split_axis];
+            const Interval interval = obj->BoundingBox()[m_split_axis];
             return (0.5 * (interval.m_min + interval.m_max)) < m_split_position_along_split_axis;
         }
     );

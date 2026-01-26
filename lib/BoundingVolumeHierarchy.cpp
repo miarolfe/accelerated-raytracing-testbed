@@ -90,7 +90,7 @@ std::size_t BVHNode::SplitSAH(IRayHittable** objects, std::size_t count)
 
         for (std::size_t object_index = 0; object_index < count; object_index++)
         {
-            const Interval& interval = objects[object_index]->BoundingBox()[axis];
+            const Interval interval = objects[object_index]->BoundingBox()[axis];
             const double centroid = 0.5 * (interval.m_min + interval.m_max);
             min_centroid = std::min(min_centroid, centroid);
             max_centroid = std::max(max_centroid, centroid);
@@ -107,7 +107,7 @@ std::size_t BVHNode::SplitSAH(IRayHittable** objects, std::size_t count)
         SplitBucket buckets[NUM_SAH_BUCKETS];
         for (std::size_t object_index = 0; object_index < count; object_index++)
         {
-            const Interval& interval = objects[object_index]->BoundingBox()[axis];
+            const Interval interval = objects[object_index]->BoundingBox()[axis];
             const double centroid = 0.5 * (interval.m_min + interval.m_max);
             std::size_t bucket_index = static_cast<std::size_t>(NUM_SAH_BUCKETS * ((centroid - min_centroid) / extent));
             if (bucket_index >= NUM_SAH_BUCKETS)
@@ -174,7 +174,7 @@ std::size_t BVHNode::SplitSAH(IRayHittable** objects, std::size_t count)
         objects, objects + count,
         [best_axis, best_split_pos_along_best_axis](IRayHittable* obj)
         {
-            const Interval& interval = obj->BoundingBox()[best_axis];
+            const Interval interval = obj->BoundingBox()[best_axis];
             return 0.5 * (interval.m_min + interval.m_max) < best_split_pos_along_best_axis;
         }
     );
@@ -189,8 +189,8 @@ std::size_t BVHNode::SplitLongestAxis(IRayHittable** objects, std::size_t count)
 
     std::sort(objects, objects + count, [axis](IRayHittable* a, IRayHittable* b)
     {
-        const Interval& a_interval = a->BoundingBox()[axis];
-        const Interval& b_interval = b->BoundingBox()[axis];
+        const Interval a_interval = a->BoundingBox()[axis];
+        const Interval b_interval = b->BoundingBox()[axis];
         // Cheaper but equivalent for sorting comparison to comparing (2 * a_centroid) to (2 * b_centroid)
         return (a_interval.m_min + a_interval.m_max) < (b_interval.m_min + b_interval.m_max);
     });
