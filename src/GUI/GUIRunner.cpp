@@ -126,11 +126,29 @@ void GUIRunner::DrawSettingsUI()
 {
     if (ImGui::CollapsingHeader("Render Settings", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        const char* scenes[] = { "Scene 1", "Scene 2", "Scene 3", "Scene 4", "Scene 5", "Scene 6" };
-        ImGui::Combo("Scene", &m_scene_number, scenes, 6);
+        const char* scenes[] = {
+            "Scene 1 (Three spheres)",
+            "Scene 2 (Two large spheres)",
+            "Scene 3 (Glass refraction)",
+            "Scene 4 (Glass and checker)",
+            "Scene 5 (Three sphere clusters)",
+            "Scene 6 (Mixed geometry)",
+            "Scene 7 (Uniform dense field)",
+            "Scene 8 (Sparse clusters in void)",
+            "Scene 9 (Extreme size variation)",
+            "Scene 10 (Long corridor)",
+            "Scene 11 (Centroid co-location)",
+            "Scene 12 (Flat plane distribution)",
+            "Scene 13 (Diagonal wall)",
+            "Scene 14 (High object count)",
+            "Scene 15 (Overlapping box city)"
+        };
+        ImGui::Combo("Scene", &m_scene_number, scenes, 15);
         ImGui::InputInt("Width (px)", &m_render_width);
         ImGui::InputInt("Height (px)", &m_render_height);
         ImGui::InputInt("Samples per pixel", &m_samples_per_pixel);
+        ImGui::InputInt("Colour seed (0 = random)", &m_colour_seed);
+        ImGui::InputInt("Position seed (0 = random)", &m_position_seed);
 
         m_render_width = (m_render_width < MIN_RENDER_WIDTH) ? MIN_RENDER_WIDTH : m_render_width;
         m_render_width = (m_render_width > MAX_RENDER_WIDTH) ? MAX_RENDER_WIDTH : m_render_width;
@@ -138,6 +156,8 @@ void GUIRunner::DrawSettingsUI()
         m_render_height = (m_render_height > MAX_RENDER_HEIGHT) ? MAX_RENDER_HEIGHT : m_render_height;
         m_samples_per_pixel = (m_samples_per_pixel < MIN_SAMPLES_PER_PIXEL) ? MIN_SAMPLES_PER_PIXEL : m_samples_per_pixel;
         m_samples_per_pixel = (m_samples_per_pixel > MAX_SAMPLES_PER_PIXEL) ? MAX_SAMPLES_PER_PIXEL : m_samples_per_pixel;
+        m_colour_seed = (m_colour_seed < 0) ? 0 : m_colour_seed;
+        m_position_seed = (m_position_seed < 0) ? 0 : m_position_seed;
     }
 
     if (ImGui::CollapsingHeader("Acceleration Structures", ImGuiTreeNodeFlags_DefaultOpen))
@@ -417,6 +437,10 @@ void GUIRunner::StartRenderQueue()
 
     LogRenderConfig(config, scene_number_one_indexed);
 
+    // Cast from int (ImGui expects int for UI values)
+    const uint32_t colour_seed = static_cast<uint32_t>(m_colour_seed);
+    const uint32_t position_seed = static_cast<uint32_t>(m_position_seed);
+
     m_render_queue.clear();
     m_completed_stats.clear();
     m_current_job_index = 0;
@@ -424,43 +448,43 @@ void GUIRunner::StartRenderQueue()
     if (m_use_acceleration_structure_none)
     {
         RenderJob job;
-        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::NONE);
+        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::NONE, colour_seed, position_seed);
         m_render_queue.push_back(std::move(job));
     }
     if (m_use_acceleration_structure_uniform_grid)
     {
         RenderJob job;
-        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::UNIFORM_GRID);
+        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::UNIFORM_GRID, colour_seed, position_seed);
         m_render_queue.push_back(std::move(job));
     }
     if (m_use_acceleration_structure_hierarchical_uniform_grid)
     {
         RenderJob job;
-        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
+        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::HIERARCHICAL_UNIFORM_GRID, colour_seed, position_seed);
         m_render_queue.push_back(std::move(job));
     }
     if (m_use_acceleration_structure_octree)
     {
         RenderJob job;
-        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::OCTREE);
+        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::OCTREE, colour_seed, position_seed);
         m_render_queue.push_back(std::move(job));
     }
     if (m_use_acceleration_structure_bsp_tree)
     {
         RenderJob job;
-        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::BSP_TREE);
+        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::BSP_TREE, colour_seed, position_seed);
         m_render_queue.push_back(std::move(job));
     }
     if (m_use_acceleration_structure_k_d_tree)
     {
         RenderJob job;
-        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::K_D_TREE);
+        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::K_D_TREE, colour_seed, position_seed);
         m_render_queue.push_back(std::move(job));
     }
     if (m_use_acceleration_structure_bounding_volume_hierarchy)
     {
         RenderJob job;
-        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
+        job.context = CreateAsyncRenderContext(config, scene_number_one_indexed, AccelerationStructure::BOUNDING_VOLUME_HIERARCHY, colour_seed, position_seed);
         m_render_queue.push_back(std::move(job));
     }
 
