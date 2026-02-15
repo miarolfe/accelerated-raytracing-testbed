@@ -268,7 +268,7 @@ void Camera::ResizeImageBuffer()
         delete[] m_image_data;
     }
 
-    m_image_data = new uint8_t[m_image_width * m_image_height * num_image_components];
+    m_image_data = new uint8_t[m_image_width * m_image_height * num_image_components]{};
 }
 
 Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& scene, const Colour& background_colour)
