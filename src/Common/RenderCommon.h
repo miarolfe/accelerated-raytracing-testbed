@@ -77,6 +77,9 @@ public:
 
     // Memory usage by render thread
     std::size_t memory_used_bytes{0};
+
+    // Traversal efficiency metrics
+    TraversalStats traversal_stats;
 };
 
 void LogRenderConfig(const CameraRenderConfig& render_config, int scene_number);

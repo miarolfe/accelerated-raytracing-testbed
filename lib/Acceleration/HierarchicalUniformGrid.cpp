@@ -2,6 +2,7 @@
 #include <Acceleration/HierarchicalUniformGrid.h>
 
 #include <Acceleration/UniformGrid.h>
+#include <Core/TraversalStats.h>
 #include <RayTracing/IRayHittable.h>
 #include <RayTracing/RayHitResult.h>
 
@@ -101,6 +102,7 @@ bool HierarchicalUniformGrid::Hit(const Ray& ray, Interval ray_t, RayHitResult& 
     )
     {
         const std::size_t cell_index = Calculate1DIndex(current_cell);
+        RecordNodeTraversal();
         if (CellHit(m_grid[cell_index], ray, Interval(ray_t.m_min, closest_t), temp_result))
         {
             hit_anything = true;

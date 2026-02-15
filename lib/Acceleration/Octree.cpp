@@ -1,6 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Acceleration/Octree.h>
 
+#include <Core/TraversalStats.h>
+
 namespace ART
 {
 
@@ -143,6 +145,8 @@ bool OctreeNode::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) c
     {
         return false;
     }
+
+    RecordNodeTraversal();
 
     // Leaf node: test stored objects
     if (m_leaf_count > 0)

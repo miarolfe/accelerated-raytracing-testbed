@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <Core/TraversalStats.h>
+
 namespace ART
 {
 
@@ -28,6 +30,7 @@ public:
     double m_construction_time_ms = 0.0;
     double m_render_time_ms = 0.0;
     std::size_t m_memory_used_bytes = 0;
+    TraversalStats m_traversal_stats;
 
     double TotalTimeMilliseconds() const;
 };

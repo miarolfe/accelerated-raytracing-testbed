@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <limits>
 
+#include <Core/TraversalStats.h>
 #include <RayTracing/IRayHittable.h>
 #include <RayTracing/RayHitResult.h>
 
@@ -205,6 +206,8 @@ bool BVHNode::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) cons
     {
         return false;
     }
+
+    RecordNodeTraversal();
 
     // Leaf nodes with only child
     if (m_right == nullptr)
