@@ -11,8 +11,11 @@ namespace ART
 KDTreeNode::KDTreeNode(std::vector<IRayHittable*>& objects)
     : m_allocator(nullptr), m_left(nullptr), m_right(nullptr)
 {
-    // KD-tree has at most 2N-1 nodes for N objects
-    const std::size_t arena_size = (2 * objects.size()) * sizeof(KDTreeNode);
+    // KD-tree has at most 2N-1 nodes for N objects.
+    // Additional space needed for temporary centroid arrays allocated from the arena during construction.
+    const std::size_t node_space = (2 * objects.size()) * sizeof(KDTreeNode);
+    const std::size_t centroid_space = objects.size() * sizeof(double) * (MAX_DEPTH + 1);
+    const std::size_t arena_size = node_space + centroid_space;
     m_allocator = new ArenaAllocator(arena_size);
 
     Create(objects.data(), objects.size(), 0, *m_allocator);
