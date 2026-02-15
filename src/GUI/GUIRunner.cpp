@@ -242,13 +242,15 @@ void GUIRunner::DrawResultsUI()
         return;
     }
 
-    if (ImGui::BeginTable("RenderResults", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    if (ImGui::BeginTable("RenderResults", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
         ImGui::TableSetupColumn("Structure");
         ImGui::TableSetupColumn("Construction (ms)");
         ImGui::TableSetupColumn("Render (ms)");
         ImGui::TableSetupColumn("Total (ms)");
         ImGui::TableSetupColumn("Memory used");
+        ImGui::TableSetupColumn("Avg nodes/ray");
+        ImGui::TableSetupColumn("Avg tests/ray");
         ImGui::TableHeadersRow();
 
         for (const RenderStats& stats : m_completed_stats)
@@ -269,6 +271,12 @@ void GUIRunner::DrawResultsUI()
 
             ImGui::TableNextColumn();
             ImGui::Text("%s", FormatMemoryUsed(stats.m_memory_used_bytes).c_str());
+
+            ImGui::TableNextColumn();
+            ImGui::Text("%.2f", stats.m_traversal_stats.AvgNodesTraversedPerRay());
+
+            ImGui::TableNextColumn();
+            ImGui::Text("%.2f", stats.m_traversal_stats.AvgIntersectionTestsPerRay());
         }
 
         ImGui::EndTable();
@@ -278,8 +286,8 @@ void GUIRunner::DrawResultsUI()
     {
         std::ostringstream md;
         md << std::fixed << std::setprecision(2);
-        md << "| Structure | Construction (ms) | Render (ms) | Total (ms) | Memory used |\n";
-        md << "| --- | --- | --- | --- | --- |\n";
+        md << "| Structure | Construction (ms) | Render (ms) | Total (ms) | Memory used | Avg nodes/ray | Avg tests/ray |\n";
+        md << "| --- | --- | --- | --- | --- | --- | --- |\n";
         for (const RenderStats& stats : m_completed_stats)
         {
             md << "| " << AccelerationStructureToString(stats.m_acceleration_structure)
@@ -287,6 +295,8 @@ void GUIRunner::DrawResultsUI()
                << " | " << stats.m_render_time_ms
                << " | " << stats.TotalTimeMilliseconds()
                << " | " << FormatMemoryUsed(stats.m_memory_used_bytes)
+               << " | " << stats.m_traversal_stats.AvgNodesTraversedPerRay()
+               << " | " << stats.m_traversal_stats.AvgIntersectionTestsPerRay()
                << " |\n";
         }
         SDL_SetClipboardText(md.str().c_str());
@@ -328,6 +338,7 @@ void GUIRunner::UpdateRenderState()
             stats.m_construction_time_ms = completed_ctx.construction_time_ms;
             stats.m_render_time_ms = completed_ctx.render_time_ms;
             stats.m_memory_used_bytes = completed_ctx.memory_used_bytes;
+            stats.m_traversal_stats = completed_ctx.traversal_stats;
             m_completed_stats.push_back(stats);
         }
     }

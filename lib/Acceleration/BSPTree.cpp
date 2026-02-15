@@ -2,6 +2,7 @@
 #include <Acceleration/BSPTree.h>
 
 #include <Core/Common.h>
+#include <Core/TraversalStats.h>
 
 namespace ART
 {
@@ -246,6 +247,8 @@ bool BSPTreeNode::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) 
     {
         return false;
     }
+
+    RecordNodeTraversal();
 
     // Single child leaf
     if (m_back == nullptr)

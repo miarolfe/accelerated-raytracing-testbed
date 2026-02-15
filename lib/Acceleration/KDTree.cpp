@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <Core/TraversalStats.h>
+
 namespace ART
 {
 
@@ -109,6 +111,8 @@ bool KDTreeNode::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) c
     {
         return false;
     }
+
+    RecordNodeTraversal();
 
     // Leaf node with only one child
     if (m_right == nullptr)

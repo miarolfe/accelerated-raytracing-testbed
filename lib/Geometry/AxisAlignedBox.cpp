@@ -1,6 +1,8 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Geometry/AxisAlignedBox.h>
 
+#include <Core/TraversalStats.h>
+
 namespace ART
 {
 
@@ -12,6 +14,8 @@ AxisAlignedBox::AxisAlignedBox(const AABB& bounding_box, Material* material)
 
 bool AxisAlignedBox::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) const
 {
+    RecordIntersectionTest();
+
     // Latest entry point across all slabs
     double t_min = ray_t.m_min;
 

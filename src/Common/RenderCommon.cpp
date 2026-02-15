@@ -21,6 +21,7 @@ RenderContext::RenderContext(RenderContext&& other) noexcept
     , construction_time_ms(other.construction_time_ms)
     , render_time_ms(other.render_time_ms)
     , memory_used_bytes(other.memory_used_bytes)
+    , traversal_stats(other.traversal_stats)
 {
     other.num_completed_rows.store(0);
     other.total_rows.store(0);
@@ -30,6 +31,7 @@ RenderContext::RenderContext(RenderContext&& other) noexcept
     other.construction_time_ms = 0.0;
     other.render_time_ms = 0.0;
     other.memory_used_bytes = 0;
+    other.traversal_stats = {};
 }
 
 RenderContext& RenderContext::operator=(RenderContext&& other) noexcept
@@ -52,6 +54,7 @@ RenderContext& RenderContext::operator=(RenderContext&& other) noexcept
         construction_time_ms = other.construction_time_ms;
         render_time_ms = other.render_time_ms;
         memory_used_bytes = other.memory_used_bytes;
+        traversal_stats = other.traversal_stats;
 
         other.num_completed_rows.store(0);
         other.total_rows.store(0);
@@ -61,6 +64,7 @@ RenderContext& RenderContext::operator=(RenderContext&& other) noexcept
         other.construction_time_ms = 0.0;
         other.render_time_ms = 0.0;
         other.memory_used_bytes = 0;
+        other.traversal_stats = {};
     }
     return *this;
 }
@@ -96,6 +100,10 @@ void LogRenderStats(const RenderStats& stats)
     {
         output_string_stream << stats.m_memory_used_bytes << " B";
     }
+
+    output_string_stream << ", Avg nodes/ray: " << stats.m_traversal_stats.AvgNodesTraversedPerRay()
+        << ", Avg intersection tests/ray: " << stats.m_traversal_stats.AvgIntersectionTestsPerRay();
+
     Logger::Get().LogInfo(output_string_stream.str());
 }
 
@@ -113,7 +121,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             stats.m_memory_used_bytes = 0;
 
             timer.Start();
-            camera.Render(scene, scene_config, "render_none.png");
+            camera.Render(scene, scene_config, "render_none.png", &stats.m_traversal_stats);
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -127,7 +135,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             stats.m_memory_used_bytes = uniform_grid.MemoryUsedBytes();
 
             timer.Start();
-            camera.Render(uniform_grid, scene_config, "render_uniform_grid.png");
+            camera.Render(uniform_grid, scene_config, "render_uniform_grid.png", &stats.m_traversal_stats);
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -141,7 +149,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             stats.m_memory_used_bytes = hierarchical_uniform_grid.MemoryUsedBytes();
 
             timer.Start();
-            camera.Render(hierarchical_uniform_grid, scene_config, "render_hierarchical_uniform_grid.png");
+            camera.Render(hierarchical_uniform_grid, scene_config, "render_hierarchical_uniform_grid.png", &stats.m_traversal_stats);
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -155,7 +163,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             stats.m_memory_used_bytes = octree.MemoryUsedBytes();
 
             timer.Start();
-            camera.Render(octree, scene_config, "render_octree.png");
+            camera.Render(octree, scene_config, "render_octree.png", &stats.m_traversal_stats);
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -169,7 +177,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             stats.m_memory_used_bytes = bsp_tree.MemoryUsedBytes();
 
             timer.Start();
-            camera.Render(bsp_tree, scene_config, "render_bsp_tree.png");
+            camera.Render(bsp_tree, scene_config, "render_bsp_tree.png", &stats.m_traversal_stats);
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -183,7 +191,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             stats.m_memory_used_bytes = hierarchical_uniform_grid.MemoryUsedBytes();
 
             timer.Start();
-            camera.Render(hierarchical_uniform_grid, scene_config, "render_k_d_tree.png");
+            camera.Render(hierarchical_uniform_grid, scene_config, "render_k_d_tree.png", &stats.m_traversal_stats);
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -197,7 +205,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             stats.m_memory_used_bytes = bounding_volume_hierarchy.MemoryUsedBytes();
 
             timer.Start();
-            camera.Render(bounding_volume_hierarchy, scene_config, "render_bounding_volume_hierarchy.png");
+            camera.Render(bounding_volume_hierarchy, scene_config, "render_bounding_volume_hierarchy.png", &stats.m_traversal_stats);
             timer.Stop();
             stats.m_render_time_ms = timer.ElapsedMilliseconds();
             break;
@@ -481,7 +489,8 @@ bool ExecuteAsyncRender(RenderContext& context)
             context.scene_config,
             context.cancel_requested,
             &context.num_completed_rows,
-            context.output_image_name
+            context.output_image_name,
+            &context.traversal_stats
         );
         timer.Stop();
         context.render_time_ms = timer.ElapsedMilliseconds();
@@ -572,6 +581,7 @@ bool ExecuteAsyncRender(RenderContext& context)
         stats.m_construction_time_ms = context.construction_time_ms;
         stats.m_render_time_ms = context.render_time_ms;
         stats.m_memory_used_bytes = context.memory_used_bytes;
+        stats.m_traversal_stats = context.traversal_stats;
         LogRenderStats(stats);
     }
 

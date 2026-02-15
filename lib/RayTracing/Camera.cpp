@@ -7,6 +7,7 @@
 #include <Core/Common.h>
 #include <Core/Logger.h>
 #include <Core/Random.h>
+#include <Core/TraversalStats.h>
 #include <Core/Utility.h>
 #include <Materials/Material.h>
 #include <Maths/Colour.h>
@@ -131,12 +132,12 @@ Camera& Camera::operator=(Camera&& other) noexcept
 
 static const Interval intensity(0.0, 0.999);
 
-void Camera::Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name)
+void Camera::Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name, TraversalStats* out_traversal_stats)
 {
     std::atomic<bool> no_cancel{false};
 
     // Uses same render process with no cancel option or progress indicators
-    RenderAsync(scene, scene_config, no_cancel, nullptr, output_image_name);
+    RenderAsync(scene, scene_config, no_cancel, nullptr, output_image_name, out_traversal_stats);
 }
 
 bool Camera::RenderAsync
@@ -145,7 +146,8 @@ bool Camera::RenderAsync
     const SceneConfig& scene_config,
     const std::atomic<bool>& should_cancel,
     std::atomic<std::size_t>* num_completed_rows,
-    const std::string& output_image_name
+    const std::string& output_image_name,
+    TraversalStats* out_traversal_stats
 )
 {
     assert(m_image_width > 0);
@@ -159,6 +161,16 @@ bool Camera::RenderAsync
 
     // Update progress every 16 rows
     constexpr std::size_t progress_update_interval = 16;
+
+    // Counters for aggregation later
+    const int max_threads = omp_get_max_threads();
+    TraversalCounters* per_thread_counters = new TraversalCounters[max_threads];
+
+    // Reset all counters
+    #pragma omp parallel
+    {
+        tl_traversal_counters.Reset();
+    }
 
     #pragma omp parallel for schedule(dynamic)
     for (std::int64_t j = 0; j < static_cast<std::int64_t>(m_image_height); j++)
@@ -204,6 +216,29 @@ bool Camera::RenderAsync
             num_completed_rows->fetch_add(progress_update_interval, std::memory_order_relaxed);
         }
     }
+
+    // Aggregate traversal counters from all threads
+    #pragma omp parallel
+    {
+        const int thread_id = omp_get_thread_num();
+        per_thread_counters[thread_id] = tl_traversal_counters;
+        tl_traversal_counters.Reset();
+    }
+
+    if (out_traversal_stats)
+    {
+        out_traversal_stats->total_nodes_traversed = 0;
+        out_traversal_stats->total_intersection_tests = 0;
+        out_traversal_stats->total_rays_cast = 0;
+        for (int thread_id = 0; thread_id < max_threads; thread_id++)
+        {
+            out_traversal_stats->total_nodes_traversed += per_thread_counters[thread_id].nodes_traversed;
+            out_traversal_stats->total_intersection_tests += per_thread_counters[thread_id].intersection_tests;
+            out_traversal_stats->total_rays_cast += per_thread_counters[thread_id].rays_cast;
+        }
+    }
+
+    delete[] per_thread_counters;
 
     // Exit if render cancel has been requested
     if (should_cancel.load(std::memory_order_relaxed))
@@ -277,6 +312,8 @@ Colour Camera::RayColour(const Ray& ray, std::size_t depth, const IRayHittable& 
     {
         return Colour(0.0);
     }
+
+    RecordRayCast();
 
     RayHitResult result;
     const double min_ray_t = 0.001;

@@ -4,6 +4,7 @@
 #include <atomic>
 
 #include <Core/Common.h>
+#include <Core/TraversalStats.h>
 #include <Maths/Colour.h>
 #include <RayTracing/IRayHittable.h>
 
@@ -55,18 +56,20 @@ public:
 
     Camera& operator=(Camera&& other) noexcept;
 
-    void Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name = "render.png");
+    void Render(const IRayHittable& scene, const SceneConfig& scene_config, const std::string& output_image_name = "render.png", TraversalStats* out_traversal_stats = nullptr);
 
     // Render with cancellation and progress indicator support
     // should_cancel: cancel render-in-progress
     // num_completed_rows (optional): incremented as rows complete
+    // out_traversal_stats (optional): populated with traversal efficiency metrics
     bool RenderAsync
     (
         const IRayHittable& scene,
         const SceneConfig& scene_config,
         const std::atomic<bool>& should_cancel,
         std::atomic<std::size_t>* num_completed_rows = nullptr,
-        const std::string& output_image_name = "render.png"
+        const std::string& output_image_name = "render.png",
+        TraversalStats* out_traversal_stats = nullptr
     );
 
     // Read-only access to image buffer for live preview

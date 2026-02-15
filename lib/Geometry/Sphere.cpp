@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #include <Geometry/Sphere.h>
 
+#include <Core/TraversalStats.h>
 #include <Geometry/AxisAlignedBoundingBox.h>
 #include <Materials/Material.h>
 
@@ -17,6 +18,8 @@ Sphere::Sphere(const Point3& centre, double radius, Material* material)
 
 bool Sphere::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) const
 {
+    RecordIntersectionTest();
+
     const Vec3 oc = m_centre - ray.m_origin;
     const double a = ray.m_direction.LengthSquared();
     const double h = Dot(ray.m_direction, oc);
