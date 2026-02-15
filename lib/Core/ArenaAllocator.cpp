@@ -83,4 +83,9 @@ void ArenaAllocator::Clear()
     m_offset = 0;
 }
 
+std::size_t ArenaAllocator::MemoryUsedBytes() const
+{
+    return m_offset;
+}
+
 } // namespace ART

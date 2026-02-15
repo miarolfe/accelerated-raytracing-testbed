@@ -202,6 +202,8 @@ void UniformGrid::Create(std::vector<IRayHittable*>& objects)
 
     m_hittables_buffer = new IRayHittable*[num_object_references];
 
+    m_memory_used_bytes = (num_cells * sizeof(UniformGridEntry)) + (num_object_references * sizeof(IRayHittable*));
+
     std::size_t* objects_count_per_cell = new std::size_t[num_cells]();
 
     // Distribute objects to cells
@@ -260,6 +262,7 @@ void UniformGrid::Destroy()
     m_num_y_cells = 0;
     m_num_z_cells = 0;
     m_is_grid_valid = false;
+    m_memory_used_bytes = 0;
 }
 
 bool UniformGrid::CellHit(const UniformGridEntry& entry, const Ray& ray, Interval ray_t, RayHitResult& out_result) const
@@ -330,6 +333,11 @@ std::size_t UniformGrid::Calculate1DIndex(Vec3Int three_dimensional_index) const
 {
     // i = x * (Y_size * Z_size) + y * Z_size + z;
     return three_dimensional_index.m_x * (m_num_y_cells * m_num_z_cells) + three_dimensional_index.m_y * m_num_z_cells + three_dimensional_index.m_z;
+}
+
+std::size_t UniformGrid::MemoryUsedBytes() const
+{
+    return m_memory_used_bytes;
 }
 
 } // namespace ART

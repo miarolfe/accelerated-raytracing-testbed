@@ -187,4 +187,9 @@ AABB OctreeNode::BoundingBox() const
     return m_bounding_box;
 }
 
+std::size_t OctreeNode::MemoryUsedBytes() const
+{
+    return m_allocator ? m_allocator->MemoryUsedBytes() : 0;
+}
+
 } // namespace ART

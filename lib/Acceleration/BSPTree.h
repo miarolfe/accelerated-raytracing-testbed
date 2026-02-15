@@ -41,6 +41,8 @@ public:
 
     AABB BoundingBox() const override;
 
+    std::size_t MemoryUsedBytes() const;
+
     BSPTreeNode(IRayHittable** objects, std::size_t count, std::size_t depth, ArenaAllocator& allocator);
 
 protected:

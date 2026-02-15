@@ -28,6 +28,8 @@ public:
 
     AABB BoundingBox() const override;
 
+    std::size_t MemoryUsedBytes() const;
+
 protected:
     void Create(std::vector<IRayHittable*>& objects);
 
@@ -53,6 +55,7 @@ protected:
     std::size_t m_num_y_cells = 0;
     std::size_t m_num_z_cells = 0;
     bool m_is_grid_valid = false;
+    std::size_t m_memory_used_bytes = 0;
 };
 
 } // namespace ART
