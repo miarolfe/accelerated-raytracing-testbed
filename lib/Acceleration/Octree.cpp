@@ -65,8 +65,8 @@ void OctreeNode::Create(IRayHittable** objects, std::size_t count, std::size_t d
         0.5 * (m_bounding_box.m_z.m_min + m_bounding_box.m_z.m_max)
     );
 
-    // Create leaf node if at max depth or object density low enough
-    if (count <= MAX_OBJECTS_PER_LEAF || depth >= MAX_DEPTH)
+    // Create leaf node if object density low enough (and fits in eight children)
+    if (count <= MAX_OBJECTS_PER_LEAF)
     {
         m_leaf_count = count;
         for (std::size_t i = 0; i < count; i++)
@@ -76,24 +76,39 @@ void OctreeNode::Create(IRayHittable** objects, std::size_t count, std::size_t d
         return;
     }
 
+    // At max depth or all objects in same octant, can't subdivide more
+    // Chain overflow into child nodes
     std::size_t object_count_per_octant[8] = {0};
     for (std::size_t object_index = 0; object_index < count; object_index++)
     {
         object_count_per_octant[GetOctant(objects[object_index]->BoundingBox())]++;
     }
 
-    // If all objects are in same octant, create leaf
     std::size_t num_occupied_octants = 0;
     for (std::size_t octant_index = 0; octant_index < 8; octant_index++)
     {
         num_occupied_octants += static_cast<std::size_t>(object_count_per_octant[octant_index] > 0);
     }
-    if (num_occupied_octants <= 1)
+
+    if (depth >= MAX_DEPTH || num_occupied_octants <= 1)
     {
-        m_leaf_count = count;
-        for (std::size_t object_index = 0; object_index < count; object_index++)
+        if (count <= 8)
         {
-            m_children[object_index] = objects[object_index];
+            m_leaf_count = count;
+            for (std::size_t i = 0; i < count; i++)
+            {
+                m_children[i] = objects[i];
+            }
+        }
+        else
+        {
+            // Store first 7 objects directly, chain remainder into a child node
+            m_leaf_count = 8;
+            for (std::size_t i = 0; i < 7; i++)
+            {
+                m_children[i] = objects[i];
+            }
+            m_children[7] = allocator.Create<OctreeNode>(objects + 7, count - 7, depth, allocator);
         }
         return;
     }
