@@ -30,6 +30,8 @@ public:
     void* Alloc(std::size_t size_in_bytes, std::size_t alignment_in_bytes = 16);
     void Clear();
 
+    std::size_t MemoryUsedBytes() const;
+
     template<typename T, typename... Args>
     T* Create(Args&& ... args);
 

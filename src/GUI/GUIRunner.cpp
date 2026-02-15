@@ -6,6 +6,7 @@
 #include <imgui/backends/imgui_impl_sdlrenderer3.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
+#include <cstdio>
 #include <string>
 
 #include <Core/Logger.h>
@@ -155,6 +156,7 @@ void GUIRunner::DrawSettingsUI()
     if (m_render_state == RenderState::COMPLETED)
     {
         ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Render complete!");
+        DrawResultsUI();
         ImGui::Separator();
     }
 
@@ -215,6 +217,82 @@ void GUIRunner::DrawRenderingUI()
     ImGui::PopStyleColor(3);
 }
 
+std::string GUIRunner::FormatMemoryUsed(std::size_t bytes)
+{
+    char buffer[64];
+    if (bytes >= ONE_MEGABYTE)
+    {
+        std::snprintf(buffer, sizeof(buffer), "%.2f MB", static_cast<double>(bytes) / ONE_MEGABYTE);
+    }
+    else if (bytes >= ONE_KILOBYTE)
+    {
+        std::snprintf(buffer, sizeof(buffer), "%.2f KB", static_cast<double>(bytes) / ONE_KILOBYTE);
+    }
+    else
+    {
+        std::snprintf(buffer, sizeof(buffer), "%zu B", bytes);
+    }
+    return buffer;
+}
+
+void GUIRunner::DrawResultsUI()
+{
+    if (m_completed_stats.empty())
+    {
+        return;
+    }
+
+    if (ImGui::BeginTable("RenderResults", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    {
+        ImGui::TableSetupColumn("Structure");
+        ImGui::TableSetupColumn("Construction (ms)");
+        ImGui::TableSetupColumn("Render (ms)");
+        ImGui::TableSetupColumn("Total (ms)");
+        ImGui::TableSetupColumn("Memory used");
+        ImGui::TableHeadersRow();
+
+        for (const RenderStats& stats : m_completed_stats)
+        {
+            ImGui::TableNextRow();
+
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", AccelerationStructureToString(stats.m_acceleration_structure).c_str());
+
+            ImGui::TableNextColumn();
+            ImGui::Text("%.2f", stats.m_construction_time_ms);
+
+            ImGui::TableNextColumn();
+            ImGui::Text("%.2f", stats.m_render_time_ms);
+
+            ImGui::TableNextColumn();
+            ImGui::Text("%.2f", stats.TotalTimeMilliseconds());
+
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", FormatMemoryUsed(stats.m_memory_used_bytes).c_str());
+        }
+
+        ImGui::EndTable();
+    }
+
+    if (ImGui::Button("Copy as Markdown"))
+    {
+        std::ostringstream md;
+        md << std::fixed << std::setprecision(2);
+        md << "| Structure | Construction (ms) | Render (ms) | Total (ms) | Memory used |\n";
+        md << "| --- | --- | --- | --- | --- |\n";
+        for (const RenderStats& stats : m_completed_stats)
+        {
+            md << "| " << AccelerationStructureToString(stats.m_acceleration_structure)
+               << " | " << stats.m_construction_time_ms
+               << " | " << stats.m_render_time_ms
+               << " | " << stats.TotalTimeMilliseconds()
+               << " | " << FormatMemoryUsed(stats.m_memory_used_bytes)
+               << " |\n";
+        }
+        SDL_SetClipboardText(md.str().c_str());
+    }
+}
+
 void GUIRunner::UpdateRenderState()
 {
     if (m_render_state != RenderState::RENDERING)
@@ -238,6 +316,20 @@ void GUIRunner::UpdateRenderState()
     if (m_render_thread.joinable())
     {
         m_render_thread.join();
+    }
+
+    // Collect stats from completed job
+    {
+        RenderContext& completed_ctx = render_context;
+        if (!completed_ctx.was_cancelled.load(std::memory_order_relaxed))
+        {
+            RenderStats stats;
+            stats.m_acceleration_structure = completed_ctx.acceleration_structure;
+            stats.m_construction_time_ms = completed_ctx.construction_time_ms;
+            stats.m_render_time_ms = completed_ctx.render_time_ms;
+            stats.m_memory_used_bytes = completed_ctx.memory_used_bytes;
+            m_completed_stats.push_back(stats);
+        }
     }
 
     // Move to next job
@@ -315,6 +407,7 @@ void GUIRunner::StartRenderQueue()
     LogRenderConfig(config, scene_number_one_indexed);
 
     m_render_queue.clear();
+    m_completed_stats.clear();
     m_current_job_index = 0;
 
     if (m_use_acceleration_structure_none)

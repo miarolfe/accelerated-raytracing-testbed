@@ -20,6 +20,7 @@ RenderContext::RenderContext(RenderContext&& other) noexcept
     , was_cancelled(other.was_cancelled.load())
     , construction_time_ms(other.construction_time_ms)
     , render_time_ms(other.render_time_ms)
+    , memory_used_bytes(other.memory_used_bytes)
 {
     other.num_completed_rows.store(0);
     other.total_rows.store(0);
@@ -28,6 +29,7 @@ RenderContext::RenderContext(RenderContext&& other) noexcept
     other.was_cancelled.store(false);
     other.construction_time_ms = 0.0;
     other.render_time_ms = 0.0;
+    other.memory_used_bytes = 0;
 }
 
 RenderContext& RenderContext::operator=(RenderContext&& other) noexcept
@@ -49,6 +51,7 @@ RenderContext& RenderContext::operator=(RenderContext&& other) noexcept
 
         construction_time_ms = other.construction_time_ms;
         render_time_ms = other.render_time_ms;
+        memory_used_bytes = other.memory_used_bytes;
 
         other.num_completed_rows.store(0);
         other.total_rows.store(0);
@@ -57,6 +60,7 @@ RenderContext& RenderContext::operator=(RenderContext&& other) noexcept
         other.was_cancelled.store(false);
         other.construction_time_ms = 0.0;
         other.render_time_ms = 0.0;
+        other.memory_used_bytes = 0;
     }
     return *this;
 }
@@ -77,7 +81,21 @@ void LogRenderStats(const RenderStats& stats)
     output_string_stream << "[Acceleration structure: " << AccelerationStructureToString(stats.m_acceleration_structure) << "] "
         << "Construction time: " << stats.m_construction_time_ms << " ms, "
         << "Render time: " << stats.m_render_time_ms << " ms, "
-        << "Total time: " << stats.TotalTimeMilliseconds() << " ms";
+        << "Total time: " << stats.TotalTimeMilliseconds() << " ms, "
+        << "Memory used: ";
+
+    if (stats.m_memory_used_bytes >= ONE_MEGABYTE)
+    {
+        output_string_stream << static_cast<double>(stats.m_memory_used_bytes) / ONE_MEGABYTE << " MB";
+    }
+    else if (stats.m_memory_used_bytes >= ONE_KILOBYTE)
+    {
+        output_string_stream << static_cast<double>(stats.m_memory_used_bytes) / ONE_KILOBYTE << " KB";
+    }
+    else
+    {
+        output_string_stream << stats.m_memory_used_bytes << " B";
+    }
     Logger::Get().LogInfo(output_string_stream.str());
 }
 
@@ -92,6 +110,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
         case AccelerationStructure::NONE:
         {
             stats.m_construction_time_ms = 0.0;
+            stats.m_memory_used_bytes = 0;
 
             timer.Start();
             camera.Render(scene, scene_config, "render_none.png");
@@ -105,6 +124,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             UniformGrid uniform_grid(scene.GetObjects());
             timer.Stop();
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+            stats.m_memory_used_bytes = uniform_grid.MemoryUsedBytes();
 
             timer.Start();
             camera.Render(uniform_grid, scene_config, "render_uniform_grid.png");
@@ -118,6 +138,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             HierarchicalUniformGrid hierarchical_uniform_grid(scene.GetObjects());
             timer.Stop();
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+            stats.m_memory_used_bytes = hierarchical_uniform_grid.MemoryUsedBytes();
 
             timer.Start();
             camera.Render(hierarchical_uniform_grid, scene_config, "render_hierarchical_uniform_grid.png");
@@ -131,6 +152,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             OctreeNode octree(scene.GetObjects());
             timer.Stop();
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+            stats.m_memory_used_bytes = octree.MemoryUsedBytes();
 
             timer.Start();
             camera.Render(octree, scene_config, "render_octree.png");
@@ -144,6 +166,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             BSPTreeNode bsp_tree(scene.GetObjects());
             timer.Stop();
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+            stats.m_memory_used_bytes = bsp_tree.MemoryUsedBytes();
 
             timer.Start();
             camera.Render(bsp_tree, scene_config, "render_bsp_tree.png");
@@ -157,6 +180,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             KDTreeNode hierarchical_uniform_grid(scene.GetObjects());
             timer.Stop();
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+            stats.m_memory_used_bytes = hierarchical_uniform_grid.MemoryUsedBytes();
 
             timer.Start();
             camera.Render(hierarchical_uniform_grid, scene_config, "render_k_d_tree.png");
@@ -170,6 +194,7 @@ RenderStats RenderWithAccelerationStructure(Camera& camera, RayHittableList& sce
             BVHNode bounding_volume_hierarchy(scene.GetObjects());
             timer.Stop();
             stats.m_construction_time_ms = timer.ElapsedMilliseconds();
+            stats.m_memory_used_bytes = bounding_volume_hierarchy.MemoryUsedBytes();
 
             timer.Start();
             camera.Render(bounding_volume_hierarchy, scene_config, "render_bounding_volume_hierarchy.png");
@@ -470,6 +495,7 @@ bool ExecuteAsyncRender(RenderContext& context)
         case AccelerationStructure::NONE:
         {
             context.construction_time_ms = 0.0;
+            context.memory_used_bytes = 0;
             completed = do_render(context.scene);
             break;
         }
@@ -479,6 +505,7 @@ bool ExecuteAsyncRender(RenderContext& context)
             UniformGrid accel(context.scene.GetObjects());
             timer.Stop();
             context.construction_time_ms = timer.ElapsedMilliseconds();
+            context.memory_used_bytes = accel.MemoryUsedBytes();
             completed = do_render(accel);
             break;
         }
@@ -488,6 +515,7 @@ bool ExecuteAsyncRender(RenderContext& context)
             HierarchicalUniformGrid accel(context.scene.GetObjects());
             timer.Stop();
             context.construction_time_ms = timer.ElapsedMilliseconds();
+            context.memory_used_bytes = accel.MemoryUsedBytes();
             completed = do_render(accel);
             break;
         }
@@ -497,6 +525,7 @@ bool ExecuteAsyncRender(RenderContext& context)
             OctreeNode accel(context.scene.GetObjects());
             timer.Stop();
             context.construction_time_ms = timer.ElapsedMilliseconds();
+            context.memory_used_bytes = accel.MemoryUsedBytes();
             completed = do_render(accel);
             break;
         }
@@ -506,6 +535,7 @@ bool ExecuteAsyncRender(RenderContext& context)
             BSPTreeNode accel(context.scene.GetObjects());
             timer.Stop();
             context.construction_time_ms = timer.ElapsedMilliseconds();
+            context.memory_used_bytes = accel.MemoryUsedBytes();
             completed = do_render(accel);
             break;
         }
@@ -515,6 +545,7 @@ bool ExecuteAsyncRender(RenderContext& context)
             KDTreeNode accel(context.scene.GetObjects());
             timer.Stop();
             context.construction_time_ms = timer.ElapsedMilliseconds();
+            context.memory_used_bytes = accel.MemoryUsedBytes();
             completed = do_render(accel);
             break;
         }
@@ -524,6 +555,7 @@ bool ExecuteAsyncRender(RenderContext& context)
             BVHNode accel(context.scene.GetObjects());
             timer.Stop();
             context.construction_time_ms = timer.ElapsedMilliseconds();
+            context.memory_used_bytes = accel.MemoryUsedBytes();
             completed = do_render(accel);
             break;
         }
@@ -539,6 +571,7 @@ bool ExecuteAsyncRender(RenderContext& context)
         stats.m_acceleration_structure = context.acceleration_structure;
         stats.m_construction_time_ms = context.construction_time_ms;
         stats.m_render_time_ms = context.render_time_ms;
+        stats.m_memory_used_bytes = context.memory_used_bytes;
         LogRenderStats(stats);
     }
 

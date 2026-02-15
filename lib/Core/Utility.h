@@ -27,6 +27,7 @@ public:
     AccelerationStructure m_acceleration_structure;
     double m_construction_time_ms = 0.0;
     double m_render_time_ms = 0.0;
+    std::size_t m_memory_used_bytes = 0;
 
     double TotalTimeMilliseconds() const;
 };

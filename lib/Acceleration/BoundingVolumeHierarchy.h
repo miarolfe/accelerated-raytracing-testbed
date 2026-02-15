@@ -29,6 +29,8 @@ public:
 
     AABB BoundingBox() const override;
 
+    std::size_t MemoryUsedBytes() const;
+
     BVHNode(IRayHittable** objects, std::size_t count, ArenaAllocator& allocator);
 
 protected:

@@ -46,6 +46,10 @@ private:
 
     void DrawRenderingUI();
 
+    static std::string FormatMemoryUsed(std::size_t bytes);
+
+    void DrawResultsUI();
+
     void UpdateRenderState();
 
     void UpdatePreviewTexture();
@@ -83,6 +87,8 @@ private:
     SDL_Texture* m_preview_texture = nullptr;
     int m_preview_width = 0;
     int m_preview_height = 0;
+
+    std::vector<RenderStats> m_completed_stats;
 };
 
 } // namespace ART

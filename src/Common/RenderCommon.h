@@ -74,6 +74,9 @@ public:
     // Timing (set by render thread)
     double construction_time_ms{0.0};
     double render_time_ms{0.0};
+
+    // Memory usage by render thread
+    std::size_t memory_used_bytes{0};
 };
 
 void LogRenderConfig(const CameraRenderConfig& render_config, int scene_number);

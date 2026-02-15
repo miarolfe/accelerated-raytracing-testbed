@@ -258,6 +258,15 @@ void HierarchicalUniformGrid::Create(std::vector<IRayHittable*>& objects)
     delete[] objects_per_cell_count;
     delete[] objects_count_per_cell;
 
+    m_memory_used_bytes = num_cells * sizeof(HierarchicalUniformGridEntry);
+    for (std::size_t i = 0; i < num_cells; i++)
+    {
+        if (m_grid[i].subgrid != nullptr)
+        {
+            m_memory_used_bytes += m_grid[i].subgrid->MemoryUsedBytes();
+        }
+    }
+
     m_is_grid_valid = true;
 }
 
@@ -287,6 +296,7 @@ void HierarchicalUniformGrid::Destroy()
     m_num_y_cells = 0;
     m_num_z_cells = 0;
     m_is_grid_valid = false;
+    m_memory_used_bytes = 0;
 }
 
 bool HierarchicalUniformGrid::CellHit(const HierarchicalUniformGridEntry& entry, const Ray& ray, Interval ray_t, RayHitResult& out_result) const
@@ -343,6 +353,11 @@ std::size_t HierarchicalUniformGrid::Calculate1DIndex(Vec3Int three_dimensional_
 {
     // i = x * (Y_size * Z_size) + y * Z_size + z;
     return three_dimensional_index.m_x * (m_num_y_cells * m_num_z_cells) + three_dimensional_index.m_y * m_num_z_cells + three_dimensional_index.m_z;
+}
+
+std::size_t HierarchicalUniformGrid::MemoryUsedBytes() const
+{
+    return m_memory_used_bytes;
 }
 
 } // namespace ART
