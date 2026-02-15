@@ -77,7 +77,7 @@ private:
     int m_render_width = 1280;
     int m_render_height = 720;
     int m_samples_per_pixel = 100;
-    int m_scene_number = 5; // 0-indexed
+    int m_scene_number = 0; // 0-indexed
     int m_colour_seed = DEFAULT_COLOUR_SEED;
     int m_position_seed = DEFAULT_POSITION_SEED;
 

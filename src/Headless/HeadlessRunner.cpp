@@ -19,7 +19,7 @@ void PrintHelpMsg(const char* program_name)
                 << "  --width <pixels>       Screen width (default: 1280)\n"
                 << "  --height <pixels>      Screen height (default: 720)\n"
                 << "  --samples <count>      Samples per pixel (default: 100)\n"
-                << "  --scene <scene_number> Scene to render (default: 5)\n"
+                << "  --scene <scene_number> Scene to render (default: 1)\n"
                 << "  --colour-seed <seed>   Seed for object colour RNG (default: 22052003, 0 = random)\n"
                 << "  --position-seed <seed> Seed for object position RNG (default: 13012025, 0 = random)\n"
                 << "  --help                 Show this help message\n";
@@ -69,9 +69,9 @@ bool ParseCLIArgs(int argc, char* argv[], CLIParams& out_params)
                 return false;
             }
             out_params.scene = std::atoi(argv[++i]);
-            if (out_params.scene < 1 || out_params.scene > 15)
+            if (out_params.scene < 1 || out_params.scene > 10)
             {
-                std::cerr << "Error: --scene must be between 1 and 15\n";
+                std::cerr << "Error: --scene must be between 1 and 10\n";
                 return false;
             }
         }
