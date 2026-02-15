@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include <Common/RenderCommon.h>
 #include <RayTracing/Camera.h>
 
 namespace ART
@@ -15,6 +16,8 @@ public:
     std::size_t screen_height = 720;
     std::size_t samples_per_pixel = 100;
     int scene = 5;
+    uint32_t colour_seed = DEFAULT_COLOUR_SEED;
+    uint32_t position_seed = DEFAULT_POSITION_SEED;
 };
 
 void PrintHelpMsg(const char* program_name);
@@ -37,6 +40,8 @@ public:
 protected:
     CameraRenderConfig m_camera_render_config;
     int m_scene_number = -1;
+    uint32_t m_colour_seed = DEFAULT_COLOUR_SEED;
+    uint32_t m_position_seed = DEFAULT_POSITION_SEED;
 };
 
 } // namespace ART

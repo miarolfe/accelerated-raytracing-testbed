@@ -20,6 +20,8 @@ void PrintHelpMsg(const char* program_name)
                 << "  --height <pixels>      Screen height (default: 720)\n"
                 << "  --samples <count>      Samples per pixel (default: 100)\n"
                 << "  --scene <scene_number> Scene to render (default: 5)\n"
+                << "  --colour-seed <seed>   Seed for object colour RNG (default: 22052003, 0 = random)\n"
+                << "  --position-seed <seed> Seed for object position RNG (default: 13012025, 0 = random)\n"
                 << "  --help                 Show this help message\n";
 }
 
@@ -67,11 +69,29 @@ bool ParseCLIArgs(int argc, char* argv[], CLIParams& out_params)
                 return false;
             }
             out_params.scene = std::atoi(argv[++i]);
-            if (out_params.scene < 1 || out_params.scene > 6)
+            if (out_params.scene < 1 || out_params.scene > 15)
             {
-                std::cerr << "Error: --scene must be between 1 and 6\n";
+                std::cerr << "Error: --scene must be between 1 and 15\n";
                 return false;
             }
+        }
+        else if (std::strcmp(argv[i], "--colour-seed") == 0)
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Error: --colour-seed requires a value\n";
+                return false;
+            }
+            out_params.colour_seed = static_cast<uint32_t>(std::strtoul(argv[++i], nullptr, 10));
+        }
+        else if (std::strcmp(argv[i], "--position-seed") == 0)
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Error: --position-seed requires a value\n";
+                return false;
+            }
+            out_params.position_seed = static_cast<uint32_t>(std::strtoul(argv[++i], nullptr, 10));
         }
         else
         {
@@ -108,6 +128,8 @@ HeadlessRunner::HeadlessRunner(int argc, char* argv[])
     ParseCLIArgs(argc, argv, cli_params);
     m_camera_render_config = MakeCameraRenderConfig(cli_params);
     m_scene_number = cli_params.scene;
+    m_colour_seed = cli_params.colour_seed;
+    m_position_seed = cli_params.position_seed;
 }
 
 HeadlessRunner::~HeadlessRunner()
@@ -121,13 +143,13 @@ void HeadlessRunner::Init()
 
     LogRenderConfig(m_camera_render_config, m_scene_number);
 
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::NONE);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::UNIFORM_GRID);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::HIERARCHICAL_UNIFORM_GRID);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::OCTREE);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BSP_TREE);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::K_D_TREE);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BOUNDING_VOLUME_HIERARCHY);
+    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::NONE, m_colour_seed, m_position_seed);
+    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::UNIFORM_GRID, m_colour_seed, m_position_seed);
+    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::HIERARCHICAL_UNIFORM_GRID, m_colour_seed, m_position_seed);
+    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::OCTREE, m_colour_seed, m_position_seed);
+    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BSP_TREE, m_colour_seed, m_position_seed);
+    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::K_D_TREE, m_colour_seed, m_position_seed);
+    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BOUNDING_VOLUME_HIERARCHY, m_colour_seed, m_position_seed);
 }
 
 void HeadlessRunner::Shutdown()

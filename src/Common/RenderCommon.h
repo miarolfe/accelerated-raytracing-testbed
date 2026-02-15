@@ -35,6 +35,8 @@ constexpr std::size_t MIN_RENDER_HEIGHT = 1;
 constexpr std::size_t MAX_RENDER_HEIGHT = 4320;
 constexpr std::size_t MIN_SAMPLES_PER_PIXEL = 1;
 constexpr std::size_t MAX_SAMPLES_PER_PIXEL = 10000;
+constexpr uint32_t DEFAULT_POSITION_SEED = 22052003;
+constexpr uint32_t DEFAULT_COLOUR_SEED = 13012025;
 
 // Holds all scene data needed for async rendering
 struct RenderContext
@@ -98,21 +100,27 @@ void SetupScene
 (
     RenderContext& render_context,
     const CameraRenderConfig& render_config,
-    int scene_number
+    int scene_number,
+    uint32_t colour_seed = DEFAULT_COLOUR_SEED,
+    uint32_t position_seed = DEFAULT_POSITION_SEED
 );
 
 void RenderScene
 (
     const CameraRenderConfig& render_config,
     int scene_number,
-    AccelerationStructure acceleration_structure
+    AccelerationStructure acceleration_structure,
+    uint32_t colour_seed = DEFAULT_COLOUR_SEED,
+    uint32_t position_seed = DEFAULT_POSITION_SEED
 );
 
 // Set up a scene for async rendering
 RenderContext CreateAsyncRenderContext(
     const CameraRenderConfig& render_config,
     int scene_number,
-    AccelerationStructure acceleration_structure
+    AccelerationStructure acceleration_structure,
+    uint32_t colour_seed = DEFAULT_COLOUR_SEED,
+    uint32_t position_seed = DEFAULT_POSITION_SEED
 );
 
 // Execute the render (call from background thread)
