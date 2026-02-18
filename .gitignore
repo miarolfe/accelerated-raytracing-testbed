@@ -51,6 +51,9 @@ build/build_files
 build/Makefile
 build/obj
 
+benchmark/results
+benchmark/*.png
+
 # Program output
 render.png
 /*.png
