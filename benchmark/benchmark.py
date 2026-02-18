@@ -1,9 +1,12 @@
+import csv
 import logging
 import os
 import shutil
 import sys
 from dataclasses import dataclass
 from typing import List
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
 @dataclass
@@ -75,7 +78,7 @@ def parse_sample_log(filepath: str) -> RenderSampleResult:
         _, part2 = line.split("Avg nodes/ray:")
         avg_nodes_per_ray = float(part2.split(",")[0])
         _, part2 = line.split("Avg intersection tests/ray:")
-        avg_intersection_tests_per_ray = float(part2.split(",")[0])
+        avg_intersection_tests_per_ray = float(part2.strip())
 
         return AccelerationStructureResults(
             construction_time_ms,
@@ -144,7 +147,7 @@ def calculate_render_test_result(
     render_sample_results: List[RenderSampleResult],
 ) -> RenderTestResults:
     # Close enough for my purposes
-    MIN_FLOAT = 1e-30
+    MIN_FLOAT = -1e30
     MAX_FLOAT = 1e30
     MIN_INT = -sys.maxsize
     MAX_INT = sys.maxsize
@@ -255,7 +258,9 @@ def calculate_render_test_result(
         octree_results.append(sample.render_with_octree_results)
         bsp_tree_results.append(sample.render_with_bsp_tree_results)
         k_d_tree_results.append(sample.render_with_k_d_tree_results)
-        bounding_volume_hierarchy_results.append(sample.render_with_k_d_tree_results)
+        bounding_volume_hierarchy_results.append(
+            sample.render_with_bounding_volume_hierarchy_results
+        )
 
     return RenderTestResults(
         calculate_render_test_one_structure_result(none_results),
@@ -292,20 +297,17 @@ NUM_SAMPLES = 10
 
 build_return_code = os.system("cd .. && ./build.sh release headless")
 if build_return_code != 0:
-    logging.log(level=logging.FATAL, msg="Failed to build ART")
+    logging.error("Failed to build ART")
+    sys.exit(1)
 else:
-    logging.log(level=logging.FATAL, msg="Built ART")
+    logging.info("Built ART")
 
 if os.path.exists("results"):
     shutil.rmtree("results")
 
-os.system("mkdir results")
-
 for scene_index in range(len(scenes)):
     for configuration_index in range(len(configurations)):
-        os.mkdir(f"results/scene_{scene_index + 1}")
-        os.mkdir(f"results/scene_{scene_index + 1}/config_{configuration_index + 1}")
-        os.mkdir(
+        os.makedirs(
             f"results/scene_{scene_index + 1}/config_{configuration_index + 1}/renders"
         )
 
@@ -314,15 +316,11 @@ for scene_index in range(len(scenes)):
     scene_number = scenes[scene_index][1]
     for configuration_index in range(len(configurations)):
         configuration = configurations[configuration_index]
-        logging.log(
-            level=logging.FATAL,
-            msg=f"Testing scene ({scene_number}) '{scene_name}' with configuration {configurations[configuration_index]}",
+        logging.info(
+            f"Testing scene ({scene_number}) '{scene_name}' with configuration {configurations[configuration_index]}"
         )
         for sample in range(NUM_SAMPLES):
-            logging.log(
-                level=logging.FATAL,
-                msg=f"Running render sample {sample + 1}",
-            )
+            logging.info(f"Running render sample {sample + 1}")
 
             # Run render for this sample
             os.system(
@@ -339,6 +337,57 @@ for scene_index in range(len(scenes)):
                 command=f"mv *.png results/scene_{scene_index + 1}/config_{configuration_index + 1}/renders"
             )
 
+structures = [
+    ("None", "render_with_none_results"),
+    ("Uniform Grid", "uniform_grid_results"),
+    ("Hierarchical Uniform Grid", "hierarchical_grid_results"),
+    ("Octree", "octree_results"),
+    ("BSP Tree", "bsp_tree_results"),
+    ("k-d Tree", "k_d_tree_results"),
+    ("BVH", "bounding_volume_hierarchy_results"),
+]
+metrics = [
+    (
+        "Construction (ms)",
+        "lowest_construction_time_ms",
+        "mean_construction_time_ms",
+        "highest_construction_time_ms",
+    ),
+    (
+        "Render (ms)",
+        "lowest_render_time_ms",
+        "mean_render_time_ms",
+        "highest_render_time_ms",
+    ),
+    (
+        "Total (ms)",
+        "lowest_total_time_ms",
+        "mean_total_time_ms",
+        "highest_total_time_ms",
+    ),
+    (
+        "Memory (B)",
+        "lowest_memory_used_bytes",
+        "mean_memory_used_bytes",
+        "highest_memory_used_bytes",
+    ),
+    (
+        "Nodes/ray",
+        "lowest_avg_nodes_per_ray",
+        "mean_avg_nodes_per_ray",
+        "highest_avg_nodes_per_ray",
+    ),
+    (
+        "Tests/ray",
+        "lowest_avg_intersection_tests_per_ray",
+        "mean_avg_intersection_tests_per_ray",
+        "highest_avg_intersection_tests_per_ray",
+    ),
+]
+
+# (scene_name, config, struct_name, result)
+all_results = []
+
 for scene_index in range(len(scenes)):
     for configuration_index in range(len(configurations)):
         render_sample_results = []
@@ -346,8 +395,72 @@ for scene_index in range(len(scenes)):
             render_sample_result = parse_sample_log(
                 f"results/scene_{scene_index + 1}/config_{configuration_index + 1}/log_sample_{sample + 1}.txt"
             )
-
             render_sample_results.append(render_sample_result)
 
         results = calculate_render_test_result(render_sample_results)
-        print(results)
+        scene_name = scenes[scene_index][0]
+        config = configurations[configuration_index]
+        for struct_name, attr in structures:
+            all_results.append(
+                (scene_name, config, struct_name, getattr(results, attr))
+            )
+
+csv_path = "results/results.csv"
+with open(csv_path, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(
+        [
+            "scene",
+            "width",
+            "height",
+            "samples_per_pixel",
+            "acceleration_structure",
+            "min_construction_time_ms",
+            "mean_construction_time_ms",
+            "max_construction_time_ms",
+            "min_render_time_ms",
+            "mean_render_time_ms",
+            "max_render_time_ms",
+            "min_total_time_ms",
+            "mean_total_time_ms",
+            "max_total_time_ms",
+            "min_memory_used_bytes",
+            "mean_memory_used_bytes",
+            "max_memory_used_bytes",
+            "min_avg_nodes_per_ray",
+            "mean_avg_nodes_per_ray",
+            "max_avg_nodes_per_ray",
+            "min_avg_intersection_tests_per_ray",
+            "mean_avg_intersection_tests_per_ray",
+            "max_avg_intersection_tests_per_ray",
+        ]
+    )
+    for scene_name, config, struct_name, r in all_results:
+        writer.writerow(
+            [
+                scene_name,
+                config["width"],
+                config["height"],
+                config["samples_per_pixel"],
+                struct_name,
+                r.lowest_construction_time_ms,
+                r.mean_construction_time_ms,
+                r.highest_construction_time_ms,
+                r.lowest_render_time_ms,
+                r.mean_render_time_ms,
+                r.highest_render_time_ms,
+                r.lowest_total_time_ms,
+                r.mean_total_time_ms,
+                r.highest_total_time_ms,
+                r.lowest_memory_used_bytes,
+                r.mean_memory_used_bytes,
+                r.highest_memory_used_bytes,
+                r.lowest_avg_nodes_per_ray,
+                r.mean_avg_nodes_per_ray,
+                r.highest_avg_nodes_per_ray,
+                r.lowest_avg_intersection_tests_per_ray,
+                r.mean_avg_intersection_tests_per_ray,
+                r.highest_avg_intersection_tests_per_ray,
+            ]
+        )
+logging.info(f"Results written to {csv_path}")
