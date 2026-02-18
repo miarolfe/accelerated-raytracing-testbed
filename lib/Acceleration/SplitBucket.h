@@ -8,6 +8,7 @@ namespace ART
 
 struct SplitBucket
 {
+public:
     AABB bounding_box;
     std::size_t num_hittables = 0;
 };
