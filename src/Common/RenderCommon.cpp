@@ -227,103 +227,6 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
     {
         case 1:
         {
-            CameraViewConfig view_config
-            {
-                Point3(0, 0.0, 0.0),
-                Point3(0.0, 0.0, 10.0),
-                Vec3(0.0, 1.0, 0.0),
-                90.0, 0.0, 10.0
-            };
-            render_context.camera = Camera(view_config, render_config);
-
-            Texture* even_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.2, 0.3, 0.1));
-            Texture* odd_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.9, 0.9, 0.9));
-            Texture* checker_texture = render_context.arena.Create<CheckerTexture>(0.32, even_texture, odd_texture);
-            Material* checker_material = render_context.arena.Create<LambertianMaterial>(checker_texture);
-            Material* metal_material = render_context.arena.Create<MetalMaterial>(Colour(0.7), 0.5);
-            Material* dielectric_material = render_context.arena.Create<DielectricMaterial>(0.5);
-
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(-7.5, 0.0, 10.0), 5.0, checker_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, 0.0, 1.0), 0.5, dielectric_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(7.5, 0.0, 10.0), 2.5, metal_material));
-            break;
-        }
-        case 2:
-        {
-            CameraViewConfig view_config
-            {
-                Point3(13.0, 2.0, 3.0),
-                Point3(0.0, 0.0, 0.0),
-                Vec3(0.0, 1.0, 0.0),
-                20.0, 0.0, 10.0
-            };
-            render_context.camera = Camera(view_config, render_config);
-
-            Texture* even_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.2, 0.3, 0.1));
-            Texture* odd_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.9, 0.9, 0.9));
-            Texture* checker_texture = render_context.arena.Create<CheckerTexture>(0.32, even_texture, odd_texture);
-            Material* checker_material = render_context.arena.Create<LambertianMaterial>(checker_texture);
-
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, -10.0, 0.0), 10.0, checker_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, 10.0, 0.0), 10.0, checker_material));
-            break;
-        }
-        case 3:
-        {
-            CameraRenderConfig scene3_config = render_config;
-            scene3_config.max_ray_bounces = 50;
-
-            CameraViewConfig view_config
-            {
-                Point3(13.0, 2.0, 3.0),
-                Point3(0.0, 0.0, 0.0),
-                Vec3(0.0, 1.0, 0.0),
-                20.0, 0.0, 10.0
-            };
-            render_context.camera = Camera(view_config, scene3_config);
-
-            Texture* even_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.0, 0.0, 0.0));
-            Texture* odd_texture = render_context.arena.Create<SolidColourTexture>(Colour(1.0, 1.0, 1.0));
-            Texture* checker_texture = render_context.arena.Create<CheckerTexture>(0.5, even_texture, odd_texture);
-            Texture* cyan_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.0, 0.8, 0.8));
-
-            Material* cyan_material = render_context.arena.Create<LambertianMaterial>(cyan_texture);
-            Material* checker_material = render_context.arena.Create<LambertianMaterial>(checker_texture);
-            Material* glass_material = render_context.arena.Create<DielectricMaterial>(1.5);
-            Material* glass_inner_material = render_context.arena.Create<DielectricMaterial>(1.0 / 1.5);
-
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, -1005.0, 0.0), 1000.0, cyan_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, -10.0, 0.0), 10.0, checker_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, 1.0, 0.0), 1.0, glass_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, 1.0, 0.0), 0.8, glass_inner_material));
-            break;
-        }
-        case 4:
-        {
-            CameraViewConfig view_config
-            {
-                Point3(13.0, 2.0, 3.0),
-                Point3(0.0, 0.0, 0.0),
-                Vec3(0.0, 1.0, 0.0),
-                20.0, 0.0, 10.0
-            };
-            render_context.camera = Camera(view_config, render_config);
-
-            Texture* even_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.0, 0.0, 0.0));
-            Texture* odd_texture = render_context.arena.Create<SolidColourTexture>(Colour(1.0, 1.0, 1.0));
-            Texture* checker_texture = render_context.arena.Create<CheckerTexture>(0.5, even_texture, odd_texture);
-
-            Material* checker_material = render_context.arena.Create<LambertianMaterial>(checker_texture);
-            Material* glass_material = render_context.arena.Create<DielectricMaterial>(1.5);
-            Material* glass_inner_material = render_context.arena.Create<DielectricMaterial>(1.0 / 1.5);
-
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, -10.0, 0.0), 10.0, checker_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, 1.0, 0.0), 1.0, glass_material));
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, 1.0, 0.0), 0.8, glass_inner_material));
-            break;
-        }
-        case 5:
-        {
             Point3 average_position_cluster_1;
             int num_spheres_cluster_1 = 0;
 
@@ -388,50 +291,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             render_context.camera = Camera(view_config, render_config);
             break;
         }
-        case 6:
-        {
-            CameraViewConfig view_config
-            {
-                Point3(5.0, 4.0, 8.0),
-                Point3(0.0, 0.5, 0.0),
-                Vec3(0.0, 1.0, 0.0),
-                40.0, 0.0, 10.0
-            };
-            render_context.camera = Camera(view_config, render_config);
-
-            // Ground
-            Texture* ground_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.4, 0.4, 0.4));
-            Material* ground_material = render_context.arena.Create<LambertianMaterial>(ground_texture);
-            render_context.scene.Add(render_context.arena.Create<AxisAlignedBox>(Point3(-5.0, -0.5, -5.0), Point3(5.0, 0.0, 5.0), ground_material));
-
-            // Red box
-            Texture* red_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.8, 0.2, 0.2));
-            Material* red_material = render_context.arena.Create<LambertianMaterial>(red_texture);
-            render_context.scene.Add(render_context.arena.Create<AxisAlignedBox>(Point3(-1.5, 0.0, -0.5), Point3(-0.5, 1.0, 0.5), red_material));
-
-            // Green metallic box
-            Material* green_metal = render_context.arena.Create<MetalMaterial>(Colour(0.3, 0.8, 0.3), 0.1);
-            render_context.scene.Add(render_context.arena.Create<AxisAlignedBox>(Point3(0.5, 0.0, -0.5), Point3(1.5, 1.5, 0.5), green_metal));
-
-            // Glass sphere
-            Material* glass_material = render_context.arena.Create<DielectricMaterial>(1.5);
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(-1.0, 1.35, 0.0), 0.35, glass_material));
-
-            // Silver metallic sphere
-            Material* silver_metal = render_context.arena.Create<MetalMaterial>(Colour(0.9, 0.9, 0.9), 0.0);
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(0.0, 0.4, 1.5), 0.4, silver_metal));
-
-            // Blue sphere
-            Texture* blue_texture = render_context.arena.Create<SolidColourTexture>(Colour(0.2, 0.2, 0.8));
-            Material* blue_material = render_context.arena.Create<LambertianMaterial>(blue_texture);
-            render_context.scene.Add(render_context.arena.Create<Sphere>(Point3(-2.0, 0.3, 1.0), 0.3, blue_material));
-
-            // Small gold metallic box
-            Material* gold_metal = render_context.arena.Create<MetalMaterial>(Colour(0.8, 0.6, 0.2), 0.3);
-            render_context.scene.Add(render_context.arena.Create<AxisAlignedBox>(Point3(1.8, 0.0, 1.0), Point3(2.3, 0.5, 1.5), gold_metal));
-            break;
-        }
-        case 7:
+        case 2:
         {
             // Uniform dense field: 10,000 objects mostly uniformly distributed
             CameraViewConfig view_config
@@ -476,7 +336,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             }
             break;
         }
-        case 8:
+        case 3:
         {
             // Sparse clusters in void: 5 clusters of 400 spheres in a very large bounding volume
             CameraViewConfig view_config
@@ -529,7 +389,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             }
             break;
         }
-        case 9:
+        case 4:
         {
             // Extreme size Variation: huge ground + backdrop spheres with tiny spheres
             CameraViewConfig view_config
@@ -569,7 +429,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             }
             break;
         }
-        case 10:
+        case 5:
         {
             // Long corridor: rings of spheres with box walls
             CameraViewConfig view_config
@@ -614,7 +474,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             render_context.scene.Add(render_context.arena.Create<AxisAlignedBox>(Point3(-8.0, -1.0, -1.0), Point3(-7.0, 12.0, 201.0), wall_material));
             break;
         }
-        case 11:
+        case 6:
         {
             // Centroid co-location: concentric spheres with identical centroids
             CameraViewConfig view_config
@@ -656,7 +516,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             }
             break;
         }
-        case 12:
+        case 7:
         {
             // Flat plane distribution: objects on a ground plane, almost 2D in distribution
             CameraViewConfig view_config
@@ -697,7 +557,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             }
             break;
         }
-        case 13:
+        case 8:
         {
             // Diagonal wall: objects placed along x=z diagonal
             CameraViewConfig view_config
@@ -739,7 +599,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             }
             break;
         }
-        case 14:
+        case 9:
         {
             // High object count: 12,000 objects randomly distributed
             CameraViewConfig view_config
@@ -776,7 +636,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
             }
             break;
         }
-        case 15:
+        case 10:
         {
             // Overlapping box city: boxes and spheres with a lot of overlap
             CameraViewConfig view_config
@@ -831,8 +691,8 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
         }
         default:
         {
-            // Default to scene 6
-            SetupScene(render_context, render_config, 6);
+            // Default to scene 1
+            SetupScene(render_context, render_config, 1);
             return;
         }
     }

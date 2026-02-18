@@ -15,7 +15,7 @@ public:
     std::size_t screen_width = 1280;
     std::size_t screen_height = 720;
     std::size_t samples_per_pixel = 100;
-    int scene = 5;
+    int scene = 1;
     uint32_t colour_seed = DEFAULT_COLOUR_SEED;
     uint32_t position_seed = DEFAULT_POSITION_SEED;
 };

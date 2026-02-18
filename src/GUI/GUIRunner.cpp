@@ -127,23 +127,18 @@ void GUIRunner::DrawSettingsUI()
     if (ImGui::CollapsingHeader("Render Settings", ImGuiTreeNodeFlags_DefaultOpen))
     {
         const char* scenes[] = {
-            "Scene 1 (Three spheres)",
-            "Scene 2 (Two large spheres)",
-            "Scene 3 (Glass refraction)",
-            "Scene 4 (Glass and checker)",
-            "Scene 5 (Three sphere clusters)",
-            "Scene 6 (Mixed geometry)",
-            "Scene 7 (Uniform dense field)",
-            "Scene 8 (Sparse clusters in void)",
-            "Scene 9 (Extreme size variation)",
-            "Scene 10 (Long corridor)",
-            "Scene 11 (Centroid co-location)",
-            "Scene 12 (Flat plane distribution)",
-            "Scene 13 (Diagonal wall)",
-            "Scene 14 (High object count)",
-            "Scene 15 (Overlapping box city)"
+            "Scene 1 (Three sphere clusters)",
+            "Scene 2 (Uniform dense field)",
+            "Scene 3 (Sparse clusters in void)",
+            "Scene 4 (Extreme size variation)",
+            "Scene 5 (Long corridor)",
+            "Scene 6 (Centroid co-location)",
+            "Scene 7 (Flat plane distribution)",
+            "Scene 8 (Diagonal wall)",
+            "Scene 9 (High object count)",
+            "Scene 10 (Overlapping box city)"
         };
-        ImGui::Combo("Scene", &m_scene_number, scenes, 15);
+        ImGui::Combo("Scene", &m_scene_number, scenes, 10);
         ImGui::InputInt("Width (px)", &m_render_width);
         ImGui::InputInt("Height (px)", &m_render_height);
         ImGui::InputInt("Samples per pixel", &m_samples_per_pixel);
