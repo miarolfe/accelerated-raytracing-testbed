@@ -8,6 +8,28 @@ from typing import List
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
+configurations = [
+    {"width": "200", "height": "100", "samples_per_pixel": "25"},
+    {"width": "400", "height": "200", "samples_per_pixel": "50"},
+    {"width": "800", "height": "400", "samples_per_pixel": "75"},
+    {"width": "1600", "height": "800", "samples_per_pixel": "100"},
+]
+
+scenes = [
+    ["Three sphere clusters", 1],
+    ["Uniform dense field", 2],
+    ["Sparse clusters in void", 3],
+    ["Extreme size variation", 4],
+    ["Long corridor", 5],
+    ["Centroid co-location", 6],
+    ["Flat plane distribution", 7],
+    ["Diagonal wall", 8],
+    ["High object count", 9],
+    ["Overlapping box city", 10],
+]
+
+NUM_SAMPLES = 10
+
 
 @dataclass
 class AccelerationStructureResults:
@@ -272,28 +294,6 @@ def calculate_render_test_result(
         calculate_render_test_one_structure_result(bounding_volume_hierarchy_results),
     )
 
-
-configurations = [
-    {"width": "32", "height": "32", "samples_per_pixel": "1"},
-    # {"width": "200", "height": "200", "samples_per_pixel": "50"},
-    #     {"width": "400", "height": "400", "samples_per_pixel": "50"},
-    #     {"width": "1920", "height": "1080", "samples_per_pixel": "10"},
-]
-
-scenes = [
-    ["Three sphere clusters", 1],
-    # ["Uniform dense field", 2],
-    # ["Sparse clusters in void", 3],
-    # ["Extreme size variation", 4],
-    # ["Long corridor", 5],
-    # ["Centroid co-location", 6],
-    # ["Flat plane distribution", 7],
-    # ["Diagonal wall", 8],
-    # ["High object count", 9],
-    # ["Overlapping box city", 10],
-]
-
-NUM_SAMPLES = 10
 
 build_return_code = os.system("cd .. && ./build.sh release headless")
 if build_return_code != 0:
