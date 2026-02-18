@@ -2,6 +2,7 @@
 #include <Acceleration/KDTree.h>
 
 #include <algorithm>
+#include <limits>
 
 #include <Core/TraversalStats.h>
 
@@ -12,19 +13,16 @@ KDTreeNode::KDTreeNode(std::vector<IRayHittable*>& objects)
     : m_allocator(nullptr), m_left(nullptr), m_right(nullptr)
 {
     // KD-tree has at most 2N-1 nodes for N objects
-    // Additional space needed for centroid arrays used in construction
-    const std::size_t node_space = (2 * objects.size()) * sizeof(KDTreeNode);
-    const std::size_t centroid_space = objects.size() * sizeof(double) * (MAX_DEPTH + 1);
-    const std::size_t arena_size = node_space + centroid_space;
+    const std::size_t arena_size = (2 * objects.size()) * sizeof(KDTreeNode);
     m_allocator = new ArenaAllocator(arena_size);
 
-    Create(objects.data(), objects.size(), 0, *m_allocator);
+    Create(objects.data(), objects.size(), *m_allocator);
 }
 
-KDTreeNode::KDTreeNode(IRayHittable** objects, std::size_t count, std::size_t depth, ArenaAllocator& allocator)
+KDTreeNode::KDTreeNode(IRayHittable** objects, std::size_t count, ArenaAllocator& allocator)
     : m_allocator(nullptr), m_left(nullptr), m_right(nullptr)
 {
-    Create(objects, count, depth, allocator);
+    Create(objects, count, allocator);
 }
 
 KDTreeNode::~KDTreeNode()
@@ -37,7 +35,7 @@ KDTreeNode::~KDTreeNode()
     }
 }
 
-void KDTreeNode::Create(IRayHittable** objects, std::size_t count, std::size_t depth, ArenaAllocator& allocator)
+void KDTreeNode::Create(IRayHittable** objects, std::size_t count, ArenaAllocator& allocator)
 {
     // Compute bounding box for all objects
     for (std::size_t object_index = 0; object_index < count; object_index++)
@@ -61,50 +59,149 @@ void KDTreeNode::Create(IRayHittable** objects, std::size_t count, std::size_t d
         return;
     }
 
-    // Reached max tree depth, split in half
-    if (depth >= MAX_DEPTH)
+    std::size_t split = SplitSAH(objects, count);
+
+    // If SAH split fails use fallback method
+    if (split == 0 || split >= count)
     {
-        const std::size_t mid = count / 2;
-        m_left = allocator.Create<KDTreeNode>(objects, mid, depth + 1, allocator);
-        m_right = allocator.Create<KDTreeNode>(objects + mid, count - mid, depth + 1, allocator);
-        return;
+        split = SplitLongestAxis(objects, count);
     }
 
-    // Split axis cycles through axes based on depth
-    m_split_axis = depth % 3;
+    m_left = allocator.Create<KDTreeNode>(objects, split, allocator);
+    m_right = allocator.Create<KDTreeNode>(objects + split, count - split, allocator);
+}
 
-    // Find median split position using centroids
-    double* centroids = static_cast<double*>(allocator.Alloc(count * sizeof(double), alignof(double)));
-    for (std::size_t object_index = 0; object_index < count; object_index++)
+std::size_t KDTreeNode::SplitSAH(IRayHittable** objects, std::size_t count)
+{
+    const double parent_node_surface_area = m_bounding_box.SurfaceArea();
+    const double leaf_cost = count * HITTABLE_INTERSECT_COST;
+
+    double best_cost = std::numeric_limits<double>::max();
+    double best_split_pos_along_best_axis = 0.0;
+    std::size_t best_axis = 0;
+
+    // Evaluate SAH for each axis
+    for (std::size_t axis = 0; axis < 3; axis++)
     {
-        const Interval interval = objects[object_index]->BoundingBox()[m_split_axis];
-        centroids[object_index] = 0.5 * (interval.m_min + interval.m_max);
+        double min_centroid = std::numeric_limits<double>::max();
+        double max_centroid = std::numeric_limits<double>::lowest();
+
+        for (std::size_t object_index = 0; object_index < count; object_index++)
+        {
+            const Interval interval = objects[object_index]->BoundingBox()[axis];
+            const double centroid = 0.5 * (interval.m_min + interval.m_max);
+            min_centroid = std::min(min_centroid, centroid);
+            max_centroid = std::max(max_centroid, centroid);
+        }
+
+        const double extent = max_centroid - min_centroid;
+        static constexpr double fp_tolerance = 1e-10;
+        if (extent < fp_tolerance)
+        {
+            continue;
+        }
+
+        // Assign objects to buckets
+        SplitBucket buckets[NUM_SAH_BUCKETS];
+        for (std::size_t object_index = 0; object_index < count; object_index++)
+        {
+            const Interval interval = objects[object_index]->BoundingBox()[axis];
+            const double centroid = 0.5 * (interval.m_min + interval.m_max);
+            std::size_t bucket_index = static_cast<std::size_t>(NUM_SAH_BUCKETS * ((centroid - min_centroid) / extent));
+            if (bucket_index >= NUM_SAH_BUCKETS)
+            {
+                bucket_index = NUM_SAH_BUCKETS - 1;
+            }
+            buckets[bucket_index].num_hittables++;
+            buckets[bucket_index].bounding_box = AABB(buckets[bucket_index].bounding_box, objects[object_index]->BoundingBox());
+        }
+
+        // Evaluate split positions
+        for (std::size_t split = 1; split < NUM_SAH_BUCKETS; split++)
+        {
+            AABB left_bounding_box;
+            AABB right_bounding_box;
+            std::size_t left_num_hittables = 0;
+            std::size_t right_num_hittables = 0;
+
+            for (std::size_t bucket_index = 0; bucket_index < split; bucket_index++)
+            {
+                if (buckets[bucket_index].num_hittables > 0)
+                {
+                    left_bounding_box = AABB(left_bounding_box, buckets[bucket_index].bounding_box);
+                    left_num_hittables += buckets[bucket_index].num_hittables;
+                }
+            }
+            for (std::size_t bucket_index = split; bucket_index < NUM_SAH_BUCKETS; bucket_index++)
+            {
+                if (buckets[bucket_index].num_hittables > 0)
+                {
+                    right_bounding_box = AABB(right_bounding_box, buckets[bucket_index].bounding_box);
+                    right_num_hittables += buckets[bucket_index].num_hittables;
+                }
+            }
+
+            if (left_num_hittables == 0 || right_num_hittables == 0)
+            {
+                continue;
+            }
+
+            const double cost_of_left_subtree = (left_bounding_box.SurfaceArea() / parent_node_surface_area) * left_num_hittables * HITTABLE_INTERSECT_COST;
+            const double cost_of_right_subtree = (right_bounding_box.SurfaceArea() / parent_node_surface_area) * right_num_hittables * HITTABLE_INTERSECT_COST;
+            const double total_cost = NODE_TRAVERSAL_COST + cost_of_left_subtree + cost_of_right_subtree;
+
+            if (total_cost < best_cost)
+            {
+                best_cost = total_cost;
+                best_axis = axis;
+                best_split_pos_along_best_axis = min_centroid + (split * extent / NUM_SAH_BUCKETS);
+            }
+        }
     }
-    std::sort(centroids, centroids + count);
 
-    m_split_position_along_split_axis = centroids[count / 2];
+    // No worthwhile split found
+    if (best_cost >= leaf_cost)
+    {
+        return 0;
+    }
 
-    // Partition objects on split position
+    // Record split axis and position for traversal
+    m_split_axis = best_axis;
+    m_split_position_along_split_axis = best_split_pos_along_best_axis;
+
+    // Partition objects at the best split position
     IRayHittable** mid = std::partition
     (
         objects, objects + count,
-        [this](IRayHittable* obj)
+        [best_axis, best_split_pos_along_best_axis](IRayHittable* obj)
         {
-            const Interval interval = obj->BoundingBox()[m_split_axis];
-            return (0.5 * (interval.m_min + interval.m_max)) < m_split_position_along_split_axis;
+            const Interval interval = obj->BoundingBox()[best_axis];
+            return 0.5 * (interval.m_min + interval.m_max) < best_split_pos_along_best_axis;
         }
     );
 
-    std::size_t split_index = static_cast<std::size_t>(mid - objects);
+    const std::size_t split_index = static_cast<std::size_t>(mid - objects);
+    return split_index;
+}
 
-    // If all objects are on side of the split, fallback to middle division
-    if (split_index == 0 || split_index >= count)
+std::size_t KDTreeNode::SplitLongestAxis(IRayHittable** objects, std::size_t count)
+{
+    const std::size_t axis = m_bounding_box.LongestAxis();
+    m_split_axis = axis;
+
+    std::sort(objects, objects + count, [axis](IRayHittable* a, IRayHittable* b)
     {
-        split_index = count / 2;
-    }
+        const Interval a_interval = a->BoundingBox()[axis];
+        const Interval b_interval = b->BoundingBox()[axis];
+        // Cheaper but equivalent for sorting comparison to comparing (2 * a_centroid) to (2 * b_centroid)
+        return (a_interval.m_min + a_interval.m_max) < (b_interval.m_min + b_interval.m_max);
+    });
 
-    m_left = allocator.Create<KDTreeNode>(objects, split_index, depth + 1, allocator);
-    m_right = allocator.Create<KDTreeNode>(objects + split_index, count - split_index, depth + 1, allocator);
+    const std::size_t split_index = count / 2;
+    const Interval mid_interval = objects[split_index]->BoundingBox()[axis];
+    m_split_position_along_split_axis = 0.5 * (mid_interval.m_min + mid_interval.m_max);
+
+    return split_index;
 }
 
 bool KDTreeNode::Hit(const Ray& ray, Interval ray_t, RayHitResult& out_result) const
