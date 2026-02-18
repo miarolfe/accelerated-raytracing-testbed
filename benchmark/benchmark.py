@@ -14,6 +14,7 @@ configurations = [
     {"width": "800", "height": "400", "samples_per_pixel": "75"},
     {"width": "1600", "height": "800", "samples_per_pixel": "100"},
     {"width": "3200", "height": "1600", "samples_per_pixel": "125"},
+    {"width": "3840", "height": "2160", "samples_per_pixel": "500"},
 ]
 
 scenes = [
