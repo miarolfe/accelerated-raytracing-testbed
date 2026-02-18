@@ -86,20 +86,7 @@ void LogRenderStats(const RenderStats& stats)
         << "Construction time: " << stats.m_construction_time_ms << " ms, "
         << "Render time: " << stats.m_render_time_ms << " ms, "
         << "Total time: " << stats.TotalTimeMilliseconds() << " ms, "
-        << "Memory used: ";
-
-    if (stats.m_memory_used_bytes >= ONE_MEGABYTE)
-    {
-        output_string_stream << static_cast<double>(stats.m_memory_used_bytes) / ONE_MEGABYTE << " MB";
-    }
-    else if (stats.m_memory_used_bytes >= ONE_KILOBYTE)
-    {
-        output_string_stream << static_cast<double>(stats.m_memory_used_bytes) / ONE_KILOBYTE << " KB";
-    }
-    else
-    {
-        output_string_stream << stats.m_memory_used_bytes << " B";
-    }
+        << "Memory used: " << stats.m_memory_used_bytes << " B, ";
 
     output_string_stream << ", Avg nodes/ray: " << stats.m_traversal_stats.AvgNodesTraversedPerRay()
         << ", Avg intersection tests/ray: " << stats.m_traversal_stats.AvgIntersectionTestsPerRay();
