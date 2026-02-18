@@ -1,6 +1,7 @@
 // Copyright Mia Rolfe. All rights reserved.
 #pragma once
 
+#include <Acceleration/SplitBucket.h>
 #include <Core/ArenaAllocator.h>
 #include <Core/Common.h>
 #include <Maths/Interval.h>
@@ -10,13 +11,6 @@
 
 namespace ART
 {
-
-struct SplitBucket
-{
-public:
-    AABB bounding_box;
-    std::size_t num_hittables = 0;
-};
 
 class BVHNode : public IRayHittable
 {
