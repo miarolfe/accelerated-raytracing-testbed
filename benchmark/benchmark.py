@@ -29,7 +29,7 @@ scenes = [
     ["Overlapping box city", 10],
 ]
 
-NUM_SAMPLES = 1
+NUM_SAMPLES = 10
 
 
 @dataclass
