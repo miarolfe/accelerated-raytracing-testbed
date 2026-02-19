@@ -9,12 +9,12 @@ from typing import List
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 configurations = [
-    {"width": "200", "height": "100", "samples_per_pixel": "25"},
+    # {"width": "200", "height": "100", "samples_per_pixel": "25"},
     {"width": "400", "height": "200", "samples_per_pixel": "50"},
     {"width": "800", "height": "400", "samples_per_pixel": "75"},
     {"width": "1600", "height": "800", "samples_per_pixel": "100"},
-    {"width": "3200", "height": "1600", "samples_per_pixel": "125"},
-    {"width": "3840", "height": "2160", "samples_per_pixel": "500"},
+    # {"width": "3200", "height": "1600", "samples_per_pixel": "125"},
+    # {"width": "3840", "height": "2160", "samples_per_pixel": "500"},
 ]
 
 scenes = [
