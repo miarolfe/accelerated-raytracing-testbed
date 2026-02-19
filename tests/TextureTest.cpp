@@ -154,7 +154,7 @@ TEST_CASE("CheckerTexture with negative coordinates", "[Texture]")
 
 TEST_CASE("ImageTexture returns fallback colour when image fails to load", "[Texture]")
 {
-    const ImageTexture t("no_image_here.png");
+    const ImageTexture t("__does_not_exist__/no_image_here.png");
 
     const Colour result = t.Value(0.5, 0.5, Point3(0.0, 0.0, 0.0));
 
