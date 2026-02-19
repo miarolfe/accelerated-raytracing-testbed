@@ -15,6 +15,7 @@ Image::Image()
 }
 
 Image::Image(const char* file_name)
+    : m_image_width(0), m_image_height(0)
 {
     const std::string image_file_name(file_name);
 
