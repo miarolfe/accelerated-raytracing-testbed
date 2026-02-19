@@ -81,7 +81,10 @@ Vec3Int& Vec3Int::operator*=(int t)
 
 Vec3Int& Vec3Int::operator/=(int t)
 {
-    return *this *= static_cast<int>(1.0 / t);
+    m_x /= t;
+    m_y /= t;
+    m_z /= t;
+    return *this;
 }
 
 double Vec3Int::Length() const
@@ -102,6 +105,36 @@ std::string Vec3Int::ToString() const
 Vec3Int Vec3Int::Random(int min, int max)
 {
     return static_cast<int32_t>(RandomDouble(min, max + 1.0));
+}
+
+Vec3Int operator+(const Vec3Int& vec1, const Vec3Int& vec2)
+{
+    return Vec3Int(vec1.m_x + vec2.m_x, vec1.m_y + vec2.m_y, vec1.m_z + vec2.m_z);
+}
+
+Vec3Int operator-(const Vec3Int& vec1, const Vec3Int& vec2)
+{
+    return Vec3Int(vec1.m_x - vec2.m_x, vec1.m_y - vec2.m_y, vec1.m_z - vec2.m_z);
+}
+
+Vec3Int operator*(const Vec3Int& vec1, const Vec3Int& vec2)
+{
+    return Vec3Int(vec1.m_x * vec2.m_x, vec1.m_y * vec2.m_y, vec1.m_z * vec2.m_z);
+}
+
+Vec3Int operator*(const Vec3Int& vec, int t)
+{
+    return Vec3Int(vec.m_x * t, vec.m_y * t, vec.m_z * t);
+}
+
+Vec3Int operator*(int t, const Vec3Int& vec)
+{
+    return vec * t;
+}
+
+Vec3Int operator/(const Vec3Int& vec, int t)
+{
+    return Vec3Int(vec.m_x / t, vec.m_y / t, vec.m_z / t);
 }
 
 } // namespace ART

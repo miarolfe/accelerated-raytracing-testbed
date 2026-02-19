@@ -35,6 +35,36 @@ TEST_CASE("Ray constructor", "[Ray]")
     REQUIRE(ray.m_direction.m_z == Approx(6.0));
 }
 
+TEST_CASE("Ray inverse direction is precomputed correctly", "[Ray]")
+{
+    SECTION("Positive direction components")
+    {
+        const Ray ray(Point3(0.0, 0.0, 0.0), Vec3(2.0, 4.0, 0.5));
+
+        REQUIRE(ray.m_inverse_direction.m_x == Approx(0.5));
+        REQUIRE(ray.m_inverse_direction.m_y == Approx(0.25));
+        REQUIRE(ray.m_inverse_direction.m_z == Approx(2.0));
+    }
+
+    SECTION("Negative direction components")
+    {
+        const Ray ray(Point3(0.0, 0.0, 0.0), Vec3(-1.0, -2.0, -0.5));
+
+        REQUIRE(ray.m_inverse_direction.m_x == Approx(-1.0));
+        REQUIRE(ray.m_inverse_direction.m_y == Approx(-0.5));
+        REQUIRE(ray.m_inverse_direction.m_z == Approx(-2.0));
+    }
+
+    SECTION("Zero direction component produces infinity")
+    {
+        const Ray ray(Point3(0.0, 0.0, 0.0), Vec3(1.0, 0.0, 1.0));
+
+        REQUIRE(ray.m_inverse_direction.m_x == Approx(1.0));
+        REQUIRE(std::isinf(ray.m_inverse_direction.m_y));
+        REQUIRE(ray.m_inverse_direction.m_z == Approx(1.0));
+    }
+}
+
 TEST_CASE("Ray At(t) returns correct point along ray", "[Ray]")
 {
     const Point3 origin(1.0, 2.0, 3.0);

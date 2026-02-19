@@ -43,6 +43,7 @@ Colour ImageTexture::Value(double u, double v, const Point3& point) const
 {
     if (m_image.Width() <= 0)
 	{
+	    // Cyan
 		return Colour(0.0, 1.0, 1.0);
 	}
 
