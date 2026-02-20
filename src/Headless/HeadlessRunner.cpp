@@ -143,13 +143,13 @@ void HeadlessRunner::Init()
 
     LogRenderConfig(m_camera_render_config, m_scene_number);
 
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::NONE, m_colour_seed, m_position_seed);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::UNIFORM_GRID, m_colour_seed, m_position_seed);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::HIERARCHICAL_UNIFORM_GRID, m_colour_seed, m_position_seed);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::OCTREE, m_colour_seed, m_position_seed);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BSP_TREE, m_colour_seed, m_position_seed);
+    // RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::NONE, m_colour_seed, m_position_seed);
+    // RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::UNIFORM_GRID, m_colour_seed, m_position_seed);
+    // RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::HIERARCHICAL_UNIFORM_GRID, m_colour_seed, m_position_seed);
+    // RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::OCTREE, m_colour_seed, m_position_seed);
+    // RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BSP_TREE, m_colour_seed, m_position_seed);
     RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::K_D_TREE, m_colour_seed, m_position_seed);
-    RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BOUNDING_VOLUME_HIERARCHY, m_colour_seed, m_position_seed);
+    // RenderScene(m_camera_render_config, m_scene_number, AccelerationStructure::BOUNDING_VOLUME_HIERARCHY, m_colour_seed, m_position_seed);
 }
 
 void HeadlessRunner::Shutdown()
