@@ -208,7 +208,7 @@ void SetupScene(RenderContext& render_context, const CameraRenderConfig& render_
     SeedColourRNG(colour_seed);
     SeedPositionRNG(position_seed);
 
-    render_context.scene_config = SceneConfig{Colour(0.7, 0.8, 1.0)};
+    render_context.scene_config = SceneConfig{0.8 * Colour(0.2, 0.2, 0.6)};
 
     switch (scene_number)
     {
