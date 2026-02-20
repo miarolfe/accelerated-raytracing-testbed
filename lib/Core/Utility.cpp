@@ -50,14 +50,15 @@ double RenderStats::TotalTimeMilliseconds() const
 void Init()
 {
 #if defined(_MSC_VER)
+    kmp_set_blocktime(0);
+
     std::size_t num_openmp_threads = std::thread::hardware_concurrency();
+    
     if (num_openmp_threads <= 0)
     {
         num_openmp_threads = 1;
     }
     omp_set_num_threads(static_cast<int>(num_openmp_threads));
-
-    Logger::Get().LogInfo("Using " + std::to_string(num_openmp_threads) + " threads for render");
 #endif // defined(_MSC_VER)
 }
 
