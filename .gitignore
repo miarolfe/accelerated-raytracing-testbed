@@ -51,8 +51,10 @@ build/build_files
 build/Makefile
 build/obj
 
+benchmark/graphs
 benchmark/results
 benchmark/*.png
+.venv
 
 # Program output
 render.png
