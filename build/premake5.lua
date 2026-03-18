@@ -27,45 +27,6 @@ platforms { "x64", "ARM64" }
 
 defaultplatform "x64"
 
-filter { "toolset:gcc or toolset:clang" }
-    buildoptions {
-        "-Werror",
-        "-Wredundant-decls",
-        "-Wcast-align",
-        "-Wno-sign-conversion",
-        "-Wdouble-promotion",
-        "-Wno-unused-parameter",
-        "-Wno-unused-function",
-        "-Wuninitialized",
-        "-pedantic",
-        "-fopenmp"
-    }
-
-    linkoptions {
-        "-fopenmp"
-    }
-
-filter {}
-
-filter { "system:windows" }
-    defines { "_CRT_SECURE_NO_WARNINGS" }
-
-filter { "toolset:msc" }
-    buildoptions {
-        "/W4",
-        "/WX",
-        "/permissive-",
-        "/openmp",
-        "/MP",
-    }
-
-    linkoptions {
-        "/openmp",
-        "/MP",
-    }
-
-filter {}
-
 filter "configurations:Debug_*"
     defines { "DEBUG" }
     symbols "On"
@@ -98,6 +59,35 @@ project(workspaceName)
     location "./"
     targetdir "../bin/%{cfg.buildcfg}"
 
+    filter { "system:windows" }
+        defines { "_CRT_SECURE_NO_WARNINGS" }
+        buildoptions {
+            -- "/W4",
+            -- "/WX",
+            "/permissive-",
+            "/openmp:llvm",
+            "/MP",
+        }
+
+    filter { "system:linux" }
+        buildoptions {
+            "-Werror",
+            "-Wredundant-decls",
+            "-Wcast-align",
+            "-Wno-sign-conversion",
+            "-Wdouble-promotion",
+            "-Wno-unused-parameter",
+            "-Wno-unused-function",
+            "-Wuninitialized",
+            "-pedantic",
+            "-fopenmp"
+        }
+        linkoptions {
+            "-fopenmp"
+        }
+
+    filter {}
+
     files {
         path.getdirectory(os.getcwd()) .. "/external/stb/**.cpp",
         path.getdirectory(os.getcwd()) .. "/external/stb/**.h",
@@ -106,110 +96,110 @@ project(workspaceName)
         path.getdirectory(os.getcwd()) .. "/include/**.h",
     }
 
-filter { "configurations:*_GUI" }
-    files {
-        path.getdirectory(os.getcwd()) .. "/external/imgui/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/external/imgui/**.h",
-    }
+    filter { "configurations:*_GUI" }
+        files {
+            path.getdirectory(os.getcwd()) .. "/external/imgui/**.cpp",
+            path.getdirectory(os.getcwd()) .. "/external/imgui/**.h",
+        }
 
-filter {}
+    filter {}
 
-filter { "files:**/external/**", "toolset:msc" }
-    disablewarnings { "4100", "4244", "4267", "4389", "4505" }
+    filter { "files:**/external/**", "system:windows" }
+        disablewarnings { "4100", "4244", "4267", "4389", "4505" }
 
-filter { "files:**/external/**", "toolset:gcc or toolset:clang" }
-    buildoptions { "-w", "-Wno-error" }
+    filter { "files:**/external/**", "system:linux" }
+        buildoptions { "-w", "-Wno-error" }
 
-filter {}
-
-externalincludedirs {
-    path.getdirectory(os.getcwd()) .. "/external",
-    path.getdirectory(os.getcwd()) .. "/lib",
-    path.getdirectory(os.getcwd()) .. "/lib/foundation",
-    path.getdirectory(os.getcwd()) .. "/lib/math",
-    path.getdirectory(os.getcwd()) .. "/lib/geometry",
-    path.getdirectory(os.getcwd()) .. "/lib/materials",
-    path.getdirectory(os.getcwd()) .. "/lib/raytracing",
-    path.getdirectory(os.getcwd()) .. "/lib/acceleration",
-    path.getdirectory(os.getcwd()) .. "/include",
-}
-
-filter { "configurations:*_GUI" }
-    externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/external/imgui/",
-        path.getdirectory(os.getcwd()) .. "/external/SDL3/include",
-    }
-
-filter {}
-
-filter { "system:windows", "platforms:x64", "configurations:*_GUI" }
-    libdirs { path.getdirectory(os.getcwd()) .. "/external/SDL3/lib/windows/x64" }
-    links { "SDL3" }
-    postbuildcommands {
-        '{COPYFILE} "%{wks.location}/external/SDL3/lib/windows/x64/SDL3.dll" "%{cfg.targetdir}"'
-    }
-
-filter { "system:windows", "platforms:ARM64", "configurations:*_GUI" }
-    libdirs { path.getdirectory(os.getcwd()) .. "/external/SDL3/lib/windows/arm64" }
-    links { "SDL3" }
-    postbuildcommands {
-        '{COPYFILE} "%{wks.location}/external/SDL3/lib/windows/arm64/SDL3.dll" "%{cfg.targetdir}"'
-    }
-
-filter { "system:linux", "configurations:*_GUI" }
-    links { "SDL3" }
-
-filter {}
-
-filter { "configurations:Debug_* or Release_*" }
-    files {
-        path.getdirectory(os.getcwd()) .. "/src/ART.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/Common/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/Common/**.h",
-    }
+    filter {}
 
     externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/src",
-        path.getdirectory(os.getcwd()) .. "/src/Common",
+        path.getdirectory(os.getcwd()) .. "/external",
+        path.getdirectory(os.getcwd()) .. "/lib",
+        path.getdirectory(os.getcwd()) .. "/lib/foundation",
+        path.getdirectory(os.getcwd()) .. "/lib/math",
+        path.getdirectory(os.getcwd()) .. "/lib/geometry",
+        path.getdirectory(os.getcwd()) .. "/lib/materials",
+        path.getdirectory(os.getcwd()) .. "/lib/raytracing",
+        path.getdirectory(os.getcwd()) .. "/lib/acceleration",
+        path.getdirectory(os.getcwd()) .. "/include",
     }
 
-filter {}
+    filter { "configurations:*_GUI" }
+        externalincludedirs {
+            path.getdirectory(os.getcwd()) .. "/external/imgui/",
+            path.getdirectory(os.getcwd()) .. "/external/SDL3/include",
+        }
 
-filter { "configurations:*_GUI" }
-    files {
-        path.getdirectory(os.getcwd()) .. "/src/GUI/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/GUI/**.h",
-    }
+    filter {}
 
-    externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/src/GUI",
-    }
+    filter { "system:windows", "platforms:x64", "configurations:*_GUI" }
+        libdirs { path.getdirectory(os.getcwd()) .. "/external/SDL3/lib/windows/x64" }
+        links { "SDL3" }
+        postbuildcommands {
+            '{COPYFILE} "%{wks.location}/external/SDL3/lib/windows/x64/SDL3.dll" "%{cfg.targetdir}"'
+        }
 
-filter {}
+    filter { "system:windows", "platforms:ARM64", "configurations:*_GUI" }
+        libdirs { path.getdirectory(os.getcwd()) .. "/external/SDL3/lib/windows/arm64" }
+        links { "SDL3" }
+        postbuildcommands {
+            '{COPYFILE} "%{wks.location}/external/SDL3/lib/windows/arm64/SDL3.dll" "%{cfg.targetdir}"'
+        }
 
-filter { "configurations:*_Headless" }
-    files {
-        path.getdirectory(os.getcwd()) .. "/src/Headless/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/src/Headless/**.h",
-    }
+    filter { "system:linux", "configurations:*_GUI" }
+        links { "SDL3" }
 
-    externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/src/Headless",
-    }
+    filter {}
 
-filter {}
+    filter { "configurations:Debug_* or Release_*" }
+        files {
+            path.getdirectory(os.getcwd()) .. "/src/ART.cpp",
+            path.getdirectory(os.getcwd()) .. "/src/Common/**.cpp",
+            path.getdirectory(os.getcwd()) .. "/src/Common/**.h",
+        }
 
-filter { "configurations:Test" }
-    files {
-        path.getdirectory(os.getcwd()) .. "/tests/**.cpp",
-        path.getdirectory(os.getcwd()) .. "/tests/**.h",
-    }
+        externalincludedirs {
+            path.getdirectory(os.getcwd()) .. "/src",
+            path.getdirectory(os.getcwd()) .. "/src/Common",
+        }
 
-    externalincludedirs {
-        path.getdirectory(os.getcwd()) .. "/tests"
-    }
+    filter {}
 
-filter {}
+    filter { "configurations:*_GUI" }
+        files {
+            path.getdirectory(os.getcwd()) .. "/src/GUI/**.cpp",
+            path.getdirectory(os.getcwd()) .. "/src/GUI/**.h",
+        }
 
-cdialect "C17"
-cppdialect "C++17"
+        externalincludedirs {
+            path.getdirectory(os.getcwd()) .. "/src/GUI",
+        }
+
+    filter {}
+
+    filter { "configurations:*_Headless" }
+        files {
+            path.getdirectory(os.getcwd()) .. "/src/Headless/**.cpp",
+            path.getdirectory(os.getcwd()) .. "/src/Headless/**.h",
+        }
+
+        externalincludedirs {
+            path.getdirectory(os.getcwd()) .. "/src/Headless",
+        }
+
+    filter {}
+
+    filter { "configurations:Test" }
+        files {
+            path.getdirectory(os.getcwd()) .. "/tests/**.cpp",
+            path.getdirectory(os.getcwd()) .. "/tests/**.h",
+        }
+
+        externalincludedirs {
+            path.getdirectory(os.getcwd()) .. "/tests"
+        }
+
+    filter {}
+
+    cdialect "C17"
+    cppdialect "C++17"
